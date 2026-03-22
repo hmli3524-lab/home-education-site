@@ -392,6 +392,7 @@
 </div>
 <div class="bottom-spacer"></div>
 
+<script src="../db.js"></script>
 <script>
 const TASK_ICONS = {"Math":"🔢","Reading":"📰","Books":"📚","Vocab":"📖","Writing":"✍️","Project":"🛠️"};
 function iconFor(label) {
@@ -601,8 +602,11 @@ function saveAll() {
   setTimeout(() => m.textContent = "", 3000);
 }
 
-setInterval(() => saveState(state), 30000);
-render();
+_dbReady.then(function() {
+  state = loadState();
+  render();
+  setInterval(() => saveState(state), 30000);
+});
 </script>
 </body>
 </html>

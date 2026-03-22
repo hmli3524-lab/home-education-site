@@ -244,6 +244,7 @@
 </div>
 <div class="bottom-spacer"></div>
 
+<script src="../db.js"></script>
 <script>
 const TASK_ICONS = {"Coding":"💻","Reading":"📰","Books":"📚","Vocab":"📖","Writing":"✍️","Project":"🛠️","Wonder":"🌐","App":"💻"};
 function iconFor(label) { for (const [k,v] of Object.entries(TASK_ICONS)) { if (label.includes(k)) return v; } return "▪️"; }
@@ -436,8 +437,11 @@ function saveAll() {
   m.textContent = `✅ Saved ${new Date().toLocaleTimeString()}`;
   setTimeout(() => m.textContent = "", 3000);
 }
-setInterval(() => saveState(state), 30000);
-render();
+_dbReady.then(function() {
+  state = loadState();
+  render();
+  setInterval(() => saveState(state), 30000);
+});
 </script>
 </body>
 </html>
