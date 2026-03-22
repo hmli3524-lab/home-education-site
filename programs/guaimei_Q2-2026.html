@@ -365,7 +365,7 @@ function render() {
         t.subs.forEach((s, si) => {
           const sk = `w${w.week}_t${ti}_s${si}`;
           const sd = state[sk] || false;
-          h += `<div class="sub-task${sd?" done":""}"><input type="checkbox" id="${sk}" ${sd?"checked":""} onchange="toggleSub('${sk}',${w.week},${ti})"><span>${s}</span></div>`;
+          h += `<div class="sub-task${sd?" done":""}"><input type="checkbox" id="${sk}" ${sd?"checked":""} onchange="toggleSub('${sk}',${w.week},${ti})"><span>${s.replace(/<a /g,'<a target="_blank" ')}</span></div>`;
         });
         h += `</div>`;
       }
