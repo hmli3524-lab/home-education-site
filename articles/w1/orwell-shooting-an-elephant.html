@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shooting an Elephant — George Orwell</title>
+<style>
+  :root {
+    --bg: #2b2d31;
+    --surface: #313338;
+    --card: #383a40;
+    --accent: #e8555a;
+    --accent2: #9b6dd7;
+    --gold: #e0a82e;
+    --text: #e0e0e0;
+    --muted: #999;
+    --green: #57d9a3;
+    --teal: #4ecdc4;
+    --border: #44464d;
+    --shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+  }
+
+  /* === Top Bar === */
+  .top-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+  }
+  .back-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--teal);
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .back-btn:hover { background: var(--border); }
+  .top-meta {
+    font-size: 0.85em;
+    color: var(--muted);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .top-meta .tag {
+    background: rgba(155,109,215,0.15);
+    color: var(--accent2);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+  }
+  .reader-name {
+    margin-left: auto;
+    background: var(--accent2);
+    color: #fff;
+    padding: 5px 16px;
+    border-radius: 8px;
+    font-size: 0.88em;
+    font-weight: 700;
+  }
+
+  /* === Two-Column Grid Layout === */
+  .page-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .article-column {
+    padding: 40px 32px 80px;
+    min-width: 0;
+  }
+  .sidebar-column {
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+  }
+  .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .sidebar-tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .sidebar-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .sidebar-tab:hover:not(.active) { color: var(--text); }
+  .sidebar-content { flex: 1; overflow-y: auto; padding: 16px; }
+  .sidebar-panel { display: none; }
+  .sidebar-panel.active { display: block; }
+
+  @media (max-width: 900px) {
+    .page-grid { grid-template-columns: 1fr; }
+    .sidebar-column { position: static; height: auto; border-left: none; border-top: 2px solid var(--border); }
+  }
+
+  /* === Article === */
+  .article-header {
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .article-header h1 {
+    font-size: 2em;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+  .article-header .author {
+    font-size: 1.05em;
+    color: var(--accent2);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .article-header .pub-info {
+    font-size: 0.9em;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .guide-box {
+    background: rgba(78,205,196,0.08);
+    border: 1px solid rgba(78,205,196,0.25);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 32px;
+  }
+  .guide-box h3 {
+    color: var(--teal);
+    font-size: 0.95em;
+    margin-bottom: 8px;
+  }
+  .guide-box p {
+    font-size: 0.92em;
+    line-height: 1.7;
+  }
+  .guide-box .tip {
+    margin-top: 10px;
+    font-size: 0.88em;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .essay-text {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  .essay-text p {
+    margin-bottom: 1.4em;
+    font-size: 1.02em;
+    text-align: justify;
+  }
+
+  .source-note {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82em;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .source-note a { color: var(--muted); }
+
+  /* === Vocab Popup === */
+  #vocab-popup {
+    display: none;
+    position: fixed;
+    z-index: 200;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    padding: 16px 18px;
+    max-width: 340px;
+    min-width: 240px;
+  }
+  #vocab-popup .popup-word {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 4px;
+  }
+  #vocab-popup .popup-phonetic {
+    font-size: 0.82em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  #vocab-popup .popup-def {
+    font-size: 0.9em;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  #vocab-popup .popup-loading {
+    color: var(--muted);
+    font-size: 0.9em;
+    padding: 8px 0;
+  }
+  #vocab-popup .popup-error {
+    color: var(--accent);
+    font-size: 0.88em;
+    margin-bottom: 8px;
+  }
+  #vocab-popup .popup-manual {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.88em;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    resize: none;
+  }
+  #vocab-popup .popup-manual:focus { border-color: var(--teal); outline: none; }
+  #vocab-popup .popup-btns {
+    display: flex;
+    gap: 8px;
+  }
+  #vocab-popup .popup-btns button {
+    flex: 1;
+    padding: 7px 10px;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.82em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  #vocab-popup .popup-btns button:hover { opacity: 0.85; }
+  .btn-add { background: var(--accent2); color: #fff; }
+  .btn-added { background: var(--green) !important; color: #1a1a1a !important; }
+  #vocab-popup .popup-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.1em;
+    cursor: pointer;
+    line-height: 1;
+  }
+  #vocab-popup .popup-close:hover { color: var(--text); }
+  #vocab-popup .popup-exists {
+    font-size: 0.82em;
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* === Questions (in sidebar) === */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .question-card .q-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .q-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #1a1a1a;
+    flex-shrink: 0;
+  }
+  .q-badge-1 { background: var(--teal); }
+  .q-badge-2 { background: var(--gold); }
+  .q-badge-3 { background: var(--accent); color: #fff; }
+  .q-label {
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .q-label-1 { color: var(--teal); }
+  .q-label-2 { color: var(--gold); }
+  .q-label-3 { color: var(--accent); }
+  .q-text {
+    font-size: 0.95em;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .question-card textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.92em;
+    padding: 12px 14px;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.7;
+  }
+  .question-card textarea:focus { border-color: var(--teal); outline: none; }
+  .question-card textarea::placeholder { color: #555; }
+  .q-save-indicator {
+    font-size: 0.8em;
+    color: var(--green);
+    margin-top: 6px;
+    min-height: 18px;
+  }
+
+  /* === Vocab Panel (in sidebar) === */
+  .vocab-instruction {
+    font-size: 0.88em;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    background: rgba(78,205,196,0.06);
+    border-radius: 8px;
+    line-height: 1.6;
+  }
+  .vocab-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .vocab-entry:last-child { border-bottom: none; }
+  .vocab-entry .v-word {
+    font-weight: 700;
+    color: var(--teal);
+    min-width: 80px;
+    font-size: 0.92em;
+  }
+  .vocab-entry .v-def {
+    font-size: 0.88em;
+    color: var(--muted);
+    flex: 1;
+    line-height: 1.5;
+  }
+  .vocab-entry .v-remove {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 1em;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+  .vocab-entry .v-remove:hover { color: #ff7777; }
+  .vocab-empty {
+    padding: 16px 4px;
+    font-size: 0.88em;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .vocab-count-badge {
+    font-size: 0.82em;
+    color: var(--teal);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  /* === Bottom Bar === */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
+    font-size: 0.88em;
+  }
+  .bottom-bar .stat { color: var(--muted); }
+  .bottom-bar .stat strong { color: var(--teal); }
+  .done-btn {
+    background: var(--teal);
+    color: #1a1a1a;
+    border: none;
+    padding: 6px 24px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .done-btn:hover { opacity: 0.9; }
+  .done-btn.completed { background: var(--green); }
+  .reopen-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 6px 16px; border-radius: 6px; font-family: inherit; font-size: 0.82em; cursor: pointer; }
+  .reopen-btn:hover { color: var(--text); border-color: var(--text); }
+  .done-msg { color: var(--green); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .article-header h1 { font-size: 1.5em; }
+    .article-column { padding: 24px 16px 80px; }
+    .top-bar { padding: 10px 14px; gap: 10px; }
+    .reader-name { margin-left: 0; }
+    #vocab-popup { max-width: 90vw; }
+    .vocab-entry .v-word { min-width: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-btn" onclick="history.back()">← Back to Plan</a>
+  <div class="top-meta">
+    <span class="tag">Week 1</span>
+    <span>Essay · ~3,500 words · ~20 min</span>
+  </div>
+  <div class="reader-name" id="reader-name"></div>
+</div>
+
+<div class="page-grid">
+
+  <!-- Left Column: Article -->
+  <div class="article-column">
+
+    <div class="article-header">
+      <h1>Shooting an Elephant</h1>
+      <div class="author">George Orwell</div>
+      <div class="pub-info">
+        <span>First published in <em>New Writing</em>, Autumn 1936</span>
+        <span>Source: Orwell Foundation</span>
+      </div>
+    </div>
+
+    <div class="guide-box">
+      <h3>Before You Read</h3>
+      <p>This essay describes a single incident from Orwell's time as a colonial police officer in Burma. It seems like a simple story — but Orwell is really writing about something much bigger. Read slowly. Pay attention to moments where Orwell says one thing but feels another.</p>
+      <p class="tip">Tip: Select any unfamiliar word to look it up and save it to your vocabulary list.</p>
+    </div>
+
+    <div class="essay-text" id="essay-text">
+
+<p>In Moulmein, in lower Burma, I was hated by large numbers of people – the only time in my life that I have been important enough for this to happen to me. I was sub-divisional police officer of the town, and in an aimless, petty kind of way anti-European feeling was very bitter. No one had the guts to raise a riot, but if a European woman went through the bazaars alone somebody would probably spit betel juice over her dress. As a police officer I was an obvious target and was baited whenever it seemed safe to do so. When a nimble Burman tripped me up on the football field and the referee (another Burman) looked the other way, the crowd yelled with hideous laughter. This happened more than once. In the end the sneering yellow faces of young men that met me everywhere, the insults hooted after me when I was at a safe distance, got badly on my nerves. The young Buddhist priests were the worst of all. There were several thousands of them in the town and none of them seemed to have anything to do except stand on street corners and jeer at Europeans.</p>
+
+<p>All this was perplexing and upsetting. For at that time I had already made up my mind that imperialism was an evil thing and the sooner I chucked up my job and got out of it the better. Theoretically – and secretly, of course – I was all for the Burmese and all against their oppressors, the British. As for the job I was doing, I hated it more bitterly than I can perhaps make clear. In a job like that you see the dirty work of Empire at close quarters. The wretched prisoners huddling in the stinking cages of the lock-ups, the grey, cowed faces of the long-term convicts, the scarred buttocks of the men who had been Bogged with bamboos – all these oppressed me with an intolerable sense of guilt. But I could get nothing into perspective. I was young and ill-educated and I had had to think out my problems in the utter silence that is imposed on every Englishman in the East. I did not even know that the British Empire is dying, still less did I know that it is a great deal better than the younger empires that are going to supplant it. All I knew was that I was stuck between my hatred of the empire I served and my rage against the evil-spirited little beasts who tried to make my job impossible. With one part of my mind I thought of the British Raj as an unbreakable tyranny, as something clamped down, <em>in saecula saeculorum</em>, upon the will of prostrate peoples; with another part I thought that the greatest joy in the world would be to drive a bayonet into a Buddhist priest's guts. Feelings like these are the normal by-products of imperialism; ask any Anglo-Indian official, if you can catch him off duty.</p>
+
+<p>One day something happened which in a roundabout way was enlightening. It was a tiny incident in itself, but it gave me a better glimpse than I had had before of the real nature of imperialism – the real motives for which despotic governments act. Early one morning the sub-inspector at a police station the other end of the town rang me up on the phone and said that an elephant was ravaging the bazaar. Would I please come and do something about it? I did not know what I could do, but I wanted to see what was happening and I got on to a pony and started out. I took my rifle, an old .44 Winchester and much too small to kill an elephant, but I thought the noise might be useful <em>in terrorem</em>. Various Burmans stopped me on the way and told me about the elephant's doings. It was not, of course, a wild elephant, but a tame one which had gone "must." It had been chained up, as tame elephants always are when their attack of "must" is due, but on the previous night it had broken its chain and escaped. Its mahout, the only person who could manage it when it was in that state, had set out in pursuit, but had taken the wrong direction and was now twelve hours' journey away, and in the morning the elephant had suddenly reappeared in the town. The Burmese population had no weapons and were quite helpless against it. It had already destroyed somebody's bamboo hut, killed a cow and raided some fruit-stalls and devoured the stock; also it had met the municipal rubbish van and, when the driver jumped out and took to his heels, had turned the van over and inflicted violences upon it.</p>
+
+<p>The Burmese sub-inspector and some Indian constables were waiting for me in the quarter where the elephant had been seen. It was a very poor quarter, a labyrinth of squalid bamboo huts, thatched with palmleaf, winding all over a steep hillside. I remember that it was a cloudy, stuffy morning at the beginning of the rains. We began questioning the people as to where the elephant had gone and, as usual, failed to get any definite information. That is invariably the case in the East; a story always sounds clear enough at a distance, but the nearer you get to the scene of events the vaguer it becomes. Some of the people said that the elephant had gone in one direction, some said that he had gone in another, some professed not even to have heard of any elephant. I had almost made up my mind that the whole story was a pack of lies, when we heard yells a little distance away. There was a loud, scandalized cry of "Go away, child! Go away this instant!" and an old woman with a switch in her hand came round the corner of a hut, violently shooing away a crowd of naked children. Some more women followed, clicking their tongues and exclaiming; evidently there was something that the children ought not to have seen. I rounded the hut and saw a man's dead body sprawling in the mud. He was an Indian, a black Dravidian coolie, almost naked, and he could not have been dead many minutes. The people said that the elephant had come suddenly upon him round the corner of the hut, caught him with its trunk, put its foot on his back and ground him into the earth. This was the rainy season and the ground was soft, and his face had scored a trench a foot deep and a couple of yards long. He was lying on his belly with arms crucified and head sharply twisted to one side. His face was coated with mud, the eyes wide open, the teeth bared and grinning with an expression of unendurable agony. (Never tell me, by the way, that the dead look peaceful. Most of the corpses I have seen looked devilish.) The friction of the great beast's foot had stripped the skin from his back as neatly as one skins a rabbit. As soon as I saw the dead man I sent an orderly to a friend's house nearby to borrow an elephant rifle. I had already sent back the pony, not wanting it to go mad with fright and throw me if it smelt the elephant.</p>
+
+<p>The orderly came back in a few minutes with a rifle and five cartridges, and meanwhile some Burmans had arrived and told us that the elephant was in the paddy fields below, only a few hundred yards away. As I started forward practically the whole population of the quarter flocked out of the houses and followed me. They had seen the rifle and were all shouting excitedly that I was going to shoot the elephant. They had not shown much interest in the elephant when he was merely ravaging their homes, but it was different now that he was going to be shot. It was a bit of fun to them, as it would be to an English crowd; besides they wanted the meat. It made me vaguely uneasy. I had no intention of shooting the elephant – I had merely sent for the rifle to defend myself if necessary – and it is always unnerving to have a crowd following you. I marched down the hill, looking and feeling a fool, with the rifle over my shoulder and an ever-growing army of people jostling at my heels. At the bottom, when you got away from the huts, there was a metalled road and beyond that a miry waste of paddy fields a thousand yards across, not yet ploughed but soggy from the first rains and dotted with coarse grass. The elephant was standing eight yards from the road, his left side towards us. He took not the slightest notice of the crowd's approach. He was tearing up bunches of grass, beating them against his knees to clean them and stuffing them into his mouth.</p>
+
+<p>I had halted on the road. As soon as I saw the elephant I knew with perfect certainty that I ought not to shoot him. It is a serious matter to shoot a working elephant – it is comparable to destroying a huge and costly piece of machinery – and obviously one ought not to do it if it can possibly be avoided. And at that distance, peacefully eating, the elephant looked no more dangerous than a cow. I thought then and I think now that his attack of "must" was already passing off; in which case he would merely wander harmlessly about until the mahout came back and caught him. Moreover, I did not in the least want to shoot him. I decided that I would watch him for a little while to make sure that he did not turn savage again, and then go home.</p>
+
+<p>But at that moment I glanced round at the crowd that had followed me. It was an immense crowd, two thousand at the least and growing every minute. It blocked the road for a long distance on either side. I looked at the sea of yellow faces above the garish clothes-faces all happy and excited over this bit of fun, all certain that the elephant was going to be shot. They were watching me as they would watch a conjurer about to perform a trick. They did not like me, but with the magical rifle in my hands I was momentarily worth watching. And suddenly I realized that I should have to shoot the elephant after all. The people expected it of me and I had got to do it; I could feel their two thousand wills pressing me forward, irresistibly. And it was at this moment, as I stood there with the rifle in my hands, that I first grasped the hollowness, the futility of the white man's dominion in the East. Here was I, the white man with his gun, standing in front of the unarmed native crowd – seemingly the leading actor of the piece; but in reality I was only an absurd puppet pushed to and fro by the will of those yellow faces behind. I perceived in this moment that when the white man turns tyrant it is his own freedom that he destroys. He becomes a sort of hollow, posing dummy, the conventionalized figure of a sahib. For it is the condition of his rule that he shall spend his life in trying to impress the "natives," and so in every crisis he has got to do what the "natives" expect of him. He wears a mask, and his face grows to fit it. I had got to shoot the elephant. I had committed myself to doing it when I sent for the rifle. A sahib has got to act like a sahib; he has got to appear resolute, to know his own mind and do definite things. To come all that way, rifle in hand, with two thousand people marching at my heels, and then to trail feebly away, having done nothing – no, that was impossible. The crowd would laugh at me. And my whole life, every white man's life in the East, was one long struggle not to be laughed at.</p>
+
+<p>But I did not want to shoot the elephant. I watched him beating his bunch of grass against his knees, with that preoccupied grandmotherly air that elephants have. It seemed to me that it would be murder to shoot him. At that age I was not squeamish about killing animals, but I had never shot an elephant and never wanted to. (Somehow it always seems worse to kill a large animal.) Besides, there was the beast's owner to be considered. Alive, the elephant was worth at least a hundred pounds; dead, he would only be worth the value of his tusks, five pounds, possibly. But I had got to act quickly. I turned to some experienced-looking Burmans who had been there when we arrived, and asked them how the elephant had been behaving. They all said the same thing: he took no notice of you if you left him alone, but he might charge if you went too close to him.</p>
+
+<p>It was perfectly clear to me what I ought to do. I ought to walk up to within, say, twenty-five yards of the elephant and test his behavior. If he charged, I could shoot; if he took no notice of me, it would be safe to leave him until the mahout came back. But also I knew that I was going to do no such thing. I was a poor shot with a rifle and the ground was soft mud into which one would sink at every step. If the elephant charged and I missed him, I should have about as much chance as a toad under a steam-roller. But even then I was not thinking particularly of my own skin, only of the watchful yellow faces behind. For at that moment, with the crowd watching me, I was not afraid in the ordinary sense, as I would have been if I had been alone. A white man mustn't be frightened in front of "natives"; and so, in general, he isn't frightened. The sole thought in my mind was that if anything went wrong those two thousand Burmans would see me pursued, caught, trampled on and reduced to a grinning corpse like that Indian up the hill. And if that happened it was quite probable that some of them would laugh. That would never do.</p>
+
+<p>There was only one alternative. I shoved the cartridges into the magazine and lay down on the road to get a better aim. The crowd grew very still, and a deep, low, happy sigh, as of people who see the theatre curtain go up at last, breathed from innumerable throats. They were going to have their bit of fun after all. The rifle was a beautiful German thing with cross-hair sights. I did not then know that in shooting an elephant one would shoot to cut an imaginary bar running from ear-hole to ear-hole. I ought, therefore, as the elephant was sideways on, to have aimed straight at his ear-hole, actually I aimed several inches in front of this, thinking the brain would be further forward.</p>
+
+<p>When I pulled the trigger I did not hear the bang or feel the kick – one never does when a shot goes home – but I heard the devilish roar of glee that went up from the crowd. In that instant, in too short a time, one would have thought, even for the bullet to get there, a mysterious, terrible change had come over the elephant. He neither stirred nor fell, but every line of his body had altered. He looked suddenly stricken, shrunken, immensely old, as though the frightful impact of the bullet had paralysed him without knocking him down. At last, after what seemed a long time – it might have been five seconds, I dare say – he sagged flabbily to his knees. His mouth slobbered. An enormous senility seemed to have settled upon him. One could have imagined him thousands of years old. I fired again into the same spot. At the second shot he did not collapse but climbed with desperate slowness to his feet and stood weakly upright, with legs sagging and head drooping. I fired a third time. That was the shot that did for him. You could see the agony of it jolt his whole body and knock the last remnant of strength from his legs. But in falling he seemed for a moment to rise, for as his hind legs collapsed beneath him he seemed to tower upward like a huge rock toppling, his trunk reaching skyward like a tree. He trumpeted, for the first and only time. And then down he came, his belly towards me, with a crash that seemed to shake the ground even where I lay.</p>
+
+<p>I got up. The Burmans were already racing past me across the mud. It was obvious that the elephant would never rise again, but he was not dead. He was breathing very rhythmically with long rattling gasps, his great mound of a side painfully rising and falling. His mouth was wide open – I could see far down into caverns of pale pink throat. I waited a long time for him to die, but his breathing did not weaken. Finally I fired my two remaining shots into the spot where I thought his heart must be. The thick blood welled out of him like red velvet, but still he did not die. His body did not even jerk when the shots hit him, the tortured breathing continued without a pause. He was dying, very slowly and in great agony, but in some world remote from me where not even a bullet could damage him further. I felt that I had got to put an end to that dreadful noise. It seemed dreadful to see the great beast lying there, powerless to move and yet powerless to die, and not even to be able to finish him. I sent back for my small rifle and poured shot after shot into his heart and down his throat. They seemed to make no impression. The tortured gasps continued as steadily as the ticking of a clock.</p>
+
+<p>In the end I could not stand it any longer and went away. I heard later that it took him half an hour to die. Burmans were bringing dahs and baskets even before I left, and I was told they had stripped his body almost to the bones by the afternoon.</p>
+
+<p>Afterwards, of course, there were endless discussions about the shooting of the elephant. The owner was furious, but he was only an Indian and could do nothing. Besides, legally I had done the right thing, for a mad elephant has to be killed, like a mad dog, if its owner fails to control it. Among the Europeans opinion was divided. The older men said I was right, the younger men said it was a damn shame to shoot an elephant for killing a coolie, because an elephant was worth more than any damn Coringhee coolie. And afterwards I was very glad that the coolie had been killed; it put me legally in the right and it gave me a sufficient pretext for shooting the elephant. I often wondered whether any of the others grasped that I had done it solely to avoid looking a fool.</p>
+
+    </div>
+
+    <div class="source-note">
+      First published in <em>New Writing</em>, 2, Autumn 1936. Text sourced from the
+      <a href="https://www.orwellfoundation.com/the-orwell-foundation/orwell/essays-and-other-works/shooting-an-elephant/">Orwell Foundation</a>.
+    </div>
+
+  </div>
+
+  <!-- Right Column: Sidebar with Tabs -->
+  <div class="sidebar-column">
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" id="tab-questions" onclick="switchTab('questions')">Questions</button>
+      <button class="sidebar-tab" id="tab-vocab" onclick="switchTab('vocab')">Vocab</button>
+    </div>
+    <div class="sidebar-content">
+      <div class="sidebar-panel active" id="panel-questions">
+        <div id="questions-container"></div>
+      </div>
+      <div class="sidebar-panel" id="panel-vocab">
+        <div class="vocab-instruction">Select any word in the article to look it up and save it to your vocabulary list.</div>
+        <div class="vocab-count-badge" id="vocab-count"></div>
+        <div id="vocab-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Vocab Popup (hidden by default) -->
+<div id="vocab-popup">
+  <button class="popup-close" onclick="dismissPopup()">&times;</button>
+  <div id="popup-content"></div>
+</div>
+
+<!-- Bottom Bar -->
+<div class="bottom-bar">
+  <span class="stat">~3,500 words</span>
+  <span class="stat">Units: <strong>2-3</strong></span>
+  <button class="done-btn" id="done-btn" onclick="toggleDone()">Mark as Read</button>
+  <button class="reopen-btn" id="reopen-btn" onclick="toggleDone()" style="display:none">Reopen</button>
+  <span class="done-msg" id="done-msg"></span>
+</div>
+
+<script>
+// === Config ===
+const CHILD = (window.location.hash || "#tepi").slice(1).toLowerCase() || "tepi";
+const ARTICLE_ID = "w1_orwell_shooting";
+const ARTICLE_TITLE = "Shooting an Elephant";
+const QUESTIONS = [
+  { level: 1, label: "Thesis", text: "What is Orwell\u2019s central argument about power in this essay? Try to state it in one sentence." },
+  { level: 2, label: "Evidence", text: "Orwell describes the moment he decides to shoot as the moment he \u2018first grasped the hollowness, the futility of the white man\u2019s dominion in the East.\u2019 What specific details in the crowd scene make this argument convincing \u2014 and is there any place where his evidence doesn\u2019t fully support his thesis?" },
+  { level: 3, label: "What\u2019s Missing", text: "Orwell frames himself as a puppet of the crowd\u2019s expectations. But he never considers the Burmese perspective on why they wanted him to shoot. What would this essay look like if it took their reasons seriously? Does the omission weaken or strengthen Orwell\u2019s argument?" }
+];
+
+const PLAN_SYNC = {
+  tepi: { storageKey: "tepi_q2_2026", taskKey: "w1_t1" },
+  guaimei: { storageKey: "guaimei_q2_2026", taskKey: "w1_t0" }
+};
+const SUB_INDEX = 1; // Orwell is the second reading sub-task (s1)
+
+const STORAGE_DONE = `article_${CHILD}_${ARTICLE_ID}`;
+const STORAGE_ANSWERS = `answers_${CHILD}_${ARTICLE_ID}`;
+const STORAGE_VOCAB = `vocab_${CHILD}`;
+const childName = CHILD === "tepi" ? "TePi" : "GuaiMei";
+const defCache = new Map();
+
+document.getElementById("reader-name").textContent = childName;
+
+// === Sidebar Tabs ===
+function switchTab(tab) {
+  document.getElementById("tab-questions").classList.toggle("active", tab === "questions");
+  document.getElementById("tab-vocab").classList.toggle("active", tab === "vocab");
+  document.getElementById("panel-questions").classList.toggle("active", tab === "questions");
+  document.getElementById("panel-vocab").classList.toggle("active", tab === "vocab");
+}
+
+// === Vocab Popup ===
+function handleTextSelection() {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  let text = sel.toString().trim().replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, "");
+  if (!text || text.includes(" ") || text.length < 2) return;
+  const anchor = sel.anchorNode;
+  if (anchor && (anchor.nodeName === "TEXTAREA" || (anchor.parentElement && anchor.parentElement.nodeName === "TEXTAREA"))) return;
+  const range = sel.getRangeAt(0);
+  showPopup(text.toLowerCase(), range.getBoundingClientRect());
+}
+function showPopup(word, rect) {
+  const popup = document.getElementById("vocab-popup");
+  document.getElementById("popup-content").innerHTML = `<div class="popup-word">${word}</div><div class="popup-loading">Looking up...</div>`;
+  popup.style.display = "block";
+  let top = rect.top - 210; if (top < 10) top = rect.bottom + 10;
+  let left = Math.max(10, Math.min(rect.left + rect.width/2 - 150, window.innerWidth - 350));
+  popup.style.top = top + "px"; popup.style.left = left + "px";
+  fetchDefinition(word);
+}
+async function fetchDefinition(word) {
+  if (defCache.has(word)) { renderPopupDef(word, defCache.get(word)); return; }
+  try {
+    const resp = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    if (!resp.ok) throw new Error("Not found");
+    const data = await resp.json();
+    const phonetic = data[0].phonetic || (data[0].phonetics?.find(p=>p.text)?.text) || "";
+    let defText = "";
+    for (const m of data[0].meanings || []) {
+      defText += `<em>(${m.partOfSpeech})</em> ${m.definitions[0]?.definition || ""}<br>`;
+      if (defText.split("<br>").length > 3) break;
+    }
+    const result = { phonetic, definition: defText || "No definition found." };
+    defCache.set(word, result);
+    renderPopupDef(word, result);
+  } catch {
+    document.getElementById("popup-content").innerHTML =
+      `<div class="popup-word">${word}</div>` +
+      `<div class="popup-error">No definition found. Type your own:</div>` +
+      `<textarea class="popup-manual" id="manual-def" rows="2" placeholder="Type definition..."></textarea>` +
+      `<div class="popup-btns"><button class="btn-add" onclick="addFromPopup('${word}',true)">+ Add to ${childName}'s Vocab</button></div>`;
+  }
+}
+function renderPopupDef(word, result) {
+  const inVocab = getVocab().some(v => v.word === word);
+  document.getElementById("popup-content").innerHTML =
+    `<div class="popup-word">${word}</div>` +
+    (result.phonetic ? `<div class="popup-phonetic">${result.phonetic}</div>` : "") +
+    `<div class="popup-def">${result.definition}</div>` +
+    `<div class="popup-btns">` +
+    (inVocab
+      ? `<button class="btn-added" disabled>Already in ${childName}'s list</button>`
+      : `<button class="btn-add" onclick="addFromPopup('${word}',false)">+ Add to ${childName}'s Vocab</button>`) +
+    `</div>`;
+}
+function addFromPopup(word, manual) {
+  let def = "";
+  if (manual) {
+    const ta = document.getElementById("manual-def");
+    def = ta ? ta.value.trim() : "";
+    if (!def) { ta.style.borderColor = "var(--accent)"; return; }
+  } else {
+    const cached = defCache.get(word);
+    def = cached ? cached.definition.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : word;
+  }
+  addToVocab(word, def);
+  const btn = event.target;
+  btn.textContent = "Added!"; btn.classList.add("btn-added"); btn.disabled = true;
+  switchTab('vocab');
+  setTimeout(dismissPopup, 500);
+}
+function dismissPopup() { document.getElementById("vocab-popup").style.display = "none"; }
+
+// === Vocab Storage ===
+function getVocab() { try { return JSON.parse(localStorage.getItem(STORAGE_VOCAB)) || []; } catch { return []; } }
+function saveVocabList(list) { try { localStorage.setItem(STORAGE_VOCAB, JSON.stringify(list)); } catch {} }
+function addToVocab(word, definition) {
+  const list = getVocab();
+  if (list.some(v => v.word === word)) return;
+  list.push({ word, definition, source: ARTICLE_ID, sourceTitle: ARTICLE_TITLE, dateAdded: new Date().toISOString().slice(0,10) });
+  saveVocabList(list);
+  renderVocabPanel();
+}
+function removeFromVocab(word) {
+  saveVocabList(getVocab().filter(v => v.word !== word));
+  renderVocabPanel();
+}
+
+// === Vocab Panel (sidebar) ===
+function renderVocabPanel() {
+  const vocab = getVocab().filter(v => v.source === ARTICLE_ID);
+  document.getElementById("vocab-count").textContent = vocab.length ? `${vocab.length} word${vocab.length > 1 ? 's' : ''} saved` : "";
+  const listEl = document.getElementById("vocab-list");
+  if (!vocab.length) {
+    listEl.innerHTML = `<div class="vocab-empty">No words saved yet. Select any word in the essay to look it up.</div>`;
+    return;
+  }
+  listEl.innerHTML = vocab.map(v =>
+    `<div class="vocab-entry"><span class="v-word">${v.word}</span><span class="v-def">${v.definition}</span>` +
+    `<button class="v-remove" onclick="removeFromVocab('${v.word}')" title="Remove">&times;</button></div>`
+  ).join("");
+}
+
+// === Questions ===
+let saveTimer = null;
+function renderQuestions() {
+  document.getElementById("questions-container").innerHTML = QUESTIONS.map((q, i) => {
+    const n = i + 1;
+    return `<div class="question-card"><div class="q-top"><span class="q-badge q-badge-${n}">${n}</span>` +
+      `<div><div class="q-label q-label-${n}">${q.label}</div><div class="q-text">${q.text}</div></div></div>` +
+      `<textarea id="answer-${n}" placeholder="Write your thoughts..." oninput="scheduleAutoSave()"></textarea>` +
+      `<div class="q-save-indicator" id="save-ind-${n}"></div></div>`;
+  }).join("");
+}
+function loadAnswers() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_ANSWERS)) || {};
+    QUESTIONS.forEach((_, i) => { const ta = document.getElementById(`answer-${i+1}`); if (ta) ta.value = saved[`q${i+1}`] || ""; });
+  } catch {}
+}
+function saveAnswers() {
+  const data = { lastSaved: new Date().toISOString() };
+  QUESTIONS.forEach((_, i) => { const ta = document.getElementById(`answer-${i+1}`); data[`q${i+1}`] = ta ? ta.value : ""; });
+  try { localStorage.setItem(STORAGE_ANSWERS, JSON.stringify(data)); } catch {}
+  QUESTIONS.forEach((_, i) => {
+    const ind = document.getElementById(`save-ind-${i+1}`);
+    const ta = document.getElementById(`answer-${i+1}`);
+    if (ind && ta && ta.value.trim()) { ind.textContent = "Saved"; setTimeout(() => { if (ind.textContent === "Saved") ind.textContent = ""; }, 2000); }
+  });
+}
+function scheduleAutoSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveAnswers, 800); }
+
+// === Done / Reopen with Plan Sync ===
+function toggleDone() {
+  const current = localStorage.getItem(STORAGE_DONE);
+  if (current) {
+    // Reopening
+    localStorage.removeItem(STORAGE_DONE);
+    document.getElementById("done-btn").classList.remove("completed");
+    document.getElementById("done-btn").textContent = "Mark as Read";
+    document.getElementById("done-btn").style.display = "";
+    document.getElementById("reopen-btn").style.display = "none";
+    document.getElementById("done-msg").textContent = "";
+    // Sync to weekly plan: unmark
+    const sync = PLAN_SYNC[CHILD];
+    if (sync) {
+      const planState = JSON.parse(localStorage.getItem(sync.storageKey)) || {};
+      planState[`${sync.taskKey}_s${SUB_INDEX}`] = false;
+      planState[sync.taskKey] = false;
+      localStorage.setItem(sync.storageKey, JSON.stringify(planState));
+    }
+  } else {
+    // Marking done
+    const now = new Date().toLocaleDateString();
+    localStorage.setItem(STORAGE_DONE, now);
+    document.getElementById("done-btn").classList.add("completed");
+    document.getElementById("done-btn").textContent = "Completed";
+    document.getElementById("done-btn").style.display = "none";
+    document.getElementById("reopen-btn").style.display = "";
+    document.getElementById("done-msg").textContent = "Done " + now;
+    // Sync to weekly plan: mark sub-task and maybe parent
+    const sync = PLAN_SYNC[CHILD];
+    if (sync) {
+      const planState = JSON.parse(localStorage.getItem(sync.storageKey)) || {};
+      planState[`${sync.taskKey}_s${SUB_INDEX}`] = true;
+      // Check if ALL reading subs done (s0 and s1), if so mark parent too
+      if (planState[`${sync.taskKey}_s0`] && planState[`${sync.taskKey}_s1`]) {
+        planState[sync.taskKey] = true;
+      }
+      localStorage.setItem(sync.storageKey, JSON.stringify(planState));
+    }
+  }
+}
+function restoreDone() {
+  const done = localStorage.getItem(STORAGE_DONE);
+  if (done) {
+    document.getElementById("done-btn").classList.add("completed");
+    document.getElementById("done-btn").textContent = "Completed";
+    document.getElementById("done-btn").style.display = "none";
+    document.getElementById("reopen-btn").style.display = "";
+    document.getElementById("done-msg").textContent = "Done " + done;
+  }
+}
+
+// === Init ===
+(function() {
+  renderQuestions();
+  loadAnswers();
+  renderVocabPanel();
+  restoreDone();
+  document.addEventListener("mouseup", (e) => { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 50); });
+  document.addEventListener("touchend", (e) => { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 350); });
+  document.addEventListener("mousedown", (e) => { if (document.getElementById("vocab-popup").style.display === "block" && !document.getElementById("vocab-popup").contains(e.target)) dismissPopup(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") dismissPopup(); });
+})();
+</script>
+</body>
+</html>

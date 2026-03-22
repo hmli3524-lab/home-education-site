@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Home Education</title>
+<style>
+  :root {
+    --bg: #2b2d31; --surface: #313338; --card: #383a40;
+    --accent2: #9b6dd7; --gold: #e0a82e; --text: #e0e0e0;
+    --muted: #999; --teal: #4ecdc4; --border: #44464d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .container { max-width: 500px; width: 100%; padding: 40px 24px; }
+  h1 { font-size: 1.6em; text-align: center; margin-bottom: 8px; color: #fff; }
+  .subtitle { text-align: center; color: var(--muted); font-size: 0.92em; margin-bottom: 40px; }
+  .card {
+    display: flex; align-items: center; gap: 18px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 24px; margin-bottom: 16px; text-decoration: none; color: var(--text);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: border-color 0.2s, transform 0.15s;
+  }
+  .card:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .card .icon { font-size: 2.4em; flex-shrink: 0; }
+  .card h2 { font-size: 1.15em; margin-bottom: 4px; }
+  .card p { font-size: 0.88em; color: var(--muted); }
+  .card.tepi { border-left: 4px solid var(--accent2); }
+  .card.guaimei { border-left: 4px solid var(--gold); }
+  .footer { text-align: center; margin-top: 32px; font-size: 0.82em; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Home Education</h1>
+  <div class="subtitle">Q2 2026 &middot; Mar 23 &ndash; Jun 14</div>
+
+  <a href="programs/tepi_Q2-2026.html" class="card tepi">
+    <div class="icon">🚀</div>
+    <div>
+      <h2>TePi's Plan</h2>
+      <p>Math placement sprint, reading, writing, projects</p>
+    </div>
+  </a>
+
+  <a href="programs/guaimei_Q2-2026.html" class="card guaimei">
+    <div class="icon">🦋</div>
+    <div>
+      <h2>GuaiMei's Plan</h2>
+      <p>Orwell immersion, Wonder Log evolution, app building</p>
+    </div>
+  </a>
+
+  <div class="footer">
+    Intellectual Sovereignty &middot; Rooted Character &middot; Economic Independence
+  </div>
+</div>
+</body>
+</html>

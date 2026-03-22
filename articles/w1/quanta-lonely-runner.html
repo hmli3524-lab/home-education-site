@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lonely Runner Problem — Quanta Magazine</title>
+<style>
+  :root {
+    --bg: #2b2d31; --surface: #313338; --card: #383a40; --accent: #e8555a;
+    --accent2: #9b6dd7; --gold: #e0a82e; --text: #e0e0e0; --muted: #999;
+    --green: #57d9a3; --teal: #4ecdc4; --border: #44464d; --shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+
+  .top-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); flex-wrap: wrap; }
+  .back-btn { background: var(--card); border: 1px solid var(--border); color: var(--teal); padding: 6px 16px; border-radius: 6px; font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; text-decoration: none; }
+  .back-btn:hover { background: var(--border); }
+  .top-meta { font-size: 0.85em; color: var(--muted); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .top-meta .tag { background: rgba(78,205,196,0.15); color: var(--teal); padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+  .top-meta .tag-source { background: rgba(224,168,46,0.15); color: var(--gold); padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+  .reader-name { margin-left: auto; background: var(--accent2); color: #fff; padding: 5px 16px; border-radius: 8px; font-size: 0.88em; font-weight: 700; }
+
+  /* Two-Column Grid */
+  .page-grid { display: grid; grid-template-columns: 1fr 380px; gap: 0; max-width: 1200px; margin: 0 auto; }
+  .article-column { padding: 40px 32px 80px; min-width: 0; }
+  .sidebar-column { position: sticky; top: 60px; height: calc(100vh - 60px); border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); }
+  .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .sidebar-tab { flex: 1; padding: 12px; text-align: center; background: none; border: none; color: var(--muted); font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; }
+  .sidebar-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .sidebar-tab:hover:not(.active) { color: var(--text); }
+  .sidebar-content { flex: 1; overflow-y: auto; padding: 16px; }
+  .sidebar-panel { display: none; }
+  .sidebar-panel.active { display: block; }
+  @media (max-width: 900px) {
+    .page-grid { grid-template-columns: 1fr; }
+    .sidebar-column { position: static; height: auto; border-left: none; border-top: 2px solid var(--border); }
+  }
+
+  /* Article */
+  .article-header { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .article-header h1 { font-size: 1.8em; font-weight: 700; line-height: 1.3; margin-bottom: 8px; color: #fff; }
+  .article-header .subtitle { font-size: 1.02em; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+  .article-header .author { font-size: 1em; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
+  .article-header .pub-info { font-size: 0.9em; color: var(--muted); display: flex; flex-wrap: wrap; gap: 16px; }
+  .guide-box { background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.25); border-radius: 10px; padding: 18px 22px; margin-bottom: 32px; }
+  .guide-box h3 { color: var(--teal); font-size: 0.95em; margin-bottom: 8px; }
+  .guide-box p { font-size: 0.92em; line-height: 1.7; }
+  .guide-box .tip { margin-top: 10px; font-size: 0.88em; color: var(--muted); font-style: italic; }
+  .essay-text { user-select: text; -webkit-user-select: text; }
+  .essay-text p { margin-bottom: 1.4em; font-size: 1.02em; text-align: justify; }
+  .essay-text h2 { font-size: 1.2em; color: var(--gold); margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .source-note { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.82em; color: var(--muted); font-style: italic; }
+  .source-note a { color: var(--muted); }
+
+  /* Vocab Popup */
+  #vocab-popup { display: none; position: fixed; z-index: 200; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); padding: 16px 18px; max-width: 340px; min-width: 240px; }
+  #vocab-popup .popup-word { font-size: 1.1em; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  #vocab-popup .popup-phonetic { font-size: 0.82em; color: var(--muted); margin-bottom: 8px; }
+  #vocab-popup .popup-def { font-size: 0.9em; color: var(--text); line-height: 1.6; margin-bottom: 12px; max-height: 120px; overflow-y: auto; }
+  #vocab-popup .popup-loading { color: var(--muted); font-size: 0.9em; padding: 8px 0; }
+  #vocab-popup .popup-error { color: var(--accent); font-size: 0.88em; margin-bottom: 8px; }
+  #vocab-popup .popup-manual { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: inherit; font-size: 0.88em; padding: 6px 10px; margin-bottom: 10px; resize: none; }
+  #vocab-popup .popup-manual:focus { border-color: var(--teal); outline: none; }
+  #vocab-popup .popup-btns { display: flex; gap: 8px; }
+  #vocab-popup .popup-btns button { flex: 1; padding: 7px 10px; border: none; border-radius: 6px; font-family: inherit; font-size: 0.82em; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  #vocab-popup .popup-btns button:hover { opacity: 0.85; }
+  .btn-add { background: var(--accent2); color: #fff; }
+  .btn-added { background: var(--green) !important; color: #1a1a1a !important; }
+  #vocab-popup .popup-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--muted); font-size: 1.1em; cursor: pointer; line-height: 1; }
+  #vocab-popup .popup-close:hover { color: var(--text); }
+
+  /* Questions (sidebar) */
+  .question-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .question-card .q-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .q-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82em; font-weight: 700; color: #1a1a1a; flex-shrink: 0; }
+  .q-badge-1 { background: var(--teal); } .q-badge-2 { background: var(--gold); } .q-badge-3 { background: var(--accent); color: #fff; }
+  .q-label { font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .q-label-1 { color: var(--teal); } .q-label-2 { color: var(--gold); } .q-label-3 { color: var(--accent); }
+  .q-text { font-size: 0.95em; font-weight: 600; line-height: 1.5; }
+  .question-card textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.92em; padding: 12px 14px; resize: vertical; min-height: 100px; line-height: 1.7; }
+  .question-card textarea:focus { border-color: var(--teal); outline: none; }
+  .question-card textarea::placeholder { color: #555; }
+  .q-save-indicator { font-size: 0.8em; color: var(--green); margin-top: 6px; min-height: 18px; }
+
+  /* Vocab Panel (sidebar) */
+  .vocab-instruction { font-size: 0.88em; color: var(--muted); font-style: italic; margin-bottom: 16px; padding: 10px 12px; background: rgba(78,205,196,0.06); border-radius: 8px; line-height: 1.6; }
+  .vocab-entry { display: flex; align-items: flex-start; gap: 12px; padding: 10px 4px; border-bottom: 1px solid var(--border); }
+  .vocab-entry:last-child { border-bottom: none; }
+  .vocab-entry .v-word { font-weight: 700; color: var(--teal); min-width: 80px; font-size: 0.92em; }
+  .vocab-entry .v-def { font-size: 0.88em; color: var(--muted); flex: 1; line-height: 1.5; }
+  .vocab-entry .v-remove { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 1em; padding: 0 4px; flex-shrink: 0; }
+  .vocab-entry .v-remove:hover { color: #ff7777; }
+  .vocab-empty { padding: 16px 4px; font-size: 0.88em; color: var(--muted); font-style: italic; }
+  .vocab-count-badge { font-size: 0.82em; color: var(--teal); font-weight: 600; margin-bottom: 12px; }
+
+  /* Bottom Bar */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 10px 24px; display: flex; justify-content: center; align-items: center; gap: 20px; z-index: 100; box-shadow: 0 -2px 8px rgba(0,0,0,0.15); font-size: 0.88em; }
+  .bottom-bar .stat { color: var(--muted); } .bottom-bar .stat strong { color: var(--teal); }
+  .done-btn { background: var(--teal); color: #1a1a1a; border: none; padding: 6px 24px; border-radius: 6px; font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; }
+  .done-btn:hover { opacity: 0.9; } .done-btn.completed { background: var(--green); }
+  .reopen-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 6px 16px; border-radius: 6px; font-family: inherit; font-size: 0.82em; cursor: pointer; }
+  .reopen-btn:hover { color: var(--text); border-color: var(--text); }
+  .done-msg { color: var(--green); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .article-header h1 { font-size: 1.4em; }
+    .article-column { padding: 24px 16px 80px; }
+    .top-bar { padding: 10px 14px; gap: 10px; }
+    .reader-name { margin-left: 0; }
+    #vocab-popup { max-width: 90vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-btn" onclick="history.back()">&#8592; Back to Plan</a>
+  <div class="top-meta">
+    <span class="tag">Week 1</span>
+    <span class="tag-source">Quanta Magazine</span>
+    <span>Math &middot; ~1,800 words &middot; ~12 min</span>
+  </div>
+  <div class="reader-name" id="reader-name"></div>
+</div>
+
+<div class="page-grid">
+
+  <!-- Left Column: Article -->
+  <div class="article-column">
+    <div class="article-header">
+      <h1>New Strides Made on Deceptively Simple 'Lonely Runner' Problem</h1>
+      <div class="subtitle">Mathematicians proved a conjecture about runners on a circular track for up to 10 runners &mdash; including one breakthrough by an undergraduate.</div>
+      <div class="author">Paulina Rowi&#324;ska</div>
+      <div class="pub-info">
+        <span>March 6, 2026</span>
+        <span>Quanta Magazine</span>
+      </div>
+    </div>
+
+    <div class="guide-box">
+      <h3>Before You Read</h3>
+      <p>This article is about a math problem that sounds simple &mdash; runners going around a track &mdash; but has stumped mathematicians for decades. Pay attention to <em>how</em> they finally proved new cases: not by solving it directly, but by showing that any counterexample would be impossible.</p>
+      <p class="tip">Tip: Select any unfamiliar word to look it up and save it to your vocabulary list.</p>
+    </div>
+
+    <div class="essay-text" id="essay-text">
+
+<p>Picture a bizarre training exercise: A group of runners starts jogging around a circular track, with each runner maintaining a unique, constant pace. Will every runner end up "lonely," or relatively far from everyone else, at least once, no matter their speeds?</p>
+
+<p>Mathematicians conjecture that the answer is yes.</p>
+
+<p>The "lonely runner" problem might seem simple and inconsequential, but it crops up in many guises throughout math. It's equivalent to questions in number theory, geometry, graph theory, and more &mdash; about when it's possible to get a clear line of sight in a field of obstacles, or where billiard balls might move on a table, or how to organize a network. "It has so many facets. It touches so many different mathematical fields," said Matthias Beck of San Francisco State University.</p>
+
+<p>For just two or three runners, the conjecture's proof is elementary. Mathematicians proved it for four runners in the 1970s, and by 2007, they'd gotten as far as seven. But for the past two decades, no one has been able to advance any further.</p>
+
+<p>Then last year, Matthieu Rosenfeld, a mathematician at the Laboratory of Computer Science, Robotics, and Microelectronics of Montpellier, settled the conjecture for eight runners. And within a few weeks, a second-year undergraduate at the University of Oxford named Tanupat (Paul) Trakulthongchai built on Rosenfeld's ideas to prove it for nine and 10 runners.</p>
+
+<p>The sudden progress has renewed interest in the problem. "It's really a quantum leap," said Beck, who was not involved in the work. Adding just one runner makes the task of proving the conjecture "exponentially harder," he said. "Going from seven runners to now 10 runners is amazing."</p>
+
+<h2>The Starting Dash</h2>
+
+<p>At first, the lonely runner problem had nothing to do with running.</p>
+
+<p>Instead, mathematicians were interested in a seemingly unrelated problem: how to use fractions to approximate irrational numbers such as pi, a task that has a vast number of applications. In the 1960s, a graduate student named J&ouml;rg M. Wills conjectured that a century-old method for doing so is optimal &mdash; that there's no way to improve it.</p>
+
+<p>In 1998, a group of mathematicians rewrote that conjecture in the language of running. Say N runners start from the same spot on a circular track that's 1 unit in length, and each runs at a different constant speed. Wills' conjecture is equivalent to saying that each runner will always end up lonely at some point, no matter what the other runners' speeds are. More precisely, each runner will at some point find themselves at a distance of at least 1/N from any other runner.</p>
+
+<p>When Wills saw the lonely runner paper, he emailed one of the authors, Luis Goddyn of Simon Fraser University, to congratulate him on "this wonderful and poetic name." (Goddyn's reply: "Oh, you are still alive.")</p>
+
+<p>Mathematicians also showed that the lonely runner problem is equivalent to yet another question. Imagine an infinite sheet of graph paper. In the center of every grid, place a small square. Then start at one of the grid corners and draw a straight line. (The line can point in any direction other than perfectly vertical or horizontal.) How big can the smaller squares get before the line must hit one?</p>
+
+<p>As versions of the lonely runner problem proliferated throughout mathematics, interest in the question grew. Mathematicians proved different cases of the conjecture using completely different techniques. Sometimes they relied on tools from number theory; at other times they turned to geometry or graph theory.</p>
+
+<p>But this meant that they didn't have a general strategy for how to tackle the problem. Rather, they had a bunch of clever but ad hoc techniques that might work for four runners, say, but not five. With each additional runner, they had to go back to the starting line.</p>
+
+<p>By the mid-2000s, mathematicians had proved that when there are seven or fewer runners sprinting around a track, each of them will eventually get lonely. They'd also found ways to simplify the problem. For instance, they realized that they didn't need to prove the conjecture for all (infinitely many) combinations of speeds. Instead, if they could show that it was true for any combination of whole-number speeds, it would have to be true more generally; they could ignore fractions and irrationals.</p>
+
+<p>This was a much easier task, but it still involved dealing with infinitely many possible speeds. Something more was needed.</p>
+
+<h2>Speed Limits</h2>
+
+<p>In 2015, Terence Tao of the University of California, Los Angeles planted the first seed. He showed that if the lonely runner conjecture held for relatively low speeds, it would also hold for high speeds. For any given number of runners, mathematicians would only have to consider whole-number speeds up to a particular threshold.</p>
+
+<p>This reduced the problem to a finite number of calculations &mdash; at least in theory. In practice, even when you're dealing with only a few runners, the number of combinations of speeds you have to check is still "astronomical and completely impractical," said Noah Kravitz of the University of Oxford.</p>
+
+<p>Tao's advance would eventually catch the eye of Rosenfeld, who was interested in proofs that use a computer to check many examples.</p>
+
+<p>He reframed the problem by considering possible counterexamples to the conjecture: What features would the runners' speeds have to have so that at least one runner would never end up alone?</p>
+
+<p>It turned out that their speeds would need to be highly constrained. Rosenfeld used a computer program, along with ideas from number theory, to show that if he multiplied all the speeds together, their product would have to be divisible by certain prime numbers. Now all he needed to do was prove that no combination of speeds could satisfy this condition.</p>
+
+<p>To do so, he returned to a modified version of Tao's threshold. He then rewrote it in terms of the product of speeds: If the lonely runner conjecture was true for products up to a given size, it had to be true in general. This implied that if the conjecture was false, it would be possible to find a counterexample with a product below the threshold.</p>
+
+<p>But Rosenfeld had already shown that in any counterexample, the product would have to be divisible by all those primes. Such a product would have to be massive. So massive, in fact, that it would far exceed the threshold.</p>
+
+<p>In other words, a counterexample to the lonely runner conjecture couldn't exist &mdash; at least, not for eight runners. The conjecture was true.</p>
+
+<h2>Off Track</h2>
+
+<p>Rosenfeld started thinking about how to extend his proof to nine runners. In the meantime, Kravitz saw Rosenfeld's paper and showed it to a promising undergraduate he'd been mentoring at Oxford, Paul Trakulthongchai. He advised Trakulthongchai to work on the conjecture for nine runners.</p>
+
+<p>Trakulthongchai used Rosenfeld's overall approach, but he developed a more efficient computational technique for pinpointing the prime divisors that a counterexample would have to have. This allowed him to more quickly rule out all counterexamples for both nine and 10 runners: The conjecture was true in both cases. (Rosenfeld independently proved the conjecture for nine runners as well, just a few days after Trakulthongchai did. He was happy to see the other mathematician's burst of progress. But "at the same time, I was a bit bummed out," he said with a laugh.)</p>
+
+<p>Both Rosenfeld's and Trakulthongchai's methods are too computationally expensive to work for more runners, leaving them stuck on the problem's next case. "In order to achieve 11, I think you need an entirely new sort of way of looking at things," Trakulthongchai said.</p>
+
+<p>But mathematicians are excited by these recent advances &mdash; and by the fact that a single approach solved three cases at once, when previously each new case had required an entirely new proof. "I really see a new way of getting a hold on the whole conjecture by this new idea," said Matthias Schymura of the University of Rostock in Germany.</p>
+
+<p>Although a proof of the whole conjecture still feels far off &mdash; and mathematicians don't yet agree on whether it will hold true for any N runners &mdash; "things are starting to move after not moving for a while," Kravitz said.</p>
+
+<p>Inspired by the new results, Schymura and others are organizing a workshop on the lonely runner conjecture, to be held in Rostock this October. It will bring together researchers from the different fields in which the conjecture appears. The hope is that they'll approach the problem from various angles and "communicate and bridge the different areas," Schymura said, to find a potential proof or counterexample.</p>
+
+<p>"I'm convinced the problem will be solved," Wills said. "But it might be some 20, 30 more years."</p>
+
+    </div>
+
+    <div class="source-note">
+      Originally published on <a href="https://www.quantamagazine.org/new-strides-made-on-deceptively-simple-lonely-runner-problem-20260306/">Quanta Magazine</a>, March 6, 2026.
+    </div>
+
+  </div>
+
+  <!-- Right Column: Sidebar -->
+  <div class="sidebar-column">
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" id="tab-questions" onclick="switchTab('questions')">Questions</button>
+      <button class="sidebar-tab" id="tab-vocab" onclick="switchTab('vocab')">Vocab</button>
+    </div>
+    <div class="sidebar-content">
+      <div class="sidebar-panel active" id="panel-questions">
+        <div id="questions-container"></div>
+      </div>
+      <div class="sidebar-panel" id="panel-vocab">
+        <div class="vocab-instruction">Select any word in the article to look it up and save it to your vocabulary list.</div>
+        <div class="vocab-count-badge" id="vocab-count"></div>
+        <div id="vocab-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="vocab-popup">
+  <button class="popup-close" onclick="dismissPopup()">&times;</button>
+  <div id="popup-content"></div>
+</div>
+
+<div class="bottom-bar">
+  <span class="stat">~1,800 words</span>
+  <span class="stat">Units: <strong>2-3</strong></span>
+  <button class="done-btn" id="done-btn" onclick="toggleDone()">Mark as Read</button>
+  <button class="reopen-btn" id="reopen-btn" onclick="toggleDone()" style="display:none">Reopen</button>
+  <span class="done-msg" id="done-msg"></span>
+</div>
+
+<script>
+// === Config ===
+const CHILD = (window.location.hash || "#tepi").slice(1).toLowerCase() || "tepi";
+const ARTICLE_ID = "w1_quanta_lonely_runner";
+const ARTICLE_TITLE = "Lonely Runner Problem (Quanta)";
+const QUESTIONS = [
+  { level: 1, label: "The Big Idea", text: "Imagine you\u2019re explaining this to a friend who\u2019s never heard of it. How would you describe the Lonely Runner Conjecture in your own words \u2014 and why is it surprising that such a simple-sounding question is so hard to answer?" },
+  { level: 2, label: "How They Did It", text: "Rosenfeld didn\u2019t prove the conjecture directly \u2014 he proved that any counterexample would be impossible. It\u2019s like proving nobody ate the cookies by showing nobody could reach the cookie jar. Walk through his two key steps: what did he show about the prime numbers, and how did that kill all possible counterexamples?" },
+  { level: 3, label: "The Bigger Picture", text: "Paul Trakulthongchai was a second-year undergraduate \u2014 barely older than you \u2014 when he proved this for 9 and 10 runners. What does his story suggest about what it actually takes to make a breakthrough? Is it years of experience, being clever, building on someone else\u2019s work, or something else? Use evidence from the article." }
+];
+
+const PLAN_SYNC = {
+  tepi: { storageKey: "tepi_q2_2026", taskKey: "w1_t1" },
+  guaimei: { storageKey: "guaimei_q2_2026", taskKey: "w1_t0" }
+};
+const SUB_INDEX = 0; // Quanta is the first reading sub-task (s0)
+
+const STORAGE_DONE = `article_${CHILD}_${ARTICLE_ID}`;
+const STORAGE_ANSWERS = `answers_${CHILD}_${ARTICLE_ID}`;
+const STORAGE_VOCAB = `vocab_${CHILD}`;
+const childName = CHILD === "tepi" ? "TePi" : "GuaiMei";
+const defCache = new Map();
+
+document.getElementById("reader-name").textContent = childName;
+
+// === Sidebar Tabs ===
+function switchTab(tab) {
+  document.getElementById("tab-questions").classList.toggle("active", tab === "questions");
+  document.getElementById("tab-vocab").classList.toggle("active", tab === "vocab");
+  document.getElementById("panel-questions").classList.toggle("active", tab === "questions");
+  document.getElementById("panel-vocab").classList.toggle("active", tab === "vocab");
+}
+
+// === Vocab Popup ===
+function handleTextSelection() {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  let text = sel.toString().trim().replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, "");
+  if (!text || text.includes(" ") || text.length < 2) return;
+  const anchor = sel.anchorNode;
+  if (anchor && (anchor.nodeName === "TEXTAREA" || (anchor.parentElement && anchor.parentElement.nodeName === "TEXTAREA"))) return;
+  const range = sel.getRangeAt(0);
+  showPopup(text.toLowerCase(), range.getBoundingClientRect());
+}
+function showPopup(word, rect) {
+  const popup = document.getElementById("vocab-popup");
+  document.getElementById("popup-content").innerHTML = '<div class="popup-word">' + word + '</div><div class="popup-loading">Looking up...</div>';
+  popup.style.display = "block";
+  var top = rect.top - 210; if (top < 10) top = rect.bottom + 10;
+  var left = Math.max(10, Math.min(rect.left + rect.width/2 - 150, window.innerWidth - 350));
+  popup.style.top = top + "px"; popup.style.left = left + "px";
+  fetchDefinition(word);
+}
+async function fetchDefinition(word) {
+  if (defCache.has(word)) { renderPopupDef(word, defCache.get(word)); return; }
+  try {
+    const resp = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(word));
+    if (!resp.ok) throw new Error("Not found");
+    const data = await resp.json();
+    const phonetic = data[0].phonetic || (data[0].phonetics && data[0].phonetics.find(function(p){return p.text}) || {}).text || "";
+    var defText = "";
+    var meanings = data[0].meanings || [];
+    for (var mi = 0; mi < meanings.length; mi++) {
+      var m = meanings[mi];
+      defText += '<em>(' + m.partOfSpeech + ')</em> ' + ((m.definitions[0] || {}).definition || '') + '<br>';
+      if (defText.split("<br>").length > 3) break;
+    }
+    var result = { phonetic: phonetic, definition: defText || "No definition found." };
+    defCache.set(word, result);
+    renderPopupDef(word, result);
+  } catch(e) {
+    document.getElementById("popup-content").innerHTML =
+      '<div class="popup-word">' + word + '</div>' +
+      '<div class="popup-error">No definition found. Type your own:</div>' +
+      '<textarea class="popup-manual" id="manual-def" rows="2" placeholder="Type definition..."></textarea>' +
+      '<div class="popup-btns"><button class="btn-add" onclick="addFromPopup(\'' + word + '\',true)">+ Add to ' + childName + '\'s Vocab</button></div>';
+  }
+}
+function renderPopupDef(word, result) {
+  var inVocab = getVocab().some(function(v) { return v.word === word; });
+  document.getElementById("popup-content").innerHTML =
+    '<div class="popup-word">' + word + '</div>' +
+    (result.phonetic ? '<div class="popup-phonetic">' + result.phonetic + '</div>' : '') +
+    '<div class="popup-def">' + result.definition + '</div>' +
+    '<div class="popup-btns">' +
+    (inVocab
+      ? '<button class="btn-added" disabled>Already in ' + childName + '\'s list</button>'
+      : '<button class="btn-add" onclick="addFromPopup(\'' + word + '\',false)">+ Add to ' + childName + '\'s Vocab</button>') +
+    '</div>';
+}
+function addFromPopup(word, manual) {
+  var def = "";
+  if (manual) {
+    var ta = document.getElementById("manual-def");
+    def = ta ? ta.value.trim() : "";
+    if (!def) { ta.style.borderColor = "var(--accent)"; return; }
+  } else {
+    var cached = defCache.get(word);
+    def = cached ? cached.definition.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : word;
+  }
+  addToVocab(word, def);
+  var btn = event.target;
+  btn.textContent = "Added!"; btn.classList.add("btn-added"); btn.disabled = true;
+  // Auto-switch to vocab tab to show the new word
+  switchTab('vocab');
+  setTimeout(dismissPopup, 500);
+}
+function dismissPopup() { document.getElementById("vocab-popup").style.display = "none"; }
+
+// === Vocab Storage ===
+function getVocab() { try { return JSON.parse(localStorage.getItem(STORAGE_VOCAB)) || []; } catch(e) { return []; } }
+function saveVocabList(list) { try { localStorage.setItem(STORAGE_VOCAB, JSON.stringify(list)); } catch(e) {} }
+function addToVocab(word, definition) {
+  var list = getVocab();
+  if (list.some(function(v) { return v.word === word; })) return;
+  list.push({ word: word, definition: definition, source: ARTICLE_ID, sourceTitle: ARTICLE_TITLE, dateAdded: new Date().toISOString().slice(0,10) });
+  saveVocabList(list);
+  renderVocabPanel();
+}
+function removeFromVocab(word) {
+  saveVocabList(getVocab().filter(function(v) { return v.word !== word; }));
+  renderVocabPanel();
+}
+
+// === Vocab Panel (sidebar) ===
+function renderVocabPanel() {
+  var vocab = getVocab().filter(function(v) { return v.source === ARTICLE_ID; });
+  document.getElementById("vocab-count").textContent = vocab.length ? vocab.length + " word" + (vocab.length > 1 ? "s" : "") + " saved" : "";
+  var listEl = document.getElementById("vocab-list");
+  if (!vocab.length) {
+    listEl.innerHTML = '<div class="vocab-empty">No words saved yet. Select any word in the article to look it up.</div>';
+    return;
+  }
+  listEl.innerHTML = vocab.map(function(v) {
+    return '<div class="vocab-entry"><span class="v-word">' + v.word + '</span><span class="v-def">' + v.definition + '</span>' +
+      '<button class="v-remove" onclick="removeFromVocab(\'' + v.word + '\')" title="Remove">&times;</button></div>';
+  }).join("");
+}
+
+// === Questions ===
+var saveTimer = null;
+function renderQuestions() {
+  document.getElementById("questions-container").innerHTML = QUESTIONS.map(function(q, i) {
+    var n = i + 1;
+    return '<div class="question-card"><div class="q-top"><span class="q-badge q-badge-' + n + '">' + n + '</span>' +
+      '<div><div class="q-label q-label-' + n + '">' + q.label + '</div><div class="q-text">' + q.text + '</div></div></div>' +
+      '<textarea id="answer-' + n + '" placeholder="Write your thoughts..." oninput="scheduleAutoSave()"></textarea>' +
+      '<div class="q-save-indicator" id="save-ind-' + n + '"></div></div>';
+  }).join("");
+}
+function loadAnswers() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORAGE_ANSWERS)) || {};
+    QUESTIONS.forEach(function(_, i) { var ta = document.getElementById("answer-" + (i+1)); if (ta) ta.value = saved["q" + (i+1)] || ""; });
+  } catch(e) {}
+}
+function saveAnswers() {
+  var data = { lastSaved: new Date().toISOString() };
+  QUESTIONS.forEach(function(_, i) { var ta = document.getElementById("answer-" + (i+1)); data["q" + (i+1)] = ta ? ta.value : ""; });
+  try { localStorage.setItem(STORAGE_ANSWERS, JSON.stringify(data)); } catch(e) {}
+  QUESTIONS.forEach(function(_, i) {
+    var ind = document.getElementById("save-ind-" + (i+1));
+    var ta = document.getElementById("answer-" + (i+1));
+    if (ind && ta && ta.value.trim()) { ind.textContent = "Saved"; setTimeout(function() { if (ind.textContent === "Saved") ind.textContent = ""; }, 2000); }
+  });
+}
+function scheduleAutoSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveAnswers, 800); }
+
+// === Done / Reopen with Plan Sync ===
+function toggleDone() {
+  var current = localStorage.getItem(STORAGE_DONE);
+  var sync = PLAN_SYNC[CHILD];
+  if (current) {
+    localStorage.removeItem(STORAGE_DONE);
+    document.getElementById("done-btn").classList.remove("completed");
+    document.getElementById("done-btn").textContent = "Mark as Read";
+    document.getElementById("done-btn").style.display = "";
+    document.getElementById("reopen-btn").style.display = "none";
+    document.getElementById("done-msg").textContent = "";
+    if (sync) {
+      var ps = JSON.parse(localStorage.getItem(sync.storageKey)) || {};
+      ps[sync.taskKey + "_s" + SUB_INDEX] = false;
+      ps[sync.taskKey] = false;
+      localStorage.setItem(sync.storageKey, JSON.stringify(ps));
+    }
+  } else {
+    var now = new Date().toLocaleDateString();
+    localStorage.setItem(STORAGE_DONE, now);
+    document.getElementById("done-btn").classList.add("completed");
+    document.getElementById("done-btn").textContent = "Completed";
+    document.getElementById("done-btn").style.display = "none";
+    document.getElementById("reopen-btn").style.display = "";
+    document.getElementById("done-msg").textContent = "Done " + now;
+    if (sync) {
+      var ps2 = JSON.parse(localStorage.getItem(sync.storageKey)) || {};
+      ps2[sync.taskKey + "_s" + SUB_INDEX] = true;
+      if (ps2[sync.taskKey + "_s0"] && ps2[sync.taskKey + "_s1"]) { ps2[sync.taskKey] = true; }
+      localStorage.setItem(sync.storageKey, JSON.stringify(ps2));
+    }
+  }
+}
+function restoreDone() {
+  var done = localStorage.getItem(STORAGE_DONE);
+  if (done) {
+    document.getElementById("done-btn").classList.add("completed");
+    document.getElementById("done-btn").textContent = "Completed";
+    document.getElementById("done-btn").style.display = "none";
+    document.getElementById("reopen-btn").style.display = "";
+    document.getElementById("done-msg").textContent = "Done " + done;
+  }
+}
+
+// === Init ===
+(function() {
+  renderQuestions();
+  loadAnswers();
+  renderVocabPanel();
+  restoreDone();
+  document.addEventListener("mouseup", function(e) { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 50); });
+  document.addEventListener("touchend", function(e) { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 350); });
+  document.addEventListener("mousedown", function(e) { if (document.getElementById("vocab-popup").style.display === "block" && !document.getElementById("vocab-popup").contains(e.target)) dismissPopup(); });
+  document.addEventListener("keydown", function(e) { if (e.key === "Escape") dismissPopup(); });
+})();
+</script>
+</body>
+</html>

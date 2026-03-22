@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TePi — Q2-2026</title>
+<style>
+  :root {
+    --bg: #2b2d31;
+    --surface: #313338;
+    --card: #383a40;
+    --accent: #e8555a;
+    --accent2: #9b6dd7;
+    --gold: #e0a82e;
+    --text: #e0e0e0;
+    --muted: #999;
+    --green: #57d9a3;
+    --green-light: rgba(87,217,163,0.1);
+    --border: #44464d;
+    --shadow: 0 2px 6px rgba(0,0,0,0.2);
+    --done-bg: rgba(87,217,163,0.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  /* Tab navigation */
+  .tab-bar {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+  .tab-btn {
+    padding: 12px 18px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--text); background: var(--card); }
+  .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+
+  .tab-page { display: none; padding: 28px 20px; max-width: 880px; margin: 0 auto; }
+  .tab-page.active { display: block; }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: var(--surface);
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-inner { max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  .progress-title { font-weight: 600; font-size: 0.95em; white-space: nowrap; }
+  .progress-title .emoji { font-size: 1.1em; }
+  .progress-bar-wrap { flex: 1; }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 0.78em; color: var(--muted); margin-bottom: 4px;
+  }
+  .progress-label .pct { color: var(--green); font-weight: 700; }
+  .progress-track { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold), var(--green));
+    border-radius: 5px;
+    transition: width 0.5s ease;
+  }
+
+  /* Pillars */
+  .pillars { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+  .pillar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .pillar .icon { font-size: 1.8em; margin-bottom: 6px; }
+  .pillar h3 { font-size: 1em; margin-bottom: 4px; }
+  .pillar p { font-size: 0.85em; color: var(--muted); }
+  .pillar:nth-child(1) { border-top: 3px solid var(--accent); }
+  .pillar:nth-child(2) { border-top: 3px solid var(--accent2); }
+  .pillar:nth-child(3) { border-top: 3px solid var(--gold); }
+
+  /* Target sections */
+  .target-section { margin-bottom: 20px; }
+  .target-section h3 {
+    font-size: 0.95em;
+    padding: 8px 14px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .target-section h3 .icon { font-size: 1.1em; }
+  .ts-read h3 { background: rgba(232,85,90,0.12); color: var(--accent); }
+  .ts-write h3 { background: rgba(155,109,215,0.12); color: var(--accent2); }
+  .ts-math h3 { background: rgba(224,168,46,0.12); color: var(--gold); }
+  .ts-project h3 { background: var(--green-light); color: var(--green); }
+
+  .target-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .target-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.92em;
+    box-shadow: var(--shadow);
+  }
+  .target-item .value { color: var(--green); font-weight: 600; font-size: 0.92em; }
+
+  /* Phase card on overview */
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .phase-card .phase-icon { font-size: 2em; flex-shrink: 0; }
+  .phase-card h3 { font-size: 1.05em; margin-bottom: 2px; }
+  .phase-card p { font-size: 0.9em; color: var(--muted); }
+  .phase-card .phase-dates { font-size: 0.85em; color: var(--green); font-weight: 600; margin-top: 4px; }
+  .phase-card.p1 { border-left: 4px solid var(--accent); }
+  .phase-card.p2 { border-left: 4px solid var(--accent2); }
+  .phase-card.p3 { border-left: 4px solid var(--gold); }
+
+  /* Phase header in week tabs */
+  .phase-header {
+    margin-bottom: 18px; padding: 14px 18px; border-radius: 10px;
+    background: var(--surface); box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .phase-header .phase-icon { font-size: 1.6em; }
+  .phase-header h2 { font-size: 1.1em; }
+  .phase-header p { font-size: 0.82em; color: var(--muted); }
+  .phase-header.p1 { border-left: 4px solid var(--accent); }
+  .phase-header.p2 { border-left: 4px solid var(--accent2); }
+  .phase-header.p3 { border-left: 4px solid var(--gold); }
+
+  /* Week card */
+  .week-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .week-card-header {
+    padding: 12px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+  }
+  .week-card-header h3 { font-size: 1em; display: flex; align-items: center; gap: 8px; }
+  .week-progress { font-size: 0.82em; color: var(--green); font-weight: 600; }
+  .week-body { padding: 16px 18px; }
+
+  /* Task group */
+  .task-group {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .task-group:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+
+  .task-parent {
+    display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px;
+  }
+  .task-parent input[type="checkbox"] {
+    accent-color: var(--green);
+    width: 18px; height: 18px; margin-top: 3px; flex-shrink: 0;
+  }
+  .task-parent-icon { font-size: 1.1em; flex-shrink: 0; }
+  .task-parent-label {
+    font-weight: 600; font-size: 0.95em; flex-shrink: 0; min-width: 80px;
+  }
+  .task-parent-text { font-size: 0.95em; }
+  .task-parent.done .task-parent-text,
+  .task-parent.done .task-parent-label { text-decoration: line-through; color: var(--muted); }
+
+  .sub-tasks { margin-left: 30px; margin-top: 6px; }
+  .sub-task {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 4px 0; font-size: 0.9em;
+  }
+  .sub-task input[type="checkbox"] {
+    accent-color: var(--green);
+    width: 15px; height: 15px; margin-top: 2px; flex-shrink: 0;
+  }
+  .sub-task.done span { text-decoration: line-through; color: var(--muted); }
+  .sub-task a { color: var(--green); text-decoration: none; font-weight: 600; border-bottom: 1px dashed rgba(87,217,163,0.4); }
+  .sub-task a:hover { border-bottom-style: solid; }
+
+  .comment-area { margin-top: 8px; margin-left: 30px; }
+  .comment-area textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.88em;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 32px;
+  }
+  .comment-area textarea:focus { border-color: var(--green); outline: none; }
+  .comment-area textarea::placeholder { color: #bbb; }
+
+  /* Save bar */
+  .save-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex; justify-content: center; align-items: center; gap: 16px;
+    z-index: 100;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+  }
+  .save-btn {
+    background: var(--green); color: #fff; border: none;
+    padding: 8px 32px; border-radius: 6px;
+    font-family: inherit; font-size: 0.9em; font-weight: 600; cursor: pointer;
+  }
+  .save-btn:hover { opacity: 0.9; }
+  .save-msg { font-size: 0.82em; color: var(--green); }
+
+  .highlight {
+    background: rgba(224,168,46,0.2); padding: 1px 6px; border-radius: 3px; font-weight: 600; color: var(--gold);
+  }
+
+  .bottom-spacer { height: 60px; }
+
+  @media (max-width: 700px) {
+    .pillars { grid-template-columns: 1fr; }
+    .target-grid { grid-template-columns: 1fr; }
+    .tab-btn { padding: 10px 12px; font-size: 0.8em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('overview')">📋 Overview</button>
+  <button class="tab-btn" onclick="showTab('w1')">W1</button>
+  <button class="tab-btn" onclick="showTab('w2')">W2</button>
+  <button class="tab-btn" onclick="showTab('w3')">W3</button>
+  <button class="tab-btn" onclick="showTab('w4')">W4</button>
+  <button class="tab-btn" onclick="showTab('w5')">W5</button>
+  <button class="tab-btn" onclick="showTab('w6')">W6</button>
+  <button class="tab-btn" onclick="showTab('w7')">W7</button>
+  <button class="tab-btn" onclick="showTab('w8')">W8</button>
+  <button class="tab-btn" onclick="showTab('w9')">W9</button>
+  <button class="tab-btn" onclick="showTab('w10')">W10</button>
+  <button class="tab-btn" onclick="showTab('w11')">W11</button>
+  <button class="tab-btn" onclick="showTab('w12')">W12</button>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="progress-title"><span class="emoji">🎯</span> TePi Q2-2026</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>Overall Progress</span>
+        <span class="pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="tab-page active" id="tab-overview">
+
+  <div class="pillars">
+    <div class="pillar"><div class="icon">🧠</div><h3>Intellectual Sovereignty</h3><p>Think independently when machines think for you</p></div>
+    <div class="pillar"><div class="icon">💛</div><h3>Rooted Character</h3><p>Faith, love, community, discipline</p></div>
+    <div class="pillar"><div class="icon">🔧</div><h3>Economic Independence</h3><p>Practical skills, shipped projects, visible results</p></div>
+  </div>
+
+  <h2 style="margin:0 0 16px; font-size:1.15em;">📅 Phases</h2>
+
+  <div class="phase-card p1">
+    <div class="phase-icon">🚀</div>
+    <div>
+      <h3>Phase 1 — Sharpen the Foundation</h3>
+      <p>Math sprint to placement test. Launch reading habit with Economist + Orwell. Build the intellectual engine.</p>
+      <div class="phase-dates">Weeks 1-5 · Mar 23 – Apr 27 · 🎯 Placement Test Apr 23</div>
+    </div>
+  </div>
+  <div class="phase-card p2">
+    <div class="phase-icon">📈</div>
+    <div>
+      <h3>Phase 2 — Deepen & Build</h3>
+      <p>Reading volume doubles. Project begins with defined scope. Math shifts to self-paced growth. From consuming to producing.</p>
+      <div class="phase-dates">Weeks 6-9 · Apr 28 – May 25</div>
+    </div>
+  </div>
+  <div class="phase-card p3">
+    <div class="phase-icon">🏁</div>
+    <div>
+      <h3>Phase 3 — Ship It</h3>
+      <p>Project delivers a visible result. Knowledge becomes something the community can see. Prove you can finish what you start.</p>
+      <div class="phase-dates">Weeks 10-12 · May 26 – Jun 14</div>
+    </div>
+  </div>
+
+  <h2 style="margin:28px 0 14px; font-size:1.15em;">🎯 Quarter Targets</h2>
+
+  <div class="target-section ts-read">
+    <h3><span class="icon">📚</span> Reading — Intellectual Sovereignty</h3>
+    <div class="target-grid">
+      <div class="target-item"><span>Books (his choice)</span><span class="value">1.8M words</span></div>
+      <div class="target-item"><span>Finance & Economics</span><span class="value">~20 articles</span></div>
+      <div class="target-item"><span>Policy & Institutions</span><span class="value">~5 articles</span></div>
+      <div class="target-item"><span>Science & Math</span><span class="value">~8 articles</span></div>
+      <div class="target-item"><span>Essay Craft (Orwell)</span><span class="value">4 essays</span></div>
+    </div>
+  </div>
+
+  <div class="target-section ts-write">
+    <h3><span class="icon">✍️</span> Writing & Vocab — Sharpen the Instrument</h3>
+    <div class="target-grid">
+      <div class="target-item"><span>Opinion essays (Econ/Business/Science)</span><span class="value">~12 essays</span></div>
+      <div class="target-item"><span>Response essays (Orwell/NYT)</span><span class="value">~12 essays</span></div>
+      <div class="target-item"><span>SAT Vocabulary</span><span class="value">110 pages</span></div>
+    </div>
+  </div>
+
+  <div class="target-section ts-math">
+    <h3><span class="icon">🔢</span> Math — Placement Readiness</h3>
+    <div class="target-grid">
+      <div class="target-item"><span>Algebra 2 (12 units)</span><span class="value">Weeks 1-4</span></div>
+      <div class="target-item"><span>Trigonometry (4 units)</span><span class="value">Week 5</span></div>
+      <div class="target-item"><span>Precalculus (stretch)</span><span class="value">Weeks 6-12</span></div>
+      <div class="target-item"><span>Placement Test</span><span class="value">Apr 23</span></div>
+    </div>
+  </div>
+
+  <div class="target-section ts-project">
+    <h3><span class="icon">🛠️</span> Project — Economic Independence</h3>
+    <div class="target-grid">
+      <div class="target-item"><span>Ship one project</span><span class="value">Weeks 6-11</span></div>
+      <div class="target-item"><span>Visible to community</span><span class="value">Week 11</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- WEEK TABS -->
+<div class="tab-page" id="tab-w1"></div>
+<div class="tab-page" id="tab-w2"></div>
+<div class="tab-page" id="tab-w3"></div>
+<div class="tab-page" id="tab-w4"></div>
+<div class="tab-page" id="tab-w5"></div>
+<div class="tab-page" id="tab-w6"></div>
+<div class="tab-page" id="tab-w7"></div>
+<div class="tab-page" id="tab-w8"></div>
+<div class="tab-page" id="tab-w9"></div>
+<div class="tab-page" id="tab-w10"></div>
+<div class="tab-page" id="tab-w11"></div>
+<div class="tab-page" id="tab-w12"></div>
+
+<div class="save-bar">
+  <button class="save-btn" onclick="saveAll()">💾 Save Progress</button>
+  <span class="save-msg" id="save-msg"></span>
+</div>
+<div class="bottom-spacer"></div>
+
+<script>
+const TASK_ICONS = {"Math":"🔢","Reading":"📰","Books":"📚","Vocab":"📖","Writing":"✍️","Project":"🛠️"};
+function iconFor(label) {
+  for (const [k,v] of Object.entries(TASK_ICONS)) { if (label.includes(k)) return v; }
+  return "▪️";
+}
+
+const WEEKS = [
+  { week:1, dates:"Mar 23–29", phase:1, phaseName:"Sharpen the Foundation", phaseIcon:"🚀", tasks:[
+    {label:"Math",text:"Algebra 2 diagnostic + Units 1-3",subs:["<a href='https://www.khanacademy.org/math/algebra2/test/x2ec2f6f830c9fb89:course-challenge'>Take Course Challenge</a> — record scores","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:poly-arithmetic'>Unit 1: Polynomial arithmetic</a>","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:complex'>Unit 2: Complex numbers</a>","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:poly-factor'>Unit 3: Polynomial factoring</a>"]},
+    {label:"Reading",text:"Quanta + Orwell",subs:["<a href='../articles/w1/quanta-lonely-runner.html#tepi'>Quanta: Lonely Runner Problem</a> (~1,800 words, math)","<a href='../articles/w1/orwell-shooting-an-elephant.html#tepi'>Orwell: Shooting an Elephant</a> (~3,500 words)"]},
+    {label:"Books",text:"Continue current fiction · 150K words",subs:["Track title and word count"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on math or science — inspired by the Quanta article","1 essay responding to Orwell (Shooting an Elephant)"]}
+  ]},
+  { week:2, dates:"Mar 30–Apr 5", phase:1, phaseName:"Sharpen the Foundation", phaseIcon:"🚀", tasks:[
+    {label:"Math",text:"Algebra 2 Units 4-6",subs:["<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:poly-div'>Unit 4: Polynomial division</a>","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:poly-graphs'>Unit 5: Polynomial graphs</a>","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:exp'>Unit 6: Rational exponents & radicals</a>"]},
+    {label:"Reading",text:"Economist + Quanta",subs:["Economist: 1 article","Quanta: 1 article"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to NYT prompt"]}
+  ]},
+  { week:3, dates:"Apr 6–12", phase:1, phaseName:"Sharpen the Foundation", phaseIcon:"🚀", tasks:[
+    {label:"Math",text:"Algebra 2 Units 7-9",subs:["<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:exp-model'>Unit 7: Exponential models</a>","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:logs'>Unit 8: Logarithms</a>","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:transformations'>Unit 9: Transformations of functions</a>"]},
+    {label:"Reading",text:"Economist + National Affairs + Orwell",subs:["Economist: 1 article","National Affairs: 1 article","Orwell: A Hanging"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to Orwell (A Hanging)"]}
+  ]},
+  { week:4, dates:"Apr 13–19", phase:1, phaseName:"Sharpen the Foundation", phaseIcon:"🚀", tasks:[
+    {label:"Math",text:"Algebra 2 Units 10-12 + Course Challenge",subs:["<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:rational'>Unit 10: Rational functions</a>","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:eq'>Unit 11: Equations</a>","<a href='https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:modeling'>Unit 12: Modeling</a>","<a href='https://www.khanacademy.org/math/algebra2/test/x2ec2f6f830c9fb89:course-challenge'>Retake Course Challenge</a> — compare to Week 1"]},
+    {label:"Reading",text:"Economist + Quanta",subs:["Economist: 1 article","Quanta: 1 article"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to NYT prompt"]}
+  ]},
+  { week:5, dates:"Apr 20–27", phase:1, phaseName:"Sharpen the Foundation", phaseIcon:"🚀", tasks:[
+    {label:"Math",text:"Trig Units 1-4 · PLACEMENT TEST Apr 23",subs:["<a href='https://www.khanacademy.org/math/trigonometry/trigonometry-right-triangles'>Unit 1: Right triangles & trigonometry</a>","<a href='https://www.khanacademy.org/math/trigonometry/unit-circle-trig-func'>Unit 2: Trigonometric functions</a>","<a href='https://www.khanacademy.org/math/trigonometry/trig-with-general-triangles'>Unit 3: Non-right triangles</a>","<a href='https://www.khanacademy.org/math/trigonometry/trig-equations-and-identities'>Unit 4: Trig identities & equations</a>","🎯 PLACEMENT TEST — April 23"]},
+    {label:"Reading",text:"Economist + National Affairs",subs:["Economist: 1 article","National Affairs: 1 article"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to NYT prompt"]}
+  ]},
+  { week:6, dates:"Apr 28–May 4", phase:2, phaseName:"Deepen & Build", phaseIcon:"📈", tasks:[
+    {label:"Math",text:"Precalculus at own pace",subs:["<a href='https://www.khanacademy.org/math/precalculus'>Continue on Precalculus</a>"]},
+    {label:"Reading",text:"Economist ×2 + Quanta + Orwell",subs:["Economist: 2 articles","Quanta: 1 article","Orwell: Why I Write"]},
+    {label:"Books",text:"Start non-fiction · 150K words",subs:["Pick a non-fiction title","Track word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to Orwell (Why I Write)"]},
+    {label:"Project",text:"Decision week: define scope",subs:["Choose project","Define deliverable","Define audience","Write one-paragraph scope"]}
+  ]},
+  { week:7, dates:"May 5–11", phase:2, phaseName:"Deepen & Build", phaseIcon:"📈", tasks:[
+    {label:"Math",text:"Precalculus at own pace",subs:["Continue"]},
+    {label:"Reading",text:"Economist ×2 + National Affairs + Quanta",subs:["Economist: 2 articles","National Affairs: 1 article","Quanta: 1 article"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to NYT prompt"]},
+    {label:"Project",text:"Milestone 1: Research & design",subs:["Materials list finalized","First physical step taken"]}
+  ]},
+  { week:8, dates:"May 12–18", phase:2, phaseName:"Deepen & Build", phaseIcon:"📈", tasks:[
+    {label:"Math",text:"Precalculus at own pace",subs:["Continue"]},
+    {label:"Reading",text:"Economist ×2 + Quanta",subs:["Economist: 2 articles","Quanta: 1 article"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT: 10 pages + mid-quarter review",subs:["Complete pages","Quiz all pages so far"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to NYT prompt"]},
+    {label:"Project",text:"Milestone 2: First prototype",subs:["Something tangible exists"]}
+  ]},
+  { week:9, dates:"May 19–25", phase:2, phaseName:"Deepen & Build", phaseIcon:"📈", tasks:[
+    {label:"Math",text:"Precalculus at own pace",subs:["Continue"]},
+    {label:"Reading",text:"Economist ×2 + National Affairs",subs:["Economist: 2 articles","National Affairs: 1 article"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to NYT prompt"]},
+    {label:"Project",text:"Milestone 3: Iterate & fix",subs:["Identify what failed","Fix and improve"]}
+  ]},
+  { week:10, dates:"May 26–Jun 1", phase:3, phaseName:"Ship It", phaseIcon:"🏁", tasks:[
+    {label:"Math",text:"Precalculus — stretch",subs:["At own pace"]},
+    {label:"Reading",text:"Economist ×2 + Quanta + Orwell",subs:["Economist: 2 articles","Quanta: 1 article","Orwell: Politics and the English Language (3 days)"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to Orwell (Politics and the English Language)"]},
+    {label:"Project",text:"Milestone 4: Final build",subs:["It should work / be usable"]}
+  ]},
+  { week:11, dates:"Jun 2–8", phase:3, phaseName:"Ship It", phaseIcon:"🏁", tasks:[
+    {label:"Math",text:"Precalculus — bonus",subs:["At own pace"]},
+    {label:"Reading",text:"Economist ×2 + National Affairs + Quanta",subs:["Economist: 2 articles","National Affairs: 1 article","Quanta: 1 article"]},
+    {label:"Books",text:"150K words",subs:["Track title and word count"]},
+    {label:"Vocab",text:"SAT workbook: 10 pages",subs:["Complete pages and mark done"]},
+    {label:"Writing",text:"Two essays this week",subs:["1 opinion essay on an Economics/Business/Science topic","1 essay responding to NYT prompt"]},
+    {label:"Project",text:"🚀 SHIP IT",subs:["Publish, present, or deliver","Must reach its audience"]}
+  ]},
+  { week:12, dates:"Jun 9–14 · Quarter Close", phase:3, phaseName:"Ship It", phaseIcon:"🏁", tasks:[
+    {label:"Math",text:"Rest",subs:[]},
+    {label:"Reading",text:"Economist: 1 · Free reading",subs:["Economist: 1 article","Read whatever you want"]},
+    {label:"Books",text:"Free reading",subs:[]},
+    {label:"Vocab",text:"Full review",subs:["What's yours now? What's still foreign?"]},
+    {label:"Writing",text:"Quarter reflection essay",subs:["What did I learn this quarter? What surprised me?"]},
+    {label:"Project",text:"Post-mortem",subs:["What worked?","What didn't?","What would you do differently?"]}
+  ]}
+];
+
+const STORAGE_KEY = "tepi_q2_2026";
+function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } }
+function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+let state = loadState();
+
+function render() {
+  WEEKS.forEach(w => {
+    const el = document.getElementById(`tab-w${w.week}`);
+    const pc = `p${w.phase}`;
+    let h = `<div class="phase-header ${pc}"><div class="phase-icon">${w.phaseIcon}</div><div><h2>Week ${w.week} — ${w.phaseName}</h2><p>${w.dates}</p></div></div>`;
+    h += `<div class="week-card"><div class="week-card-header"><h3>📋 Week ${w.week} Tasks</h3><span class="week-progress" id="wp-${w.week}"></span></div><div class="week-body">`;
+    w.tasks.forEach((t, ti) => {
+      const pk = `w${w.week}_t${ti}`;
+      const pd = state[pk] || false;
+      const dc = pd ? " done" : "";
+      const ic = iconFor(t.label);
+      h += `<div class="task-group"><div class="task-parent${dc}">`;
+      h += `<input type="checkbox" id="${pk}" ${pd?"checked":""} onchange="toggleParent('${pk}',${w.week},${ti})">`;
+      h += `<span class="task-parent-icon">${ic}</span>`;
+      h += `<span class="task-parent-label">${t.label}</span>`;
+      h += `<span class="task-parent-text">${t.text}</span></div>`;
+      if (t.subs.length) {
+        h += `<div class="sub-tasks">`;
+        t.subs.forEach((s, si) => {
+          const sk = `w${w.week}_t${ti}_s${si}`;
+          const sd = state[sk] || false;
+          h += `<div class="sub-task${sd?" done":""}"><input type="checkbox" id="${sk}" ${sd?"checked":""} onchange="toggleSub('${sk}',${w.week},${ti})"><span>${s}</span></div>`;
+        });
+        h += `</div>`;
+      }
+      const ck = `w${w.week}_t${ti}_comment`;
+      h += `<div class="comment-area"><textarea id="${ck}" placeholder="Notes..." oninput="updateComment('${ck}')">${state[ck]||""}</textarea></div></div>`;
+    });
+    h += `</div></div>`;
+    el.innerHTML = h;
+  });
+  updateProgress();
+}
+
+function toggleSub(sk, week, ti) {
+  const el = document.getElementById(sk);
+  state[sk] = el.checked;
+  el.parentElement.classList.toggle("done", el.checked);
+  const t = WEEKS[week-1].tasks[ti];
+  if (t.subs.length) {
+    const all = t.subs.every((_,si) => state[`w${week}_t${ti}_s${si}`]);
+    const pk = `w${week}_t${ti}`;
+    state[pk] = all;
+    const pe = document.getElementById(pk);
+    if (pe) { pe.checked = all; pe.closest(".task-parent").classList.toggle("done", all); }
+  }
+  updateProgress();
+}
+
+function toggleParent(pk, week, ti) {
+  const el = document.getElementById(pk);
+  state[pk] = el.checked;
+  el.closest(".task-parent").classList.toggle("done", el.checked);
+  WEEKS[week-1].tasks[ti].subs.forEach((_,si) => {
+    const sk = `w${week}_t${ti}_s${si}`;
+    state[sk] = el.checked;
+    const se = document.getElementById(sk);
+    if (se) { se.checked = el.checked; se.parentElement.classList.toggle("done", el.checked); }
+  });
+  updateProgress();
+}
+
+function updateComment(k) { state[k] = document.getElementById(k).value; }
+
+function updateProgress() {
+  let total = 0, done = 0;
+  WEEKS.forEach(w => {
+    let wt = 0, wd = 0;
+    w.tasks.forEach((t, ti) => {
+      if (t.subs.length) {
+        t.subs.forEach((_,si) => { total++; wt++; if (state[`w${w.week}_t${ti}_s${si}`]) { done++; wd++; } });
+      } else { total++; wt++; if (state[`w${w.week}_t${ti}`]) { done++; wd++; } }
+    });
+    const we = document.getElementById(`wp-${w.week}`);
+    if (we) { const p = wt ? Math.round(wd/wt*100) : 0; we.textContent = p === 100 ? "✅" : `${p}%`; }
+    const btn = document.querySelectorAll(".tab-btn")[w.week];
+    if (btn) {
+      const p = wt ? Math.round(wd/wt*100) : 0;
+      if (p === 100) { btn.style.color = "var(--green)"; btn.textContent = `W${w.week} ✅`; }
+      else if (p > 0) { btn.style.color = "var(--text)"; }
+    }
+  });
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById("progress-pct").textContent = `${pct}%`;
+  document.getElementById("progress-fill").style.width = `${pct}%`;
+}
+
+function showTab(id) {
+  document.querySelectorAll(".tab-page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  const t = document.getElementById(`tab-${id}`);
+  if (t) t.classList.add("active");
+  const btns = document.querySelectorAll(".tab-btn");
+  if (id === "overview") btns[0].classList.add("active");
+  else { const i = parseInt(id.replace("w","")); if (btns[i]) btns[i].classList.add("active"); }
+}
+
+function saveAll() {
+  saveState(state);
+  const m = document.getElementById("save-msg");
+  m.textContent = `✅ Saved ${new Date().toLocaleTimeString()}`;
+  setTimeout(() => m.textContent = "", 3000);
+}
+
+setInterval(() => saveState(state), 30000);
+render();
+</script>
+</body>
+</html>
