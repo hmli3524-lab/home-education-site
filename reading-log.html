@@ -293,9 +293,9 @@
       <div class="stat-sub" id="stat-year-sub">2025-2026</div>
     </div>
     <div class="stat-card rereads">
-      <div class="stat-value" id="stat-rereads">--</div>
-      <div class="stat-label">Rereads</div>
-      <div class="stat-sub">Favorites</div>
+      <div class="stat-value" id="stat-level">--</div>
+      <div class="stat-label">Reading Level</div>
+      <div class="stat-sub" id="stat-level-sub">vs grade level</div>
     </div>
   </div>
 
@@ -325,10 +325,7 @@
   <div class="section-panel active" id="spanel-books">
     <!-- Add book form -->
     <div class="add-form-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <h3 style="margin:0">+ Add New Book</h3>
-        <a href="#" onclick="switchSection('suggestions');return false" style="color:var(--accent2);font-size:0.85em;text-decoration:none;font-weight:600">Need a suggestion? &rarr;</a>
-      </div>
+      <h3 style="margin-bottom:14px">+ Add New Book</h3>
       <div class="form-row">
         <div class="form-group" style="flex:3">
           <label>Book Title</label>
@@ -932,7 +929,22 @@ function render() {
   document.getElementById("stat-total-books").textContent = totalBooks;
   document.getElementById("stat-year-words").textContent = fmt(yearWords);
   document.getElementById("stat-year-sub").textContent = yearWords.toLocaleString() + " / " + fmt(target);
-  document.getElementById("stat-rereads").textContent = rereadCount;
+  // Quick reading level for stat card (full analysis below)
+  var quickLevelNames = ['Adult Non-Fiction','Advanced (Gr 9-10)','Young Adult (Gr 7-8)','Middle Grade (Gr 5-6)','Elementary (Gr 3-4)'];
+  var quickLevelGrades = {'Adult Non-Fiction':'11+','Advanced (Gr 9-10)':'9-10','Young Adult (Gr 7-8)':'7-8','Middle Grade (Gr 5-6)':'5-6','Elementary (Gr 3-4)':'3-4'};
+  var cyBooks = all.filter(function(b){return b.year===CURRENT_YEAR;});
+  var qlLevel = 'Middle Grade';
+  for (var qi=0;qi<quickLevelNames.length;qi++){
+    var qlN=quickLevelNames[qi]; var qlKws=levelKeywords[qlN]?levelKeywords[qlN].keywords:[];
+    var qlCnt=0; cyBooks.forEach(function(b){var lo=b.title.toLowerCase();for(var k=0;k<qlKws.length;k++){if(lo.indexOf(qlKws[k])>=0){qlCnt++;break;}}});
+    if(qlCnt>=2){qlLevel=qlN;break;}
+  }
+  var qlGrade = quickLevelGrades[qlLevel]||'?';
+  var expGrade = activeChild==='tepi'?'8':'6';
+  var lvlMsg = parseInt(qlGrade)>parseInt(expGrade)?'Above grade':'At grade';
+  if(qlGrade==='11+') lvlMsg='Adult level';
+  document.getElementById("stat-level").textContent = "Gr " + qlGrade;
+  document.getElementById("stat-level-sub").textContent = lvlMsg;
 
   // Progress bar
   const pct = Math.min(100, (yearWords / target * 100));
@@ -1330,7 +1342,7 @@ function render() {
   renderSuggestions(all);
   function renderSuggestions(allBooks) {
     var hidden = getDismissed(activeChild);
-    var batchSize = 3; // books per direction per page
+    var batchSize = 4; // max books shown per direction
     var recs = RECS[activeChild] || [];
     var sugHtml = '<h2>Reading Suggestions</h2>';
 
@@ -1351,10 +1363,12 @@ function render() {
 
       var pageKey = 'sug_page_' + activeChild + '_' + di;
       var page = parseInt(localStorage.getItem(pageKey) || '0');
-      var start = 0;
-      var end = (page + 1) * batchSize;
+      var totalPages = Math.ceil(visible.length / batchSize);
+      if (page >= totalPages) page = 0; // wrap around
+      var start = page * batchSize;
+      var end = Math.min(start + batchSize, visible.length);
       var shown = visible.slice(start, end);
-      var hasMore = end < visible.length;
+      var hasOtherBatch = visible.length > batchSize;
 
       sugHtml += '<div class="direction-card">' +
         '<div class="dir-header"><span class="dir-icon">\u27A4</span><strong>' + dir.direction + '</strong></div>' +
@@ -1395,8 +1409,8 @@ function render() {
       });
 
       sugHtml += '</div>';
-      if (hasMore) {
-        sugHtml += '<button class="show-more-btn" onclick="showMoreRecs(' + di + ')">Show more \u2192</button>';
+      if (hasOtherBatch) {
+        sugHtml += '<button class="show-more-btn" onclick="showMoreRecs(' + di + ')">Try another batch \u21BB</button>';
       }
       sugHtml += '</div>';
     });
