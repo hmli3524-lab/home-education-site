@@ -185,6 +185,33 @@
   .fav-card .fav-meta { font-size: 0.82em; color: var(--muted); }
   .fav-card .fav-year { font-size: 0.78em; color: var(--gold); margin-top: 6px; }
 
+  /* Collapsible year headers */
+  .year-header.collapsible { cursor: pointer; }
+  .year-header.collapsible:hover { background: rgba(78,205,196,0.04); border-radius: 6px; }
+  .year-chevron { display: inline-block; width: 16px; font-size: 0.8em; color: var(--muted); transition: transform 0.2s; }
+
+  /* Analysis section */
+  .analysis-section { margin-top: 40px; padding-top: 32px; border-top: 2px solid var(--border); }
+  .analysis-section h2 { font-size: 1.15em; color: #fff; margin-bottom: 20px; }
+  .analysis-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+  .analysis-card h3 { font-size: 0.95em; color: var(--teal); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .volume-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 0.88em; }
+  .volume-bar .year-label { min-width: 90px; color: var(--muted); }
+  .volume-bar .bar-track { flex: 1; height: 8px; background: var(--card); border-radius: 4px; overflow: hidden; }
+  .volume-bar .bar-fill { height: 100%; border-radius: 4px; }
+  .volume-bar .bar-value { min-width: 80px; text-align: right; color: var(--text); font-weight: 600; font-size: 0.85em; }
+  .theme-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; font-size: 0.88em; }
+  .theme-row .theme-name { min-width: 140px; }
+  .theme-row .theme-bar { flex: 1; max-width: 200px; height: 6px; background: var(--card); border-radius: 3px; overflow: hidden; }
+  .theme-row .theme-fill { height: 100%; border-radius: 3px; background: var(--accent2); }
+  .theme-row .theme-count { min-width: 40px; color: var(--muted); font-size: 0.85em; }
+  .direction-card { background: var(--card); border-left: 3px solid var(--teal); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; font-size: 0.92em; line-height: 1.6; }
+  .direction-card .dir-icon { color: var(--teal); margin-right: 8px; }
+  .fiction-split { display: flex; gap: 20px; align-items: center; margin-bottom: 8px; }
+  .fiction-bar { flex: 1; height: 12px; background: var(--card); border-radius: 6px; overflow: hidden; display: flex; }
+  .fiction-fill { height: 100%; }
+  .fiction-labels { display: flex; justify-content: space-between; font-size: 0.82em; color: var(--muted); }
+
   /* Responsive */
   @media (max-width: 640px) {
     .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -267,6 +294,16 @@
         <label>Word Count</label>
         <input type="number" id="input-words" placeholder="auto" min="0">
       </div>
+      <div class="form-group" style="flex:0.6">
+        <label>Multiplier</label>
+        <input type="number" id="input-multiplier" placeholder="1" min="1" value="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="flex:1">
+        <label>Notes</label>
+        <input type="text" id="input-notes" placeholder="Series name, difficulty, etc.">
+      </div>
     </div>
     <div class="checkbox-row">
       <input type="checkbox" id="input-reread">
@@ -280,6 +317,9 @@
 
   <!-- Favorites section -->
   <div id="favorites-section" class="favorites-section"></div>
+
+  <!-- Analysis section -->
+  <div id="analysis-section" class="analysis-section"></div>
 </div>
 
 <script>
@@ -713,23 +753,30 @@ function editWords(title, currentWords, td) {
 
 // ── Add book ──
 function addBook() {
-  const title = document.getElementById("input-title").value.trim();
+  var title = document.getElementById("input-title").value.trim();
   if (!title) return;
-  const pages = parseInt(document.getElementById("input-pages").value) || 0;
-  let words = parseInt(document.getElementById("input-words").value);
-  if (isNaN(words) || words === 0) words = pages * 250;
-  const reread = document.getElementById("input-reread").checked;
+  var pages = parseInt(document.getElementById("input-pages").value) || 0;
+  var baseWords = parseInt(document.getElementById("input-words").value);
+  if (isNaN(baseWords) || baseWords === 0) baseWords = pages * 250;
+  var multiplier = parseInt(document.getElementById("input-multiplier").value) || 1;
+  var words = baseWords * multiplier;
+  var notes = document.getElementById("input-notes").value.trim();
+  var reread = document.getElementById("input-reread").checked;
 
-  const book = {
-    title, words, pages,
+  if (multiplier > 1) {
+    notes = (notes ? notes + " | " : "") + multiplier + "x (" + fmtFull(baseWords) + " each)";
+  }
+
+  var book = {
+    title: title, words: words, pages: pages,
     year: CURRENT_YEAR,
-    reread,
-    notes: "",
+    reread: reread,
+    notes: notes,
     date: new Date().toISOString().slice(0, 10),
     source: "manual"
   };
 
-  const books = getNewBooks(activeChild);
+  var books = getNewBooks(activeChild);
   books.push(book);
   saveNewBooks(activeChild, books);
   updateYearTotal(activeChild);
@@ -738,6 +785,8 @@ function addBook() {
   document.getElementById("input-title").value = "";
   document.getElementById("input-pages").value = "";
   document.getElementById("input-words").value = "";
+  document.getElementById("input-multiplier").value = "1";
+  document.getElementById("input-notes").value = "";
   document.getElementById("input-reread").checked = false;
 
   render();
@@ -812,14 +861,17 @@ function render() {
       books = [...books].sort((a, b) => sortState.asc ? a.words - b.words : b.words - a.words);
     }
 
+    const isCurrent = (year === CURRENT_YEAR);
+    const collapseId = 'yr_' + year.replace(/[^a-z0-9]/gi, '');
     html += `<div class="year-group">
-      <div class="year-header">
-        <h3>${year}</h3>
+      <div class="year-header ${isCurrent ? '' : 'collapsible'}" onclick="${isCurrent ? '' : "toggleYear('" + collapseId + "', this)"}">
+        <h3>${isCurrent ? '' : '<span class="year-chevron">\u25B6</span> '}${year}</h3>
         <div class="year-stats">
           <span>${fmtFull(yearTotal)} words</span>
           <span>${yearCount} books</span>
         </div>
       </div>
+      <div id="${collapseId}" class="year-body" style="${isCurrent ? '' : 'display:none'}">
       <table class="book-table">
         <thead><tr>
           <th>Title</th>
@@ -842,7 +894,7 @@ function render() {
       </tr>`;
     });
 
-    html += `</tbody></table></div>`;
+    html += `</tbody></table></div></div>`;
   });
 
   document.getElementById("book-list").innerHTML = html;
@@ -863,6 +915,149 @@ function render() {
   }
   document.getElementById("favorites-section").innerHTML = favHtml;
 
+  // ── Analysis Section ──
+  var analysisHtml = '<h2>Reading Analysis</h2>';
+
+  // a) Reading Volume Trend
+  var yearVolumes = {};
+  all.forEach(function(b) {
+    if (!yearVolumes[b.year]) yearVolumes[b.year] = { words: 0, count: 0 };
+    yearVolumes[b.year].words += (b.words || 0);
+    yearVolumes[b.year].count++;
+  });
+  var volYears = Object.keys(yearVolumes).sort(function(a, b) {
+    return parseInt(a.split("-")[0]) - parseInt(b.split("-")[0]);
+  });
+  var maxVolume = 0;
+  volYears.forEach(function(y) { if (yearVolumes[y].words > maxVolume) maxVolume = yearVolumes[y].words; });
+
+  analysisHtml += '<div class="analysis-card"><h3>Reading Volume Trend</h3>';
+  volYears.forEach(function(y) {
+    var v = yearVolumes[y];
+    var pctW = maxVolume > 0 ? (v.words / maxVolume * 100) : 0;
+    var inProgress = (y === CURRENT_YEAR) ? ' (in progress)' : '';
+    var barColor = (y === CURRENT_YEAR) ? 'var(--teal)' : 'var(--accent2)';
+    analysisHtml += '<div class="volume-bar">' +
+      '<span class="year-label">' + y + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + pctW.toFixed(1) + '%;background:' + barColor + '"></div></div>' +
+      '<span class="bar-value">' + fmt(v.words) + ' / ' + v.count + ' books' + inProgress + '</span>' +
+      '</div>';
+  });
+  analysisHtml += '</div>';
+
+  // b) Fiction vs Non-Fiction Balance
+  var nfKeywords = ['history', 'math', 'science', 'financial', '101', '102', 'geography', 'biography',
+    'hbr', 'marketing', 'brand', 'design', 'tax', 'accounting', 'constitution', 'supreme court',
+    'habits', 'startup', 'prisoners', 'non-fiction', 'non-ficton', 'how to', 'geometry', 'atlas',
+    'geo bee', 'finance', 'judge bio', 'justics', 'declaration', 'underground railroad',
+    'colonist', 'states', 'text book', 'war of worlds', 'daniel boone', 'george washington',
+    'healthy foods', 'artificial', 'genetic', 'parthenon', 'solar system', 'space race',
+    'no summit', 'chasing space', 'reaching for the moon', 'sam walton', 'art of learning',
+    'whack on the side', 'red scarf girl', 'diary of anne frank', 'worth dying'];
+  var nfCount = 0, fCount = 0;
+  all.forEach(function(b) {
+    var lower = (b.title + ' ' + (b.notes || '')).toLowerCase();
+    var isNF = false;
+    for (var k = 0; k < nfKeywords.length; k++) {
+      if (lower.indexOf(nfKeywords[k]) >= 0) { isNF = true; break; }
+    }
+    if (isNF) nfCount++; else fCount++;
+  });
+  var totalFNF = fCount + nfCount;
+  var fPct = totalFNF > 0 ? (fCount / totalFNF * 100) : 0;
+  var nfPct = totalFNF > 0 ? (nfCount / totalFNF * 100) : 0;
+
+  analysisHtml += '<div class="analysis-card"><h3>Fiction vs Non-Fiction Balance</h3>';
+  analysisHtml += '<div class="fiction-split">' +
+    '<span style="color:var(--accent2);font-weight:600;font-size:0.88em">Fiction ' + fPct.toFixed(0) + '%</span>' +
+    '<div class="fiction-bar">' +
+    '<div class="fiction-fill" style="width:' + fPct.toFixed(1) + '%;background:var(--accent2)"></div>' +
+    '<div class="fiction-fill" style="width:' + nfPct.toFixed(1) + '%;background:var(--teal)"></div>' +
+    '</div>' +
+    '<span style="color:var(--teal);font-weight:600;font-size:0.88em">Non-Fiction ' + nfPct.toFixed(0) + '%</span>' +
+    '</div>';
+  analysisHtml += '<div class="fiction-labels"><span>' + fCount + ' books</span><span>' + nfCount + ' books</span></div>';
+  analysisHtml += '</div>';
+
+  // c) Reading Preferences (top themes)
+  var themes = [
+    { name: 'Fantasy/Adventure', keywords: ['percy jackson', 'magnus chase', 'kane chronicles', 'harry potter', 'narnia', 'wings of fire', 'dragon', 'oracles of fire', 'wing feather', 'starlighter', 'prince warriors', 'wingfeather', 'throne of glass', 'course of series', 'house of series', 'demigod', 'trials of apollo', 'hidden oracle', 'inheritance cycle', 'murtagh', 'eragon', 'left behind', 'seven sleepers', 'heroes of olympus', 'hero of olympus', 'pendragon', 'chronicles of the', 'gods and warriors', 'ancient darkness', 'sea of trolls', 'simarilion', 'hobbit', 'swipe', 'voyagers', 'impossible quest', 'razorland', 'shadow king', 'tales of starlight', 'city of ember', 'phantom tollbooth', 'heirs of neverland'], count: 0 },
+    { name: 'Historical', keywords: ['history', 'war', 'ancient', 'biography', 'daniel boone', 'george washington', 'behind rebel lines', 'ground zero', 'escape from', 'red scarf girl', 'anne frank', 'revolution is not', 'parthenon', 'genghis', 'worth dying', 'colonist', 'underground railroad', 'declaration'], count: 0 },
+    { name: 'Science/Math', keywords: ['math', 'science', 'geometry', 'solar system', 'space race', 'q is for quark', 'artificial', 'genetic', 'music of prime', 'quanta', 'chasing space'], count: 0 },
+    { name: 'Business/Life Skills', keywords: ['hbr', 'financial', 'startup', 'habits', 'tax', 'marketing', 'brand', 'accounting', 'finance', 'sam walton', 'art of learning', 'whack on the side', 'design', 'hey whipple', 'non-designer'], count: 0 },
+    { name: 'Law/Civics', keywords: ['constitution', 'supreme court', 'justics', 'judge bio', 'rights', 'prisoners of geography', 'geo bee', 'atlas', 'states', 'maps'], count: 0 },
+    { name: 'Classic Literature', keywords: ['giver', 'ender', 'life of pi', 'count of monte', 'hunger game', 'series of unfortunate', 'swiss family', 'gulliv', 'peter pan', 'robin hood', 'king arthur', 'aesop', 'esperanza', 'stuart little', 'old yeller', 'where the red fern', 'my side of mountain', 'bridge to', 'walk two moon', 'graveyard book', 'swallows and amazons', 'borrowers', 'island of blue', 'shiloh'], count: 0 }
+  ];
+
+  var seriesKeywords = ['series', 'chronicles', 'trilogy', 'saga', '*'];
+  var seriesCount = 0;
+  var countedSeries = {};
+  all.forEach(function(b) {
+    var lower = b.title.toLowerCase();
+    for (var s = 0; s < seriesKeywords.length; s++) {
+      if (lower.indexOf(seriesKeywords[s]) >= 0) {
+        if (!countedSeries[lower]) { seriesCount++; countedSeries[lower] = true; }
+        break;
+      }
+    }
+  });
+
+  all.forEach(function(b) {
+    var lower = (b.title + ' ' + (b.notes || '')).toLowerCase();
+    themes.forEach(function(t) {
+      for (var k = 0; k < t.keywords.length; k++) {
+        if (lower.indexOf(t.keywords[k]) >= 0) { t.count++; break; }
+      }
+    });
+  });
+
+  themes.sort(function(a, b) { return b.count - a.count; });
+  var maxTheme = themes.length > 0 ? themes[0].count : 1;
+
+  analysisHtml += '<div class="analysis-card"><h3>Reading Preferences</h3>';
+  themes.forEach(function(t) {
+    if (t.count === 0) return;
+    var tPct = (t.count / maxTheme * 100);
+    analysisHtml += '<div class="theme-row">' +
+      '<span class="theme-name">' + t.name + '</span>' +
+      '<div class="theme-bar"><div class="theme-fill" style="width:' + tPct.toFixed(1) + '%"></div></div>' +
+      '<span class="theme-count">' + t.count + '</span>' +
+      '</div>';
+  });
+  analysisHtml += '<div class="theme-row" style="margin-top:8px;">' +
+    '<span class="theme-name" style="color:var(--gold)">Series Reader</span>' +
+    '<span class="theme-count" style="color:var(--gold)">' + seriesCount + ' series detected</span>' +
+    '</div>';
+  analysisHtml += '</div>';
+
+  // d) Suggested Reading Directions
+  analysisHtml += '<div class="analysis-card"><h3>Suggested Reading Directions</h3>';
+  if (activeChild === 'tepi') {
+    var tepiDirections = [
+      'Strong in fantasy series \u2014 ready for literary fiction crossover (Steinbeck, Hemingway, Bradbury)',
+      'Non-fiction growing \u2014 deepen with argument-based essays (Orwell, Hitchens)',
+      'Math/science interest emerging \u2014 Quanta Magazine + popular science (Fermat\'s Enigma, The Code Book)',
+      'Consider: historical non-fiction to connect with National Affairs reading'
+    ];
+    tepiDirections.forEach(function(d) {
+      analysisHtml += '<div class="direction-card"><span class="dir-icon">\u27A4</span>' + d + '</div>';
+    });
+  } else {
+    var guaimeiDirections = [
+      'Exceptional non-fiction appetite \u2014 rare for age. Lean into it.',
+      'Law/civics interest is a strength \u2014 expand to landmark case studies',
+      'Geography + business combo is unique \u2014 explore economic geography (Why Nations Fail, adapted)',
+      'Writing craft: read authors who argue (Hitchens, Orwell) not just report',
+      'Design interest + reading = potential for information design projects'
+    ];
+    guaimeiDirections.forEach(function(d) {
+      analysisHtml += '<div class="direction-card"><span class="dir-icon">\u27A4</span>' + d + '</div>';
+    });
+  }
+  analysisHtml += '</div>';
+
+  document.getElementById("analysis-section").innerHTML = analysisHtml;
+
   // Store year total for planner integration
   updateYearTotal(activeChild);
 }
@@ -881,6 +1076,18 @@ function escHtml(s) {
   const d = document.createElement("div");
   d.textContent = s;
   return d.innerHTML;
+}
+
+function toggleYear(id, header) {
+  var el = document.getElementById(id);
+  var chevron = header.querySelector('.year-chevron');
+  if (el.style.display === 'none') {
+    el.style.display = '';
+    if (chevron) chevron.textContent = '\u25BC';
+  } else {
+    el.style.display = 'none';
+    if (chevron) chevron.textContent = '\u25B6';
+  }
 }
 
 // ── Planner integration: exported concept ──

@@ -539,6 +539,18 @@ function render() {
         });
         h += `</div>`;
       }
+      // Add inline book logger for "Books" tasks
+      if (t.label === "Books") {
+        const bfId = `bookform_w${w.week}_t${ti}`;
+        h += `<div class="book-log-inline" id="${bfId}">
+          <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:8px 0 4px 30px;">
+            <input type="text" placeholder="Book title" style="flex:2;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:0.85em;font-family:inherit;" id="${bfId}_title">
+            <input type="number" placeholder="Pages" min="0" style="width:70px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:0.85em;font-family:inherit;" id="${bfId}_pages">
+            <input type="number" placeholder="×1" min="1" value="1" style="width:50px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:0.85em;font-family:inherit;" title="Multiplier" id="${bfId}_mult">
+            <button onclick="logBookFromPlan('${bfId}')" style="background:var(--green);color:#1a1a1a;border:none;border-radius:6px;padding:6px 14px;font-size:0.82em;font-weight:600;cursor:pointer;font-family:inherit;">+ Log</button>
+          </div>
+        </div>`;
+      }
       const ck = `w${w.week}_t${ti}_comment`;
       h += `<div class="comment-area"><textarea id="${ck}" placeholder="Notes..." oninput="updateComment('${ck}')">${state[ck]||""}</textarea></div></div>`;
     });
@@ -616,6 +628,42 @@ function saveAll() {
   const m = document.getElementById("save-msg");
   m.textContent = `✅ Saved ${new Date().toLocaleTimeString()}`;
   setTimeout(() => m.textContent = "", 3000);
+}
+
+function logBookFromPlan(formId) {
+  const title = document.getElementById(formId + "_title").value.trim();
+  if (!title) return;
+  const pages = parseInt(document.getElementById(formId + "_pages").value) || 0;
+  const mult = parseInt(document.getElementById(formId + "_mult").value) || 1;
+  const baseWords = pages * 250;
+  const words = baseWords * mult;
+  const notes = mult > 1 ? mult + "x (" + baseWords.toLocaleString() + " each)" : "";
+
+  // Save to reading log storage (same format as reading-log.html)
+  const key = "reading_log_tepi";
+  let books = [];
+  try { books = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+  books.push({
+    title: title, words: words, pages: pages,
+    year: "2025-2026", reread: false, notes: notes,
+    date: new Date().toISOString().slice(0,10), source: "planner"
+  });
+  localStorage.setItem(key, JSON.stringify(books));
+
+  // Update year total
+  const totalKey = "reading_total_tepi_2025";
+  const prev = parseInt(localStorage.getItem(totalKey) || "0");
+  localStorage.setItem(totalKey, (prev + words).toString());
+
+  // Clear form & show confirmation
+  document.getElementById(formId + "_title").value = "";
+  document.getElementById(formId + "_pages").value = "";
+  document.getElementById(formId + "_mult").value = "1";
+  const btn = event.target;
+  btn.textContent = "Logged!";
+  btn.style.background = "var(--teal)";
+  setTimeout(() => { btn.textContent = "+ Log"; btn.style.background = "var(--green)"; }, 1500);
+  updateReadingProgress();
 }
 
 function updateReadingProgress() {
