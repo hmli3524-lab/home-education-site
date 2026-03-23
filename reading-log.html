@@ -1130,22 +1130,114 @@ function render() {
     '</div>';
   analysisHtml += '</div>';
 
-  // d) Favorites & Rereads (inside analysis)
-  if (rereads.length > 0) {
-    analysisHtml += '<div class="analysis-card"><h3>\u2B50 Favorites &amp; Rereads (' + rereads.length + ')</h3>';
-    analysisHtml += '<div style="display:flex;flex-wrap:wrap;gap:10px">';
-    rereads.forEach(function(b) {
-      var amazonSearch = 'https://www.amazon.com/s?k=' + encodeURIComponent(b.title + ' book');
-      analysisHtml += '<a href="' + amazonSearch + '" target="_blank" style="text-decoration:none">' +
-        '<div style="background:rgba(224,168,46,0.08);border:1px solid rgba(224,168,46,0.25);border-radius:10px;padding:10px 14px;min-width:140px">' +
-        '<div style="font-weight:600;color:var(--gold);font-size:0.92em">' + escHtml(b.title) + '</div>' +
-        '<div style="font-size:0.78em;color:var(--muted);margin-top:2px">' + fmtFull(b.words || 0) + ' words &middot; ' + b.year + '</div>' +
-        '</div></a>';
+  // d) Reading Level Analysis
+  var levelKeywords = {
+    'Adult Non-Fiction': { grade: '11+', color: '#e8555a', keywords: ['hbr','sowell','economics','financial 101','tax book','constitution decoded','supreme court','scalia','hitchens','national affairs','prisoners of geography','sam walton','designing brand identity','strategic marketing','accounting','declaration'] },
+    'Advanced (Gr 9-10)': { grade: '9-10', color: '#9b6dd7', keywords: ['orwell','huxley','bradbury','ender','life of pi','count of monte','hunger game','divergent','maze runner','giver','1776','screwtape','mere christianity','hemingway','fahrenheit','brave new world','animal farm','anne frank','red scarf','simarilion','left behind the kids'] },
+    'Young Adult (Gr 7-8)': { grade: '7-8', color: '#4ecdc4', keywords: ['percy jackson','kane chronicles','magnus chase','harry potter','inheritance cycle','eragon','murtagh','throne of glass','course of series','house of series','genghis','heroes of olympus','trials of apollo','pendragon','gods and warriors','ancient darkness','sea of trolls','chronicles of narnia','razorland','city of ember','scorpion','encyclopedia brown','swipe'] },
+    'Middle Grade (Gr 5-6)': { grade: '5-6', color: '#57d9a3', keywords: ['wings of fire','dragons in our midst','oracles of fire','prince warriors','voyagers','starlighter','tales of starlight','shiloh','walk two moon','bridge to','borrowers','graveyard book','series of unfortunate','old yeller','where the red fern','redwall','i funny','left behind','seven sleepers','impossible quest','swallows'] },
+    'Elementary (Gr 3-4)': { grade: '3-4', color: '#e0a82e', keywords: ['magic tree house','junie b','flat stan','amelia bedelia','owl diar','dragon master','bad kitty','puppy pirate','humphrey','roald dahl','my weird school','judy moody','never girl','who would win','calendar mystery','andrew clements'] }
+  };
+  var levelCounts = {};
+  var levelNames = Object.keys(levelKeywords);
+  levelNames.forEach(function(lv) { levelCounts[lv] = 0; });
+  var unclassified = 0;
+
+  // Classify by year for progression
+  var levelByYear = {};
+  all.forEach(function(b) {
+    var lower = (b.title + ' ' + (b.notes || '')).toLowerCase();
+    var found = false;
+    for (var li = 0; li < levelNames.length; li++) {
+      var lv = levelNames[li];
+      var kws = levelKeywords[lv].keywords;
+      for (var ki = 0; ki < kws.length; ki++) {
+        if (lower.indexOf(kws[ki]) >= 0) {
+          levelCounts[lv]++;
+          if (!levelByYear[b.year]) levelByYear[b.year] = {};
+          if (!levelByYear[b.year][lv]) levelByYear[b.year][lv] = 0;
+          levelByYear[b.year][lv]++;
+          found = true; break;
+        }
+      }
+      if (found) break;
+    }
+    if (!found) unclassified++;
+  });
+
+  // Determine current reading level (most common level in current year, weighted toward highest)
+  var currentYearLevels = levelByYear[CURRENT_YEAR] || {};
+  var currentLevel = 'Middle Grade (Gr 5-6)';
+  for (var ci = 0; ci < levelNames.length; ci++) {
+    if ((currentYearLevels[levelNames[ci]] || 0) >= 2) { currentLevel = levelNames[ci]; break; }
+  }
+  var currentGrade = levelKeywords[currentLevel].grade;
+  var childAge = activeChild === 'tepi' ? 14 : 12;
+  var expectedGrade = activeChild === 'tepi' ? '8' : '6';
+  var aheadMsg = '';
+  var gradeNum = parseInt(currentGrade);
+  if (gradeNum > parseInt(expectedGrade) + 1) aheadMsg = ' \u2014 reading well above grade level';
+  else if (gradeNum > parseInt(expectedGrade)) aheadMsg = ' \u2014 reading above grade level';
+  else if (currentGrade === '11+') aheadMsg = ' \u2014 reading at adult level';
+
+  analysisHtml += '<div class="analysis-card"><h3>\uD83D\uDCCA Reading Level</h3>';
+
+  // Current level indicator
+  var lvColor = levelKeywords[currentLevel].color;
+  analysisHtml += '<div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;padding:14px 18px;background:' + lvColor + '12;border:1px solid ' + lvColor + '30;border-radius:12px">' +
+    '<div style="font-size:2.2em;font-weight:800;color:' + lvColor + '">Gr ' + currentGrade + '</div>' +
+    '<div><div style="font-weight:700;color:var(--text);font-size:1em">Current: ' + currentLevel + '</div>' +
+    '<div style="font-size:0.85em;color:var(--muted)">Age ' + childAge + ', grade ' + expectedGrade + ' equivalent' + aheadMsg + '</div></div>' +
+    '</div>';
+
+  // Level distribution (horizontal stacked bar)
+  var totalClassified = all.length - unclassified;
+  analysisHtml += '<div style="margin-bottom:14px">';
+  analysisHtml += '<div style="display:flex;height:16px;border-radius:8px;overflow:hidden;margin-bottom:8px">';
+  levelNames.slice().reverse().forEach(function(lv) {
+    var cnt = levelCounts[lv] || 0;
+    if (cnt === 0) return;
+    var pct = (cnt / totalClassified * 100);
+    analysisHtml += '<div style="width:' + pct.toFixed(1) + '%;background:' + levelKeywords[lv].color + ';transition:width 0.5s" title="' + lv + ': ' + cnt + ' books"></div>';
+  });
+  analysisHtml += '</div>';
+
+  // Legend
+  analysisHtml += '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.82em">';
+  levelNames.forEach(function(lv) {
+    var cnt = levelCounts[lv] || 0;
+    if (cnt === 0) return;
+    analysisHtml += '<div style="display:flex;align-items:center;gap:5px">' +
+      '<div style="width:10px;height:10px;border-radius:2px;background:' + levelKeywords[lv].color + '"></div>' +
+      '<span style="color:var(--muted)">' + lv.split('(')[0].trim() + '</span>' +
+      '<span style="color:var(--text);font-weight:600">' + cnt + '</span></div>';
+  });
+  analysisHtml += '</div></div>';
+
+  // Year-over-year progression
+  var progYears = Object.keys(levelByYear).sort(function(a, b) {
+    return parseInt(a.split('-')[0]) - parseInt(b.split('-')[0]);
+  });
+  if (progYears.length > 1) {
+    analysisHtml += '<div style="font-size:0.88em;margin-top:12px">';
+    analysisHtml += '<div style="font-weight:600;color:var(--text);margin-bottom:8px">Level Progression</div>';
+    progYears.forEach(function(yr) {
+      var yrLevels = levelByYear[yr];
+      // Find dominant level
+      var domLevel = ''; var domCount = 0;
+      for (var dl in yrLevels) { if (yrLevels[dl] > domCount) { domCount = yrLevels[dl]; domLevel = dl; } }
+      var dlColor = levelKeywords[domLevel] ? levelKeywords[domLevel].color : 'var(--muted)';
+      var dlGrade = levelKeywords[domLevel] ? levelKeywords[domLevel].grade : '?';
+      analysisHtml += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
+        '<span style="min-width:80px;color:var(--muted)">' + yr + '</span>' +
+        '<div style="width:10px;height:10px;border-radius:50%;background:' + dlColor + '"></div>' +
+        '<span style="color:' + dlColor + ';font-weight:600">Gr ' + dlGrade + '</span>' +
+        '<span style="color:var(--muted);font-size:0.88em">' + domLevel.split('(')[0].trim() + '</span>' +
+        '</div>';
     });
     analysisHtml += '</div>';
-    analysisHtml += '<div style="margin-top:12px;font-size:0.85em;color:var(--muted);font-style:italic">These are books read multiple times \u2014 they reveal core interests and preferred reading experiences.</div>';
-    analysisHtml += '</div>';
   }
+  analysisHtml += '</div>';
 
   // e) Suggested Reading Directions + Book Recommendations
   var RECS = {
