@@ -705,6 +705,28 @@ const META_TITLES = ["Total", "Goal 9M", "Target: 9M", "Target: 8M", "Goal 8M"];
 let activeChild = "tepi";
 let sortState = { col: null, asc: true };
 
+// ── Reading Level Data (Lexile-based) ──
+var LEVEL_DATA = {
+  'Adult Non-Fiction':  { lexile: '1300L+', color: '#e8555a', label: 'College+', keywords: ['hbr','sowell','economics','financial 101','tax book','constitution decoded','supreme court','scalia','hitchens','national affairs','prisoners of geography','sam walton','designing brand identity','strategic marketing','accounting','declaration','federalist','wealth of nations','bastiat','conflict of visions'] },
+  'Advanced':           { lexile: '1000-1300L', color: '#9b6dd7', label: 'Gr 9-12', keywords: ['orwell','huxley','bradbury','ender','life of pi','count of monte','hunger game','divergent','maze runner','giver','1776','screwtape','mere christianity','hemingway','fahrenheit','brave new world','animal farm','anne frank','red scarf','simarilion','left behind the kids','martian','watership down'] },
+  'Young Adult':        { lexile: '800-1000L', color: '#4ecdc4', label: 'Gr 6-8', keywords: ['percy jackson','kane chronicles','magnus chase','harry potter','inheritance cycle','eragon','murtagh','throne of glass','course of series','house of series','genghis','heroes of olympus','trials of apollo','pendragon','gods and warriors','ancient darkness','sea of trolls','chronicles of narnia','razorland','city of ember','scorpion','encyclopedia brown','swipe'] },
+  'Middle Grade':       { lexile: '600-800L', color: '#57d9a3', label: 'Gr 4-6', keywords: ['wings of fire','dragons in our midst','oracles of fire','prince warriors','voyagers','starlighter','tales of starlight','shiloh','walk two moon','bridge to','borrowers','graveyard book','series of unfortunate','old yeller','where the red fern','redwall','i funny','left behind','seven sleepers','impossible quest','swallows'] },
+  'Elementary':         { lexile: '400-600L', color: '#e0a82e', label: 'Gr 2-4', keywords: ['magic tree house','junie b','flat stan','amelia bedelia','owl diar','dragon master','bad kitty','puppy pirate','humphrey','roald dahl','my weird school','judy moody','never girl','who would win','calendar mystery','andrew clements'] }
+};
+var LEVEL_NAMES = Object.keys(LEVEL_DATA);
+
+function classifyBookLevel(title, notes) {
+  var lower = (title + ' ' + (notes || '')).toLowerCase();
+  for (var i = 0; i < LEVEL_NAMES.length; i++) {
+    var lv = LEVEL_NAMES[i];
+    var kws = LEVEL_DATA[lv].keywords;
+    for (var k = 0; k < kws.length; k++) {
+      if (lower.indexOf(kws[k]) >= 0) return lv;
+    }
+  }
+  return null;
+}
+
 // ── Helpers ──
 function fmt(n) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
@@ -929,22 +951,20 @@ function render() {
   document.getElementById("stat-total-books").textContent = totalBooks;
   document.getElementById("stat-year-words").textContent = fmt(yearWords);
   document.getElementById("stat-year-sub").textContent = yearWords.toLocaleString() + " / " + fmt(target);
-  // Quick reading level for stat card (full analysis below)
-  var quickLevelNames = ['Adult Non-Fiction','Advanced (Gr 9-10)','Young Adult (Gr 7-8)','Middle Grade (Gr 5-6)','Elementary (Gr 3-4)'];
-  var quickLevelGrades = {'Adult Non-Fiction':'11+','Advanced (Gr 9-10)':'9-10','Young Adult (Gr 7-8)':'7-8','Middle Grade (Gr 5-6)':'5-6','Elementary (Gr 3-4)':'3-4'};
+  // Reading level stat card — show highest Lexile in current year
   var cyBooks = all.filter(function(b){return b.year===CURRENT_YEAR;});
-  var qlLevel = 'Middle Grade';
-  for (var qi=0;qi<quickLevelNames.length;qi++){
-    var qlN=quickLevelNames[qi]; var qlKws=levelKeywords[qlN]?levelKeywords[qlN].keywords:[];
-    var qlCnt=0; cyBooks.forEach(function(b){var lo=b.title.toLowerCase();for(var k=0;k<qlKws.length;k++){if(lo.indexOf(qlKws[k])>=0){qlCnt++;break;}}});
-    if(qlCnt>=2){qlLevel=qlN;break;}
-  }
-  var qlGrade = quickLevelGrades[qlLevel]||'?';
-  var expGrade = activeChild==='tepi'?'8':'6';
-  var lvlMsg = parseInt(qlGrade)>parseInt(expGrade)?'Above grade':'At grade';
-  if(qlGrade==='11+') lvlMsg='Adult level';
-  document.getElementById("stat-level").textContent = "Gr " + qlGrade;
-  document.getElementById("stat-level-sub").textContent = lvlMsg;
+  var highestLevel = null;
+  cyBooks.forEach(function(b) {
+    var lv = classifyBookLevel(b.title, b.notes);
+    if (lv) {
+      var idx = LEVEL_NAMES.indexOf(lv);
+      if (highestLevel === null || idx < LEVEL_NAMES.indexOf(highestLevel)) highestLevel = lv;
+    }
+  });
+  if (!highestLevel) highestLevel = 'Middle Grade';
+  var ld = LEVEL_DATA[highestLevel];
+  document.getElementById("stat-level").textContent = ld.lexile;
+  document.getElementById("stat-level-sub").textContent = highestLevel;
 
   // Progress bar
   const pct = Math.min(100, (yearWords / target * 100));
@@ -1166,109 +1186,86 @@ function render() {
     '</div>';
   analysisHtml += '</div>';
 
-  // d) Reading Level Analysis
-  var levelKeywords = {
-    'Adult Non-Fiction': { grade: '11+', color: '#e8555a', keywords: ['hbr','sowell','economics','financial 101','tax book','constitution decoded','supreme court','scalia','hitchens','national affairs','prisoners of geography','sam walton','designing brand identity','strategic marketing','accounting','declaration'] },
-    'Advanced (Gr 9-10)': { grade: '9-10', color: '#9b6dd7', keywords: ['orwell','huxley','bradbury','ender','life of pi','count of monte','hunger game','divergent','maze runner','giver','1776','screwtape','mere christianity','hemingway','fahrenheit','brave new world','animal farm','anne frank','red scarf','simarilion','left behind the kids'] },
-    'Young Adult (Gr 7-8)': { grade: '7-8', color: '#4ecdc4', keywords: ['percy jackson','kane chronicles','magnus chase','harry potter','inheritance cycle','eragon','murtagh','throne of glass','course of series','house of series','genghis','heroes of olympus','trials of apollo','pendragon','gods and warriors','ancient darkness','sea of trolls','chronicles of narnia','razorland','city of ember','scorpion','encyclopedia brown','swipe'] },
-    'Middle Grade (Gr 5-6)': { grade: '5-6', color: '#57d9a3', keywords: ['wings of fire','dragons in our midst','oracles of fire','prince warriors','voyagers','starlighter','tales of starlight','shiloh','walk two moon','bridge to','borrowers','graveyard book','series of unfortunate','old yeller','where the red fern','redwall','i funny','left behind','seven sleepers','impossible quest','swallows'] },
-    'Elementary (Gr 3-4)': { grade: '3-4', color: '#e0a82e', keywords: ['magic tree house','junie b','flat stan','amelia bedelia','owl diar','dragon master','bad kitty','puppy pirate','humphrey','roald dahl','my weird school','judy moody','never girl','who would win','calendar mystery','andrew clements'] }
-  };
+  // d) Reading Level Analysis (Lexile-based)
   var levelCounts = {};
-  var levelNames = Object.keys(levelKeywords);
-  levelNames.forEach(function(lv) { levelCounts[lv] = 0; });
+  LEVEL_NAMES.forEach(function(lv) { levelCounts[lv] = 0; });
   var unclassified = 0;
-
-  // Classify by year for progression
   var levelByYear = {};
+
   all.forEach(function(b) {
-    var lower = (b.title + ' ' + (b.notes || '')).toLowerCase();
-    var found = false;
-    for (var li = 0; li < levelNames.length; li++) {
-      var lv = levelNames[li];
-      var kws = levelKeywords[lv].keywords;
-      for (var ki = 0; ki < kws.length; ki++) {
-        if (lower.indexOf(kws[ki]) >= 0) {
-          levelCounts[lv]++;
-          if (!levelByYear[b.year]) levelByYear[b.year] = {};
-          if (!levelByYear[b.year][lv]) levelByYear[b.year][lv] = 0;
-          levelByYear[b.year][lv]++;
-          found = true; break;
-        }
-      }
-      if (found) break;
+    var lv = classifyBookLevel(b.title, b.notes);
+    if (lv) {
+      levelCounts[lv]++;
+      if (!levelByYear[b.year]) levelByYear[b.year] = {};
+      if (!levelByYear[b.year][lv]) levelByYear[b.year][lv] = 0;
+      levelByYear[b.year][lv]++;
+    } else {
+      unclassified++;
     }
-    if (!found) unclassified++;
   });
 
-  // Determine current reading level (most common level in current year, weighted toward highest)
-  var currentYearLevels = levelByYear[CURRENT_YEAR] || {};
-  var currentLevel = 'Middle Grade (Gr 5-6)';
-  for (var ci = 0; ci < levelNames.length; ci++) {
-    if ((currentYearLevels[levelNames[ci]] || 0) >= 2) { currentLevel = levelNames[ci]; break; }
-  }
-  var currentGrade = levelKeywords[currentLevel].grade;
+  // Highest Lexile in current year
+  var cyHighest = null;
+  cyBooks.forEach(function(b) {
+    var lv = classifyBookLevel(b.title, b.notes);
+    if (lv) {
+      var idx = LEVEL_NAMES.indexOf(lv);
+      if (cyHighest === null || idx < LEVEL_NAMES.indexOf(cyHighest)) cyHighest = lv;
+    }
+  });
+  if (!cyHighest) cyHighest = 'Middle Grade';
+  var cyLD = LEVEL_DATA[cyHighest];
   var childAge = activeChild === 'tepi' ? 14 : 12;
-  var expectedGrade = activeChild === 'tepi' ? '8' : '6';
-  var aheadMsg = '';
-  var gradeNum = parseInt(currentGrade);
-  if (gradeNum > parseInt(expectedGrade) + 1) aheadMsg = ' \u2014 reading well above grade level';
-  else if (gradeNum > parseInt(expectedGrade)) aheadMsg = ' \u2014 reading above grade level';
-  else if (currentGrade === '11+') aheadMsg = ' \u2014 reading at adult level';
+  var expectedLexile = activeChild === 'tepi' ? '800-1000L' : '600-800L';
 
-  analysisHtml += '<div class="analysis-card"><h3>\uD83D\uDCCA Reading Level</h3>';
-
-  // Current level indicator
-  var lvColor = levelKeywords[currentLevel].color;
-  analysisHtml += '<div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;padding:14px 18px;background:' + lvColor + '12;border:1px solid ' + lvColor + '30;border-radius:12px">' +
-    '<div style="font-size:2.2em;font-weight:800;color:' + lvColor + '">Gr ' + currentGrade + '</div>' +
-    '<div><div style="font-weight:700;color:var(--text);font-size:1em">Current: ' + currentLevel + '</div>' +
-    '<div style="font-size:0.85em;color:var(--muted)">Age ' + childAge + ', grade ' + expectedGrade + ' equivalent' + aheadMsg + '</div></div>' +
+  analysisHtml += '<div class="analysis-card"><h3>\uD83D\uDCCA Reading Level (Lexile)</h3>';
+  analysisHtml += '<div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;padding:14px 18px;background:' + cyLD.color + '12;border:1px solid ' + cyLD.color + '30;border-radius:12px">' +
+    '<div style="font-size:2em;font-weight:800;color:' + cyLD.color + '">' + cyLD.lexile + '</div>' +
+    '<div><div style="font-weight:700;color:var(--text);font-size:1em">Highest this year: ' + cyHighest + '</div>' +
+    '<div style="font-size:0.85em;color:var(--muted)">Age ' + childAge + ' typical: ' + expectedLexile + '</div></div>' +
     '</div>';
 
-  // Level distribution (horizontal stacked bar)
+  // Level distribution bar
   var totalClassified = all.length - unclassified;
   analysisHtml += '<div style="margin-bottom:14px">';
   analysisHtml += '<div style="display:flex;height:16px;border-radius:8px;overflow:hidden;margin-bottom:8px">';
-  levelNames.slice().reverse().forEach(function(lv) {
+  LEVEL_NAMES.slice().reverse().forEach(function(lv) {
     var cnt = levelCounts[lv] || 0;
     if (cnt === 0) return;
     var pct = (cnt / totalClassified * 100);
-    analysisHtml += '<div style="width:' + pct.toFixed(1) + '%;background:' + levelKeywords[lv].color + ';transition:width 0.5s" title="' + lv + ': ' + cnt + ' books"></div>';
+    analysisHtml += '<div style="width:' + pct.toFixed(1) + '%;background:' + LEVEL_DATA[lv].color + '" title="' + lv + ' (' + LEVEL_DATA[lv].lexile + '): ' + cnt + ' books"></div>';
   });
   analysisHtml += '</div>';
-
-  // Legend
   analysisHtml += '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.82em">';
-  levelNames.forEach(function(lv) {
+  LEVEL_NAMES.forEach(function(lv) {
     var cnt = levelCounts[lv] || 0;
     if (cnt === 0) return;
     analysisHtml += '<div style="display:flex;align-items:center;gap:5px">' +
-      '<div style="width:10px;height:10px;border-radius:2px;background:' + levelKeywords[lv].color + '"></div>' +
-      '<span style="color:var(--muted)">' + lv.split('(')[0].trim() + '</span>' +
+      '<div style="width:10px;height:10px;border-radius:2px;background:' + LEVEL_DATA[lv].color + '"></div>' +
+      '<span style="color:var(--muted)">' + lv + ' (' + LEVEL_DATA[lv].lexile + ')</span>' +
       '<span style="color:var(--text);font-weight:600">' + cnt + '</span></div>';
   });
   analysisHtml += '</div></div>';
 
-  // Year-over-year progression
-  var progYears = Object.keys(levelByYear).sort(function(a, b) {
-    return parseInt(a.split('-')[0]) - parseInt(b.split('-')[0]);
-  });
+  // Year-over-year Lexile progression
+  var progYears = Object.keys(levelByYear).sort(function(a, b) { return parseInt(a.split('-')[0]) - parseInt(b.split('-')[0]); });
   if (progYears.length > 1) {
     analysisHtml += '<div style="font-size:0.88em;margin-top:12px">';
-    analysisHtml += '<div style="font-weight:600;color:var(--text);margin-bottom:8px">Level Progression</div>';
+    analysisHtml += '<div style="font-weight:600;color:var(--text);margin-bottom:8px">Lexile Progression</div>';
     progYears.forEach(function(yr) {
       var yrLevels = levelByYear[yr];
-      // Find dominant level
       var domLevel = ''; var domCount = 0;
       for (var dl in yrLevels) { if (yrLevels[dl] > domCount) { domCount = yrLevels[dl]; domLevel = dl; } }
-      var dlColor = levelKeywords[domLevel] ? levelKeywords[domLevel].color : 'var(--muted)';
-      var dlGrade = levelKeywords[domLevel] ? levelKeywords[domLevel].grade : '?';
+      // Show highest level for the year
+      var yrHighest = null;
+      for (var hi = 0; hi < LEVEL_NAMES.length; hi++) { if (yrLevels[LEVEL_NAMES[hi]]) { yrHighest = LEVEL_NAMES[hi]; break; } }
+      if (!yrHighest) yrHighest = domLevel;
+      var yhLD = LEVEL_DATA[yrHighest] || { color: 'var(--muted)', lexile: '?' };
       analysisHtml += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
         '<span style="min-width:80px;color:var(--muted)">' + yr + '</span>' +
-        '<div style="width:10px;height:10px;border-radius:50%;background:' + dlColor + '"></div>' +
-        '<span style="color:' + dlColor + ';font-weight:600">Gr ' + dlGrade + '</span>' +
-        '<span style="color:var(--muted);font-size:0.88em">' + domLevel.split('(')[0].trim() + '</span>' +
+        '<div style="width:10px;height:10px;border-radius:50%;background:' + yhLD.color + '"></div>' +
+        '<span style="color:' + yhLD.color + ';font-weight:600">' + yhLD.lexile + '</span>' +
+        '<span style="color:var(--muted);font-size:0.88em">' + yrHighest + '</span>' +
         '</div>';
     });
     analysisHtml += '</div>';
