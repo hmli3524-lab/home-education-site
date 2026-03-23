@@ -263,35 +263,35 @@ function iconFor(label) { for (const [k,v] of Object.entries(TASK_ICONS)) { if (
 const WEEKS = [
   { week:1, dates:"Mar 23–29", phase:1, phaseName:"Learn How Deep Thinking Moves", phaseIcon:"🔍", tasks:[
     {label:"Reading",text:"Quanta + Orwell",subs:["<a href='../articles/w1/quanta-lonely-runner.html#guaimei'>Quanta: Lonely Runner Problem</a> (~1,800 words, math)","<a href='../articles/w1/orwell-shooting-an-elephant.html#guaimei'>Orwell: Shooting an Elephant</a> — read slowly over 2 days"]},
-    {label:"Books",text:"Continue current book",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue current book",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: one piece",subs:["Respond to Orwell — what did he discover that surprised him?"]},
     {label:"Coding",text:"🎮 Game App: continue building",subs:["Prototype exists — keep adding features","Let a friend play — watch their reaction"]}
   ]},
   { week:2, dates:"Mar 30–Apr 5", phase:1, phaseName:"Learn How Deep Thinking Moves", phaseIcon:"🔍", tasks:[
     {label:"Reading",text:"Economist + Quanta",subs:["Economist: 1 article","Quanta: 1 article (pick a topic that connects to geography or law)"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: one piece",subs:["NYT prompt — try starting with a story, not an opinion"]},
     {label:"Coding",text:"🎮 Game App: iterate",subs:["Fix what confused your friend","Add one thing that makes it more fun"]}
   ]},
   { week:3, dates:"Apr 6–12", phase:1, phaseName:"Learn How Deep Thinking Moves", phaseIcon:"🔍", tasks:[
     {label:"Reading",text:"Economist + Quanta + Orwell",subs:["Economist: 1 article","Quanta: 1 article","Orwell: A Hanging (short — one sitting)"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: one piece",subs:["Write about something you're NOT sure about"]},
     {label:"Coding",text:"🎮 Game App: test with 2-3 people",subs:["Watch them play — don't explain, observe","What works? What's confusing?"]}
   ]},
   { week:4, dates:"Apr 13–19", phase:1, phaseName:"Learn How Deep Thinking Moves", phaseIcon:"🔍", tasks:[
     {label:"Reading",text:"Economist ×2 + Quanta",subs:["Economist: 2 articles","Quanta: 1 article"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: one piece",subs:["NYT prompt — put your thesis in the LAST sentence, not the first"]},
     {label:"Coding",text:"🎮 Game App: final polish",subs:["Last round of fixes","Make it ready to share"]}
   ]},
   { week:5, dates:"Apr 20–26", phase:2, phaseName:"From Collecting to Creating", phaseIcon:"🦋", tasks:[
     {label:"Reading",text:"Economist ×2 + Hitchens",subs:["Economist: 2 articles","Hitchens: first essay from Arguably — pick one on law or justice"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: one piece",subs:["Respond to Hitchens — how does he argue differently than Orwell?"]},
     {label:"Wonder Log",text:"Evolution: plan 'My Take' section",subs:["Pick 3 past topics worth deeper analysis","Draft format: what would a 'My Take' look like?","Choose first topic"]},
@@ -299,42 +299,42 @@ const WEEKS = [
   ]},
   { week:6, dates:"Apr 27–May 3", phase:2, phaseName:"From Collecting to Creating", phaseIcon:"🦋", tasks:[
     {label:"Reading",text:"Economist ×2 + Quanta",subs:["Economist: 2 articles","Quanta: 1 article"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: My Take #1",subs:["Deep analysis of chosen topic (law, geo, or business)"]},
     {label:"Coding",text:"📋 School Policy App: define & design",subs:["What does the app do? One sentence.","Who is the user? Sketch 3 screens.","You know how to build now — this time plan before coding"]}
   ]},
   { week:7, dates:"May 4–10", phase:2, phaseName:"From Collecting to Creating", phaseIcon:"🦋", tasks:[
     {label:"Reading",text:"Economist ×2 + Orwell",subs:["Economist: 2 articles","Orwell: Why I Write"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: My Take #2",subs:["Pick a current event — argue BOTH sides, then say which is stronger and why"]},
     {label:"Coding",text:"📋 School Policy App: build v1",subs:["Core functionality working","Faster this time — you've done this before"]}
   ]},
   { week:8, dates:"May 11–17", phase:2, phaseName:"From Collecting to Creating", phaseIcon:"🦋", tasks:[
     {label:"Reading",text:"Economist ×2 + Quanta",subs:["Economist: 2 articles","Quanta: 1 article"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE: 10 pages + mid-quarter review",subs:["Complete pages","Quiz yourself on all pages so far"]},
     {label:"Writing",text:"Wonder Log: My Take #3",subs:["Connect two of your interests (e.g., law + geography, business + design)"]},
     {label:"Coding",text:"📋 School Policy App: user testing",subs:["Have 2-3 classmates use it","Watch what confuses them — don't explain, observe","Write down 3 things to fix"]}
   ]},
   { week:9, dates:"May 18–24", phase:3, phaseName:"Your Voice, Amplified", phaseIcon:"⚡", tasks:[
     {label:"Reading",text:"Economist ×2 + Hitchens",subs:["Economist: 2 articles","Hitchens: second essay from Arguably"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: My Take #4",subs:["Pick a rights issue from 'I Know My Rights' — go deep"]},
     {label:"Coding",text:"📋 School Policy App: iterate & polish",subs:["Fix the 3 issues from testing","Apply design polish — professional look"]}
   ]},
   { week:10, dates:"May 25–31", phase:3, phaseName:"Your Voice, Amplified", phaseIcon:"⚡", tasks:[
     {label:"Reading",text:"Economist ×2 + Quanta + Orwell",subs:["Economist: 2 articles","Quanta: 1 article","Orwell: Politics and the English Language (over 3 days)"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: My Take #5",subs:["Business or geography topic — use data to support your argument"]},
     {label:"Coding",text:"💻 Launch School Policy App",subs:["Deploy or share the link","Get at least 1 person outside the family using it","Collect their feedback"]}
   ]},
   { week:11, dates:"Jun 1–7", phase:3, phaseName:"Your Voice, Amplified", phaseIcon:"⚡", tasks:[
     {label:"Reading",text:"Economist ×2 + Hitchens + Quanta",subs:["Economist: 2 articles","Hitchens: third essay from Arguably","Quanta: 1 article"]},
-    {label:"Books",text:"Continue reading",subs:["Track title and word count"]},
+    {label:"Books",text:"Continue reading",subs:[]},
     {label:"Vocab",text:"ISEE workbook: 10 pages",subs:["Complete pages and mark done"]},
     {label:"Writing",text:"Wonder Log: My Take #6",subs:["Your strongest analysis yet — pick your best topic, go all in"]},
     {label:"Wonder Log",text:"🚀 Publish upgraded Wonder Log",subs:["All 6 'My Take' pieces live on the site","Polish the best 2-3","Share with someone outside the family"]},

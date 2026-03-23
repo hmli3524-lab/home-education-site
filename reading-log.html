@@ -160,6 +160,8 @@
   .word-col { font-variant-numeric: tabular-nums; }
   .word-col.editable { cursor: pointer; color: var(--teal); }
   .word-col.editable:hover { text-decoration: underline; }
+  .del-btn { background: none; border: none; color: var(--muted); font-size: 1.2em; cursor: pointer; padding: 0 4px; opacity: 0.4; transition: opacity 0.15s, color 0.15s; }
+  .del-btn:hover { opacity: 1; color: var(--accent); }
   .source-badge {
     display: inline-block; font-size: 0.7em; padding: 1px 6px;
     border-radius: 6px; background: rgba(155,109,215,0.15); color: var(--accent2);
@@ -706,6 +708,18 @@ function switchChild(child) {
 }
 
 // ── Edit word count (works for both historical and new books) ──
+function deleteBook(title) {
+  if (!confirm('Delete "' + title + '" from the log?')) return;
+  var books = getNewBooks(activeChild);
+  var idx = books.findIndex(function(b) { return b.title === title; });
+  if (idx >= 0) {
+    books.splice(idx, 1);
+    saveNewBooks(activeChild, books);
+    updateYearTotal(activeChild);
+    render();
+  }
+}
+
 function editWords(title, currentWords, td) {
   // Replace cell content with an input
   const input = document.createElement("input");
@@ -878,19 +892,24 @@ function render() {
           <th class="sortable" onclick="toggleSort('words')">Words</th>
           <th>Reread</th>
           <th>Notes</th>
+          <th style="width:36px"></th>
         </tr></thead>
         <tbody>`;
 
     books.forEach((b, bi) => {
       const rereadHtml = b.reread ? '<span class="reread-badge">&#9733; Fav</span>' : '';
       const sourceHtml = b.source === "planner" ? '<span class="source-badge">planner</span>' : (b.source === "manual" ? '<span class="source-badge">new</span>' : '');
-      const editId = 'edit_' + year.replace(/[^a-z0-9]/gi,'') + '_' + bi;
-      const canEdit = b.source === "manual" || b.source === "planner";
+      const canDelete = b.source === "manual" || b.source === "planner";
+      const safeTitle = escHtml(b.title).replace(/'/g, "\\'");
+      const deleteBtn = canDelete
+        ? `<button class="del-btn" onclick="deleteBook('${safeTitle}')" title="Delete">&times;</button>`
+        : '';
       html += `<tr>
         <td class="book-title">${escHtml(b.title)}${sourceHtml}</td>
-        <td class="word-col editable" onclick="editWords('${escHtml(b.title)}', ${b.words || 0}, this)" title="Click to edit">${fmtFull(b.words || 0)}</td>
+        <td class="word-col editable" onclick="editWords('${safeTitle}', ${b.words || 0}, this)" title="Click to edit">${fmtFull(b.words || 0)}</td>
         <td>${rereadHtml}</td>
         <td class="notes-text">${escHtml(b.notes || '')}</td>
+        <td>${deleteBtn}</td>
       </tr>`;
     });
 
