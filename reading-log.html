@@ -271,6 +271,7 @@
 <!-- Top bar -->
 <div class="top-bar">
   <a href="index.html" class="nav-btn">🏠</a>
+  <a href="#" class="nav-btn" id="nav-plan" onclick="goToPlan();return false">📋</a>
   <span class="nav-btn active">📚 Reading Log</span>
   <div class="nav-spacer"></div>
   <div class="pill-toggle">
@@ -782,6 +783,10 @@ function switchChild(child) {
   document.getElementById("btn-tepi").className = "pill-btn" + (child === "tepi" ? " active-tepi" : "");
   document.getElementById("btn-guaimei").className = "pill-btn" + (child === "guaimei" ? " active-guaimei" : "");
   render();
+}
+function goToPlan() {
+  var plans = { tepi: "programs/tepi_Q2-2026.html", guaimei: "programs/guaimei_Q2-2026.html" };
+  window.location.href = plans[activeChild];
 }
 
 // ── Edit word count (works for both historical and new books) ──
