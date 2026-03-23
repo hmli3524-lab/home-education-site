@@ -162,6 +162,27 @@
   .word-col.editable:hover { text-decoration: underline; }
   .del-btn { background: none; border: none; color: var(--muted); font-size: 1.2em; cursor: pointer; padding: 0 4px; opacity: 0.4; transition: opacity 0.15s, color 0.15s; }
   .del-btn:hover { opacity: 1; color: var(--accent); }
+  .book-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,0.2); }
+  .book-link:hover { color: var(--teal); border-bottom-color: var(--teal); }
+
+  /* Recommendation cards */
+  .dir-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .dir-summary { font-size: 0.88em; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+  .rec-books { display: flex; flex-direction: column; gap: 12px; }
+  .rec-book { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .rec-book-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+  .rec-title { color: #fff; font-weight: 700; font-size: 1em; text-decoration: none; border-bottom: 1px dashed rgba(78,205,196,0.4); }
+  .rec-title:hover { color: var(--teal); border-bottom-style: solid; }
+  .rec-author { font-size: 0.85em; color: var(--muted); }
+  .rec-words { font-size: 0.78em; color: var(--teal); background: rgba(78,205,196,0.1); padding: 2px 8px; border-radius: 10px; }
+  .rec-pillar { font-size: 0.72em; color: var(--gold); background: rgba(224,168,46,0.1); padding: 2px 8px; border-radius: 10px; }
+  .rec-why { font-size: 0.9em; line-height: 1.65; color: var(--text); margin-bottom: 10px; }
+  .rec-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .rec-add-btn { background: var(--accent2); color: #fff; border: none; border-radius: 6px; padding: 6px 16px; font-size: 0.82em; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .rec-add-btn:hover { opacity: 0.85; }
+  .rec-amazon-link { font-size: 0.82em; color: var(--teal); text-decoration: none; }
+  .rec-amazon-link:hover { text-decoration: underline; }
+  .rec-read-badge { font-size: 0.82em; color: var(--green); font-weight: 600; }
   .source-badge {
     display: inline-block; font-size: 0.7em; padding: 1px 6px;
     border-radius: 6px; background: rgba(155,109,215,0.15); color: var(--accent2);
@@ -708,6 +729,18 @@ function switchChild(child) {
 }
 
 // ── Edit word count (works for both historical and new books) ──
+// ── Wishlist (reading list from recommendations) ──
+function getWishlist(child) {
+  try { return JSON.parse(localStorage.getItem("reading_wishlist_" + child)) || []; } catch(e) { return []; }
+}
+function addToWishlist(title, author, words) {
+  var list = getWishlist(activeChild);
+  if (list.some(function(w) { return w.title === title; })) return;
+  list.push({ title: title, author: author, words: words, dateAdded: new Date().toISOString().slice(0,10) });
+  localStorage.setItem("reading_wishlist_" + activeChild, JSON.stringify(list));
+  render();
+}
+
 function deleteBook(title) {
   if (!confirm('Delete "' + title + '" from the log?')) return;
   var books = getNewBooks(activeChild);
@@ -904,8 +937,9 @@ function render() {
       const deleteBtn = canDelete
         ? `<button class="del-btn" onclick="deleteBook('${safeTitle}')" title="Delete">&times;</button>`
         : '';
+      var amazonSearch = 'https://www.amazon.com/s?k=' + encodeURIComponent(b.title + ' book');
       html += `<tr>
-        <td class="book-title">${escHtml(b.title)}${sourceHtml}</td>
+        <td class="book-title"><a href="${amazonSearch}" target="_blank" class="book-link">${escHtml(b.title)}</a>${sourceHtml}</td>
         <td class="word-col editable" onclick="editWords('${safeTitle}', ${b.words || 0}, this)" title="Click to edit">${fmtFull(b.words || 0)}</td>
         <td>${rereadHtml}</td>
         <td class="notes-text">${escHtml(b.notes || '')}</td>
@@ -1049,30 +1083,82 @@ function render() {
     '</div>';
   analysisHtml += '</div>';
 
-  // d) Suggested Reading Directions
+  // d) Suggested Reading Directions + Book Recommendations
+  var RECS = {
+    tepi: [
+      { direction: "Fantasy \u2192 Literary Fiction Crossover", summary: "You love epic stories. These are shorter but hit harder \u2014 every sentence earns its place.", books: [
+        { title: "Fahrenheit 451", author: "Ray Bradbury", words: 46000, why: "A fireman who burns books starts reading them. Pairs perfectly with Orwell \u2014 both ask what happens when a society decides thinking is dangerous. Short, intense, unforgettable.", amazon: "https://www.amazon.com/dp/1451673310", pillar: "Intellectual Sovereignty" },
+        { title: "The Old Man and the Sea", author: "Ernest Hemingway", words: 27000, why: "An old fisherman vs. a giant marlin. Hemingway writes with zero wasted words. You'll finish it in one sitting and think about it for years. A masterclass in discipline and never giving up.", amazon: "https://www.amazon.com/dp/0684801221", pillar: "Rooted Character" },
+        { title: "Animal Farm", author: "George Orwell", words: 30000, why: "You're already reading Orwell essays. This is his most famous story \u2014 a farm where animals overthrow the farmer, then watch their revolution betray itself. You'll never look at power the same way.", amazon: "https://www.amazon.com/dp/0451526341", pillar: "Intellectual Sovereignty" },
+        { title: "Brave New World", author: "Aldous Huxley", words: 64000, why: "If Orwell warned about tyranny through fear, Huxley warned about tyranny through pleasure. Everyone is happy \u2014 but at what cost? The scariest dystopia because it doesn't look scary.", amazon: "https://www.amazon.com/dp/0060850523", pillar: "Intellectual Sovereignty" }
+      ]},
+      { direction: "Math & Science \u2192 Popular Science That Reads Like a Thriller", summary: "You already think mathematically. These books show that math and science have stories as gripping as any fantasy quest.", books: [
+        { title: "Fermat's Enigma", author: "Simon Singh", words: 80000, why: "A math problem that took 358 years to solve. Andrew Wiles locked himself in an attic for 7 years to crack it. You just read about the Lonely Runner \u2014 this is the ultimate version of that story.", amazon: "https://www.amazon.com/dp/0385493622", pillar: "Intellectual Sovereignty" },
+        { title: "The Code Book", author: "Simon Singh", words: 105000, why: "The history of secret codes from ancient Egypt to the internet. Math meets espionage meets war. Every chapter is a puzzle you can try to solve yourself.", amazon: "https://www.amazon.com/dp/0385495323", pillar: "Economic Independence" },
+        { title: "A Short History of Nearly Everything", author: "Bill Bryson", words: 166000, why: "How we figured out the size of the Earth, the age of the universe, and what we're made of. Hilarious and mind-blowing. You'll impress everyone at dinner with what you learn.", amazon: "https://www.amazon.com/dp/076790818X", pillar: "Intellectual Sovereignty" }
+      ]},
+      { direction: "Faith & Reasoning \u2192 Think Deeply About What You Believe", summary: "You go to church. These books show that faith and sharp thinking aren't enemies \u2014 they strengthen each other.", books: [
+        { title: "Mere Christianity", author: "C.S. Lewis", words: 65000, why: "You've read all of Narnia. This is the book behind Narnia \u2014 Lewis making the case for Christianity using pure logic. He was an atheist who argued himself into faith. The reasoning is rigorous.", amazon: "https://www.amazon.com/dp/0060652926", pillar: "Rooted Character" },
+        { title: "The Screwtape Letters", author: "C.S. Lewis", words: 35000, why: "Letters from a senior demon coaching a junior demon on how to tempt a human. Funny, brilliant, and uncomfortably accurate about how people actually think. Lewis at his most creative.", amazon: "https://www.amazon.com/dp/0060652934", pillar: "Rooted Character" }
+      ]},
+      { direction: "History & Economics \u2192 Understand How the World Actually Works", summary: "National Affairs and The Economist will make more sense when you know the stories behind the systems.", books: [
+        { title: "Economics in One Lesson", author: "Henry Hazlitt", words: 70000, why: "The most important economics book for beginners. One core idea: look at what policies do to everyone, not just the group they claim to help. Clear, logical, center-right. Every citizen should read it.", amazon: "https://www.amazon.com/dp/0517548232", pillar: "Economic Independence" },
+        { title: "The Wright Brothers", author: "David McCullough", words: 108000, why: "Two brothers with no college degrees, no funding, no connections \u2014 built the first airplane. A true story of grit, self-education, and shipping something that changed the world.", amazon: "https://www.amazon.com/dp/1476728755", pillar: "Economic Independence" },
+        { title: "1776", author: "David McCullough", words: 118000, why: "The year America almost didn't happen. Washington lost nearly every battle but refused to quit. History that reads like a thriller. You'll understand what the founders actually risked.", amazon: "https://www.amazon.com/dp/0743226720", pillar: "Rooted Character" }
+      ]}
+    ],
+    guaimei: [
+      { direction: "Law & Civics \u2192 From Reading About Rights to Understanding Arguments", summary: "You've read the Constitution 3 times and SC justice biographies. Time to see how legal reasoning actually works.", books: [
+        { title: "A Matter of Interpretation", author: "Antonin Scalia", words: 55000, why: "Justice Scalia explains how he reads the Constitution \u2014 not as a 'living document' but as a text with fixed meaning. Includes responses from other legal scholars who disagree. You'll see real legal debate, not textbook summaries.", amazon: "https://www.amazon.com/dp/0691004005", pillar: "Intellectual Sovereignty" },
+        { title: "A Conflict of Visions", author: "Thomas Sowell", words: 75000, why: "Why do smart people disagree about politics? Sowell shows it comes down to two different views of human nature. This book will give you a framework for understanding every policy debate you read about.", amazon: "https://www.amazon.com/dp/0465002056", pillar: "Intellectual Sovereignty" },
+        { title: "The Law", author: "Fr\u00e9d\u00e9ric Bastiat", words: 17000, why: "Written in 1850 but reads like it was written yesterday. What is the law for? What happens when it's used to take from some and give to others? Short, powerful, and you'll finish it in one afternoon.", amazon: "https://www.amazon.com/dp/1680920847", pillar: "Intellectual Sovereignty" }
+      ]},
+      { direction: "Geography & Economics \u2192 Why Some Places Thrive and Others Don't", summary: "You loved Prisoners of Geography. These go deeper \u2014 connecting maps to money to power.", books: [
+        { title: "How an Economy Grows and Why It Crashes", author: "Peter Schiff", words: 45000, why: "Economics explained through a story about three guys on an island who catch fish. Sounds simple but by the end you'll understand inflation, banking, and trade better than most adults. Illustrated.", amazon: "https://www.amazon.com/dp/047052670X", pillar: "Economic Independence" },
+        { title: "Basic Economics", author: "Thomas Sowell", words: 130000, why: "No graphs, no jargon \u2014 just clear explanations of how economies actually work. Sowell writes for readers who want to think, not memorize. Take it one chapter at a time alongside your Economist reading.", amazon: "https://www.amazon.com/dp/0465060730", pillar: "Economic Independence" },
+        { title: "The Geography of Genius", author: "Eric Weiner", words: 95000, why: "Why did ancient Athens produce so many geniuses? Florence during the Renaissance? Silicon Valley? A journalist travels the world investigating. Connects your geography interest to your curiosity about how greatness happens.", amazon: "https://www.amazon.com/dp/1451691661", pillar: "Intellectual Sovereignty" }
+      ]},
+      { direction: "Writing Craft \u2192 Learn from Authors Who Argue, Not Just Report", summary: "Your Wonder Log is impressive. To level it up, study writers who don't just share facts \u2014 they build arguments.", books: [
+        { title: "Politics and the English Language", author: "George Orwell", words: 5000, why: "You'll read this in your Q2 plan. Orwell's rules for clear writing. After this essay, you'll spot bad writing everywhere \u2014 in news, in textbooks, in political speeches. A weapon for your own writing.", amazon: "https://www.amazon.com/dp/0141036427", pillar: "Intellectual Sovereignty" },
+        { title: "Arguably: Essays", author: "Christopher Hitchens", words: 180000, why: "Pick any essay \u2014 you don't need to read it in order. Hitchens argues about everything from Thomas Jefferson to Harry Potter with more precision and fire than anyone. Study his structure, not just his opinions.", amazon: "https://www.amazon.com/dp/1455502782", pillar: "Intellectual Sovereignty" }
+      ]},
+      { direction: "Business & Design \u2192 From Reading About Business to Building Things", summary: "You've read HBR, Sam Walton, and branding books. Time to connect knowledge to action.", books: [
+        { title: "Start with Why", author: "Simon Sinek", words: 65000, why: "Why do some companies inspire loyalty and others don't? Sinek's answer is simple but changes how you think about any project \u2014 including your own. Directly useful for your school policy app.", amazon: "https://www.amazon.com/dp/1591846447", pillar: "Economic Independence" },
+        { title: "Grit", author: "Angela Duckworth", words: 90000, why: "Talent is overrated. What actually predicts success is sustained effort over time \u2014 grit. Backed by research, not motivational fluff. You already have grit (4 years of Wonder Log proves it). This book shows you why it matters.", amazon: "https://www.amazon.com/dp/1501111116", pillar: "Rooted Character" },
+        { title: "The Visual Display of Quantitative Information", author: "Edward Tufte", words: 50000, why: "The most important book ever written about presenting data visually. You love design AND data. This book lives where those two interests meet. It'll change how you build Wonder Log forever.", amazon: "https://www.amazon.com/dp/1930824130", pillar: "Economic Independence" }
+      ]}
+    ]
+  };
+
   analysisHtml += '<div class="analysis-card"><h3>Suggested Reading Directions</h3>';
-  if (activeChild === 'tepi') {
-    var tepiDirections = [
-      'Strong in fantasy series \u2014 ready for literary fiction crossover (Steinbeck, Hemingway, Bradbury)',
-      'Non-fiction growing \u2014 deepen with argument-based essays (Orwell, Hitchens)',
-      'Math/science interest emerging \u2014 Quanta Magazine + popular science (Fermat\'s Enigma, The Code Book)',
-      'Consider: historical non-fiction to connect with National Affairs reading'
-    ];
-    tepiDirections.forEach(function(d) {
-      analysisHtml += '<div class="direction-card"><span class="dir-icon">\u27A4</span>' + d + '</div>';
+  var recs = RECS[activeChild] || [];
+  recs.forEach(function(dir) {
+    analysisHtml += '<div class="direction-card">' +
+      '<div class="dir-header"><span class="dir-icon">\u27A4</span><strong>' + dir.direction + '</strong></div>' +
+      '<div class="dir-summary">' + dir.summary + '</div>' +
+      '<div class="rec-books">';
+    dir.books.forEach(function(bk) {
+      var safeTitle = escHtml(bk.title).replace(/'/g, "\\'");
+      var alreadyRead = all.some(function(b) { return b.title.toLowerCase().indexOf(bk.title.toLowerCase()) >= 0; });
+      var addedToList = getWishlist(activeChild).some(function(w) { return w.title === bk.title; });
+      analysisHtml += '<div class="rec-book">' +
+        '<div class="rec-book-header">' +
+          '<a href="' + bk.amazon + '" target="_blank" class="rec-title">' + escHtml(bk.title) + '</a>' +
+          '<span class="rec-author">by ' + escHtml(bk.author) + '</span>' +
+          '<span class="rec-words">~' + fmt(bk.words) + ' words</span>' +
+          '<span class="rec-pillar">' + bk.pillar + '</span>' +
+        '</div>' +
+        '<div class="rec-why">' + bk.why + '</div>' +
+        '<div class="rec-actions">' +
+          (alreadyRead ? '<span class="rec-read-badge">\u2713 Already read</span>' :
+           addedToList ? '<span class="rec-read-badge">\u2713 On reading list</span>' :
+           '<button class="rec-add-btn" onclick="addToWishlist(\'' + safeTitle + '\', \'' + escHtml(bk.author).replace(/'/g, "\\'") + '\', ' + bk.words + ')">+ Add to Reading List</button>') +
+          '<a href="' + bk.amazon + '" target="_blank" class="rec-amazon-link">View on Amazon \u2192</a>' +
+        '</div>' +
+      '</div>';
     });
-  } else {
-    var guaimeiDirections = [
-      'Exceptional non-fiction appetite \u2014 rare for age. Lean into it.',
-      'Law/civics interest is a strength \u2014 expand to landmark case studies',
-      'Geography + business combo is unique \u2014 explore economic geography (Why Nations Fail, adapted)',
-      'Writing craft: read authors who argue (Hitchens, Orwell) not just report',
-      'Design interest + reading = potential for information design projects'
-    ];
-    guaimeiDirections.forEach(function(d) {
-      analysisHtml += '<div class="direction-card"><span class="dir-icon">\u27A4</span>' + d + '</div>';
-    });
-  }
+    analysisHtml += '</div></div>';
+  });
   analysisHtml += '</div>';
 
   document.getElementById("analysis-section").innerHTML = analysisHtml;
