@@ -214,8 +214,11 @@
   .year-chevron { display: inline-block; width: 16px; font-size: 0.8em; color: var(--muted); transition: transform 0.2s; }
 
   /* Analysis section */
-  .analysis-section { margin-top: 40px; padding-top: 32px; border-top: 2px solid var(--border); }
-  .analysis-section h2 { font-size: 1.15em; color: #fff; margin-bottom: 20px; }
+  .analysis-section { margin-bottom: 24px; animation: slideDown 0.3s ease; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  .analysis-section h2 { font-size: 1.15em; color: #fff; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+  .analysis-close { background: none; border: none; color: var(--muted); font-size: 1.2em; cursor: pointer; }
+  .analysis-close:hover { color: var(--text); }
   .analysis-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
   .analysis-card h3 { font-size: 0.95em; color: var(--teal); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
   .volume-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 0.88em; }
@@ -264,10 +267,10 @@
 <div class="main">
   <!-- Stats cards -->
   <div class="stats-row">
-    <div class="stat-card words">
+    <div class="stat-card words" onclick="toggleAnalysis()" style="cursor:pointer" title="Click for reading analysis">
       <div class="stat-value" id="stat-total-words">--</div>
       <div class="stat-label">Total Words</div>
-      <div class="stat-sub">Lifetime</div>
+      <div class="stat-sub">Tap for analysis</div>
     </div>
     <div class="stat-card books">
       <div class="stat-value" id="stat-total-books">--</div>
@@ -300,6 +303,9 @@
       <span id="progress-target">Target: 0</span>
     </div>
   </div>
+
+  <!-- Analysis section (hidden by default, toggled by clicking Total Words) -->
+  <div id="analysis-section" class="analysis-section" style="display:none"></div>
 
   <!-- Add book form -->
   <div class="add-form-card">
@@ -341,8 +347,7 @@
   <!-- Favorites section -->
   <div id="favorites-section" class="favorites-section"></div>
 
-  <!-- Analysis section -->
-  <div id="analysis-section" class="analysis-section"></div>
+
 </div>
 
 <script>
@@ -741,6 +746,15 @@ function addToWishlist(title, author, words) {
   render();
 }
 
+// ── Toggle analysis panel ──
+var analysisVisible = false;
+function toggleAnalysis() {
+  analysisVisible = !analysisVisible;
+  var el = document.getElementById("analysis-section");
+  el.style.display = analysisVisible ? "" : "none";
+  if (analysisVisible) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function deleteBook(title) {
   if (!confirm('Delete "' + title + '" from the log?')) return;
   var books = getNewBooks(activeChild);
@@ -969,7 +983,7 @@ function render() {
   document.getElementById("favorites-section").innerHTML = favHtml;
 
   // ── Analysis Section ──
-  var analysisHtml = '<h2>Reading Analysis</h2>';
+  var analysisHtml = '<h2>Reading Analysis <button class="analysis-close" onclick="toggleAnalysis()" title="Close">&times;</button></h2>';
 
   // a) Reading Volume Trend
   var yearVolumes = {};
@@ -1020,16 +1034,31 @@ function render() {
   var fPct = totalFNF > 0 ? (fCount / totalFNF * 100) : 0;
   var nfPct = totalFNF > 0 ? (nfCount / totalFNF * 100) : 0;
 
-  analysisHtml += '<div class="analysis-card"><h3>Fiction vs Non-Fiction Balance</h3>';
-  analysisHtml += '<div class="fiction-split">' +
-    '<span style="color:var(--accent2);font-weight:600;font-size:0.88em">Fiction ' + fPct.toFixed(0) + '%</span>' +
-    '<div class="fiction-bar">' +
-    '<div class="fiction-fill" style="width:' + fPct.toFixed(1) + '%;background:var(--accent2)"></div>' +
-    '<div class="fiction-fill" style="width:' + nfPct.toFixed(1) + '%;background:var(--teal)"></div>' +
-    '</div>' +
-    '<span style="color:var(--teal);font-weight:600;font-size:0.88em">Non-Fiction ' + nfPct.toFixed(0) + '%</span>' +
-    '</div>';
-  analysisHtml += '<div class="fiction-labels"><span>' + fCount + ' books</span><span>' + nfCount + ' books</span></div>';
+  // SVG donut chart for fiction vs non-fiction
+  var fDeg = fPct * 3.6;
+  analysisHtml += '<div class="analysis-card"><h3>Fiction vs Non-Fiction</h3>';
+  analysisHtml += '<div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;justify-content:center">';
+  analysisHtml += '<svg width="140" height="140" viewBox="0 0 140 140">' +
+    '<circle cx="70" cy="70" r="55" fill="none" stroke="var(--card)" stroke-width="18"/>' +
+    '<circle cx="70" cy="70" r="55" fill="none" stroke="var(--accent2)" stroke-width="18" ' +
+    'stroke-dasharray="' + (fPct * 3.456).toFixed(1) + ' 345.6" stroke-dashoffset="86.4" ' +
+    'style="transition:stroke-dasharray 0.8s ease"/>' +
+    '<circle cx="70" cy="70" r="55" fill="none" stroke="var(--teal)" stroke-width="18" ' +
+    'stroke-dasharray="' + (nfPct * 3.456).toFixed(1) + ' 345.6" stroke-dashoffset="' + (86.4 - fPct * 3.456).toFixed(1) + '" ' +
+    'style="transition:stroke-dasharray 0.8s ease"/>' +
+    '<text x="70" y="66" text-anchor="middle" fill="var(--text)" font-size="22" font-weight="700">' + totalFNF + '</text>' +
+    '<text x="70" y="84" text-anchor="middle" fill="var(--muted)" font-size="11">books</text>' +
+    '</svg>';
+  analysisHtml += '<div style="display:flex;flex-direction:column;gap:10px">' +
+    '<div style="display:flex;align-items:center;gap:10px">' +
+    '<div style="width:14px;height:14px;border-radius:3px;background:var(--accent2)"></div>' +
+    '<span style="font-weight:600;min-width:50px">' + fPct.toFixed(0) + '%</span>' +
+    '<span style="color:var(--muted);font-size:0.88em">Fiction (' + fCount + ')</span></div>' +
+    '<div style="display:flex;align-items:center;gap:10px">' +
+    '<div style="width:14px;height:14px;border-radius:3px;background:var(--teal)"></div>' +
+    '<span style="font-weight:600;min-width:50px">' + nfPct.toFixed(0) + '%</span>' +
+    '<span style="color:var(--muted);font-size:0.88em">Non-Fiction (' + nfCount + ')</span></div>' +
+    '</div></div>';
   analysisHtml += '</div>';
 
   // c) Reading Preferences (top themes)
@@ -1067,19 +1096,28 @@ function render() {
   themes.sort(function(a, b) { return b.count - a.count; });
   var maxTheme = themes.length > 0 ? themes[0].count : 1;
 
+  var themeIcons = { 'Fantasy/Adventure': '\uD83D\uDC09', 'Historical': '\uD83C\uDFDB\uFE0F', 'Science/Math': '\uD83E\uDDEA', 'Business/Life Skills': '\uD83D\uDCBC', 'Law/Civics': '\u2696\uFE0F', 'Classic Literature': '\uD83D\uDCD6' };
+  var themeColors = { 'Fantasy/Adventure': '#9b6dd7', 'Historical': '#e0a82e', 'Science/Math': '#4ecdc4', 'Business/Life Skills': '#57d9a3', 'Law/Civics': '#e8555a', 'Classic Literature': '#6b8aaf' };
   analysisHtml += '<div class="analysis-card"><h3>Reading Preferences</h3>';
+  analysisHtml += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">';
   themes.forEach(function(t) {
     if (t.count === 0) return;
+    var icon = themeIcons[t.name] || '\uD83D\uDCDA';
+    var col = themeColors[t.name] || 'var(--teal)';
     var tPct = (t.count / maxTheme * 100);
-    analysisHtml += '<div class="theme-row">' +
-      '<span class="theme-name">' + t.name + '</span>' +
-      '<div class="theme-bar"><div class="theme-fill" style="width:' + tPct.toFixed(1) + '%"></div></div>' +
-      '<span class="theme-count">' + t.count + '</span>' +
+    analysisHtml += '<div style="background:' + col + '15;border:1px solid ' + col + '40;border-radius:12px;padding:12px 16px;min-width:140px;flex:1">' +
+      '<div style="font-size:1.5em;margin-bottom:4px">' + icon + '</div>' +
+      '<div style="font-weight:700;font-size:1.1em;color:' + col + '">' + t.count + '</div>' +
+      '<div style="font-size:0.82em;color:var(--text)">' + t.name + '</div>' +
+      '<div style="margin-top:6px;height:4px;background:var(--card);border-radius:2px;overflow:hidden">' +
+      '<div style="height:100%;width:' + tPct.toFixed(1) + '%;background:' + col + ';border-radius:2px"></div></div>' +
       '</div>';
   });
-  analysisHtml += '<div class="theme-row" style="margin-top:8px;">' +
-    '<span class="theme-name" style="color:var(--gold)">Series Reader</span>' +
-    '<span class="theme-count" style="color:var(--gold)">' + seriesCount + ' series detected</span>' +
+  analysisHtml += '</div>';
+  analysisHtml += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(224,168,46,0.08);border-radius:8px;font-size:0.88em">' +
+    '<span style="color:var(--gold);font-size:1.2em">\uD83D\uDCDA</span>' +
+    '<span style="color:var(--gold);font-weight:600">Series Reader:</span>' +
+    '<span style="color:var(--text)">' + seriesCount + ' series detected</span>' +
     '</div>';
   analysisHtml += '</div>';
 

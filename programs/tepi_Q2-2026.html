@@ -546,7 +546,7 @@ function render() {
           <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:8px 0 4px 30px;">
             <input type="text" placeholder="Book title" style="flex:2;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:0.85em;font-family:inherit;" id="${bfId}_title">
             <input type="number" placeholder="Pages" min="0" style="width:70px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:0.85em;font-family:inherit;" id="${bfId}_pages">
-            <input type="number" placeholder="×1" min="1" value="1" style="width:50px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:0.85em;font-family:inherit;" title="Multiplier" id="${bfId}_mult">
+            <input type="number" placeholder="×" min="1" value="1" style="width:55px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--gold);padding:6px 10px;font-size:0.85em;font-family:inherit;text-align:center;" title="Multiplier (e.g. 3 for trilogy)" id="${bfId}_mult">
             <button onclick="logBookFromPlan('${bfId}')" style="background:var(--green);color:#1a1a1a;border:none;border-radius:6px;padding:6px 14px;font-size:0.82em;font-weight:600;cursor:pointer;font-family:inherit;">+ Log</button>
           </div>
         </div>`;
