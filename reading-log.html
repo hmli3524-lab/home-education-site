@@ -183,6 +183,10 @@
   .rec-amazon-link { font-size: 0.82em; color: var(--teal); text-decoration: none; }
   .rec-amazon-link:hover { text-decoration: underline; }
   .rec-read-badge { font-size: 0.82em; color: var(--green); font-weight: 600; }
+  .rec-dismiss-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; padding: 4px 10px; font-size: 0.78em; cursor: pointer; font-family: inherit; }
+  .rec-dismiss-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .show-more-btn { display: block; width: 100%; background: var(--card); border: 1px dashed var(--border); color: var(--teal); border-radius: 10px; padding: 12px; font-family: inherit; font-size: 0.9em; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.15s; }
+  .show-more-btn:hover { background: var(--border); }
   .source-badge {
     display: inline-block; font-size: 0.7em; padding: 1px 6px;
     border-radius: 6px; background: rgba(155,109,215,0.15); color: var(--accent2);
@@ -779,6 +783,26 @@ function switchSection(name) {
   });
 }
 
+// ── Dismissed books (don't show again, reappears after 5 views) ──
+function getDismissed(child) {
+  try { return JSON.parse(localStorage.getItem("dismissed_recs_" + child)) || {}; } catch(e) { return {}; }
+}
+function saveDismissed(child, data) {
+  localStorage.setItem("dismissed_recs_" + child, JSON.stringify(data));
+}
+function dismissBook(title) {
+  var hidden = getDismissed(activeChild);
+  hidden[title] = { dismissed: new Date().toISOString().slice(0,10), views: 0 };
+  saveDismissed(activeChild, hidden);
+  render();
+}
+function showMoreRecs(dirIndex) {
+  var pageKey = 'sug_page_' + activeChild + '_' + dirIndex;
+  var page = parseInt(localStorage.getItem(pageKey) || '0');
+  localStorage.setItem(pageKey, (page + 1).toString());
+  render();
+}
+
 function deleteBook(title) {
   if (!confirm('Delete "' + title + '" from the log?')) return;
   var books = getNewBooks(activeChild);
@@ -1246,33 +1270,45 @@ function render() {
         { title: "Fahrenheit 451", author: "Ray Bradbury", words: 46000, rating: 4.6, why: "A fireman who burns books starts reading them. Pairs perfectly with Orwell \u2014 both ask what happens when a society decides thinking is dangerous. Short, intense, unforgettable.", amazon: "https://www.amazon.com/dp/1451673310", pillar: "Intellectual Sovereignty" },
         { title: "The Old Man and the Sea", author: "Ernest Hemingway", words: 27000, rating: 4.5, why: "An old fisherman vs. a giant marlin. Hemingway writes with zero wasted words. You'll finish it in one sitting and think about it for years. A masterclass in discipline and never giving up.", amazon: "https://www.amazon.com/dp/0684801221", pillar: "Rooted Character" },
         { title: "Animal Farm", author: "George Orwell", words: 30000, rating: 4.7, why: "You're already reading Orwell essays. This is his most famous story \u2014 a farm where animals overthrow the farmer, then watch their revolution betray itself. You'll never look at power the same way.", amazon: "https://www.amazon.com/dp/0451526341", pillar: "Intellectual Sovereignty" },
-        { title: "Brave New World", author: "Aldous Huxley", words: 64000, rating: 4.5, why: "If Orwell warned about tyranny through fear, Huxley warned about tyranny through pleasure. Everyone is happy \u2014 but at what cost? The scariest dystopia because it doesn't look scary.", amazon: "https://www.amazon.com/dp/0060850523", pillar: "Intellectual Sovereignty" }
+        { title: "Brave New World", author: "Aldous Huxley", words: 64000, rating: 4.5, why: "If Orwell warned about tyranny through fear, Huxley warned about tyranny through pleasure. Everyone is happy \u2014 but at what cost? The scariest dystopia because it doesn't look scary.", amazon: "https://www.amazon.com/dp/0060850523", pillar: "Intellectual Sovereignty" },
+        { title: "The Martian", author: "Andy Weir", words: 104000, rating: 4.7, why: "An astronaut stranded on Mars survives using nothing but science and stubbornness. Every chapter is a problem solved with math, chemistry, and grit. You'll learn real engineering while being unable to stop reading.", amazon: "https://www.amazon.com/dp/0553418025", pillar: "Economic Independence" },
+        { title: "The Count of Monte Cristo (abridged)", author: "Alexandre Dumas", words: 120000, rating: 4.7, why: "The greatest revenge story ever written. A man is wrongly imprisoned, escapes, becomes wealthy, and systematically destroys the people who betrayed him. Strategy, patience, justice. Epic in every sense.", amazon: "https://www.amazon.com/dp/0140449264", pillar: "Rooted Character" },
+        { title: "Watership Down", author: "Richard Adams", words: 156000, rating: 4.6, why: "Rabbits building a society. Sounds ridiculous, reads like Lord of the Rings. About leadership, courage, and what it means to build a community from nothing. One of the great adventure novels.", amazon: "https://www.amazon.com/dp/0743277708", pillar: "Rooted Character" }
       ]},
       { direction: "Math & Science \u2192 Popular Science That Reads Like a Thriller", summary: "You already think mathematically. These books show that math and science have stories as gripping as any fantasy quest.", books: [
         { title: "Fermat's Enigma", author: "Simon Singh", words: 80000, rating: 4.6, why: "A math problem that took 358 years to solve. Andrew Wiles locked himself in an attic for 7 years to crack it. You just read about the Lonely Runner \u2014 this is the ultimate version of that story.", amazon: "https://www.amazon.com/dp/0385493622", pillar: "Intellectual Sovereignty" },
         { title: "The Code Book", author: "Simon Singh", words: 105000, rating: 4.6, why: "The history of secret codes from ancient Egypt to the internet. Math meets espionage meets war. Every chapter is a puzzle you can try to solve yourself.", amazon: "https://www.amazon.com/dp/0385495323", pillar: "Economic Independence" },
-        { title: "A Short History of Nearly Everything", author: "Bill Bryson", words: 166000, rating: 4.6, why: "How we figured out the size of the Earth, the age of the universe, and what we're made of. Hilarious and mind-blowing. You'll impress everyone at dinner with what you learn.", amazon: "https://www.amazon.com/dp/076790818X", pillar: "Intellectual Sovereignty" }
+        { title: "A Short History of Nearly Everything", author: "Bill Bryson", words: 166000, rating: 4.6, why: "How we figured out the size of the Earth, the age of the universe, and what we're made of. Hilarious and mind-blowing. You'll impress everyone at dinner with what you learn.", amazon: "https://www.amazon.com/dp/076790818X", pillar: "Intellectual Sovereignty" },
+        { title: "The Music of the Primes", author: "Marcus du Sautoy", words: 95000, rating: 4.4, why: "The Riemann Hypothesis \u2014 the greatest unsolved problem in math. Why prime numbers matter for everything from internet security to the structure of the universe. After Fermat's Enigma, this is your next step.", amazon: "https://www.amazon.com/dp/0062064010", pillar: "Intellectual Sovereignty" },
+        { title: "Surely You're Joking, Mr. Feynman!", author: "Richard Feynman", words: 115000, rating: 4.6, why: "The funniest scientist who ever lived tells stories about cracking safes at Los Alamos, learning to draw, and playing bongo drums in Brazil. A genius who never took himself seriously.", amazon: "https://www.amazon.com/dp/0393355624", pillar: "Intellectual Sovereignty" }
       ]},
       { direction: "Faith & Reasoning \u2192 Think Deeply About What You Believe", summary: "You go to church. These books show that faith and sharp thinking aren't enemies \u2014 they strengthen each other.", books: [
         { title: "Mere Christianity", author: "C.S. Lewis", words: 65000, rating: 4.8, christian: true, why: "You've read all of Narnia. This is the book behind Narnia \u2014 Lewis making the case for Christianity using pure logic. He was an atheist who argued himself into faith. The reasoning is rigorous.", amazon: "https://www.amazon.com/dp/0060652926", pillar: "Rooted Character" },
-        { title: "The Screwtape Letters", author: "C.S. Lewis", words: 35000, rating: 4.7, christian: true, why: "Letters from a senior demon coaching a junior demon on how to tempt a human. Funny, brilliant, and uncomfortably accurate about how people actually think. Lewis at his most creative.", amazon: "https://www.amazon.com/dp/0060652934", pillar: "Rooted Character" }
+        { title: "The Screwtape Letters", author: "C.S. Lewis", words: 35000, rating: 4.7, christian: true, why: "Letters from a senior demon coaching a junior demon on how to tempt a human. Funny, brilliant, and uncomfortably accurate about how people actually think. Lewis at his most creative.", amazon: "https://www.amazon.com/dp/0060652934", pillar: "Rooted Character" },
+        { title: "The Abolition of Man", author: "C.S. Lewis", words: 30000, rating: 4.5, christian: true, why: "Lewis's defense of objective moral truth. Written in 1943, it predicted exactly the moral confusion we see today. Short, dense, and will sharpen your thinking about right and wrong.", amazon: "https://www.amazon.com/dp/0060652942", pillar: "Rooted Character" },
+        { title: "Orthodoxy", author: "G.K. Chesterton", words: 65000, rating: 4.5, christian: true, why: "Chesterton's spiritual autobiography \u2014 how he tried to invent his own philosophy and discovered Christianity already had all the answers. Witty, paradoxical, and deeply original.", amazon: "https://www.amazon.com/dp/1420954733", pillar: "Rooted Character" }
       ]},
       { direction: "History & Economics \u2192 Understand How the World Actually Works", summary: "National Affairs and The Economist will make more sense when you know the stories behind the systems.", books: [
         { title: "Economics in One Lesson", author: "Henry Hazlitt", words: 70000, rating: 4.5, why: "The most important economics book for beginners. One core idea: look at what policies do to everyone, not just the group they claim to help. Clear, logical, center-right. Every citizen should read it.", amazon: "https://www.amazon.com/dp/0517548232", pillar: "Economic Independence" },
         { title: "The Wright Brothers", author: "David McCullough", words: 108000, rating: 4.6, why: "Two brothers with no college degrees, no funding, no connections \u2014 built the first airplane. A true story of grit, self-education, and shipping something that changed the world.", amazon: "https://www.amazon.com/dp/1476728755", pillar: "Economic Independence" },
-        { title: "1776", author: "David McCullough", words: 118000, rating: 4.6, christian: true, why: "The year America almost didn't happen. Washington lost nearly every battle but refused to quit. The founders' faith and conviction sustained them. History that reads like a thriller.", amazon: "https://www.amazon.com/dp/0743226720", pillar: "Rooted Character" }
+        { title: "1776", author: "David McCullough", words: 118000, rating: 4.6, christian: true, why: "The year America almost didn't happen. Washington lost nearly every battle but refused to quit. The founders' faith and conviction sustained them. History that reads like a thriller.", amazon: "https://www.amazon.com/dp/0743226720", pillar: "Rooted Character" },
+        { title: "Free to Choose", author: "Milton & Rose Friedman", words: 120000, rating: 4.5, why: "The classic case for economic freedom by a Nobel Prize-winning economist. Why free markets work better than central planning. Clear enough for a teenager, rigorous enough for a professor.", amazon: "https://www.amazon.com/dp/0156334607", pillar: "Economic Independence" },
+        { title: "How to Think", author: "Alan Jacobs", words: 55000, rating: 4.3, christian: true, why: "A Christian professor explains why thinking well is so hard and how to do it better. Not about being smarter \u2014 about being more honest with yourself. Antidote to groupthink.", amazon: "https://www.amazon.com/dp/0451499603", pillar: "Intellectual Sovereignty" }
       ]}
     ],
     guaimei: [
       { direction: "Law & Civics \u2192 From Reading About Rights to Understanding Arguments", summary: "You've read the Constitution 3 times and SC justice biographies. Time to see how legal reasoning actually works.", books: [
         { title: "A Matter of Interpretation", author: "Antonin Scalia", words: 55000, rating: 4.4, why: "Justice Scalia explains how he reads the Constitution \u2014 not as a 'living document' but as a text with fixed meaning. Includes responses from other legal scholars who disagree. You'll see real legal debate, not textbook summaries.", amazon: "https://www.amazon.com/dp/0691004005", pillar: "Intellectual Sovereignty" },
         { title: "A Conflict of Visions", author: "Thomas Sowell", words: 75000, rating: 4.6, why: "Why do smart people disagree about politics? Sowell shows it comes down to two different views of human nature. This book will give you a framework for understanding every policy debate you read about.", amazon: "https://www.amazon.com/dp/0465002056", pillar: "Intellectual Sovereignty" },
-        { title: "The Law", author: "Fr\u00e9d\u00e9ric Bastiat", words: 17000, rating: 4.7, why: "Written in 1850 but reads like it was written yesterday. What is the law for? What happens when it's used to take from some and give to others? Short, powerful, and you'll finish it in one afternoon.", amazon: "https://www.amazon.com/dp/1680920847", pillar: "Intellectual Sovereignty" }
+        { title: "The Law", author: "Fr\u00e9d\u00e9ric Bastiat", words: 17000, rating: 4.7, why: "Written in 1850 but reads like it was written yesterday. What is the law for? What happens when it's used to take from some and give to others? Short, powerful, and you'll finish it in one afternoon.", amazon: "https://www.amazon.com/dp/1680920847", pillar: "Intellectual Sovereignty" },
+        { title: "My Grandfather's Son", author: "Clarence Thomas", words: 95000, rating: 4.7, christian: true, why: "Justice Thomas's memoir \u2014 raised in poverty by a strict grandfather whose faith and discipline shaped him. A story of character forged through hardship. You've read about the Court; now meet the man.", amazon: "https://www.amazon.com/dp/0060565624", pillar: "Rooted Character" },
+        { title: "The Federalist Papers (selected)", author: "Hamilton, Madison, Jay", words: 40000, rating: 4.5, why: "The original arguments FOR the Constitution, by the people who wrote it. You've read the Constitution 3 times \u2014 now read the debate about why it should exist. Start with Federalist 10 and 51.", amazon: "https://www.amazon.com/dp/0451528816", pillar: "Intellectual Sovereignty" }
       ]},
       { direction: "Geography & Economics \u2192 Why Some Places Thrive and Others Don't", summary: "You loved Prisoners of Geography. These go deeper \u2014 connecting maps to money to power.", books: [
         { title: "How an Economy Grows and Why It Crashes", author: "Peter Schiff", words: 45000, rating: 4.5, why: "Economics explained through a story about three guys on an island who catch fish. Sounds simple but by the end you'll understand inflation, banking, and trade better than most adults. Illustrated.", amazon: "https://www.amazon.com/dp/047052670X", pillar: "Economic Independence" },
         { title: "Basic Economics", author: "Thomas Sowell", words: 130000, rating: 4.7, why: "No graphs, no jargon \u2014 just clear explanations of how economies actually work. Sowell writes for readers who want to think, not memorize. Take it one chapter at a time alongside your Economist reading.", amazon: "https://www.amazon.com/dp/0465060730", pillar: "Economic Independence" },
-        { title: "The Geography of Genius", author: "Eric Weiner", words: 95000, rating: 4.3, why: "Why did ancient Athens produce so many geniuses? Florence during the Renaissance? Silicon Valley? A journalist travels the world investigating. Connects your geography interest to your curiosity about how greatness happens.", amazon: "https://www.amazon.com/dp/1451691661", pillar: "Intellectual Sovereignty" }
+        { title: "The Geography of Genius", author: "Eric Weiner", words: 95000, rating: 4.3, why: "Why did ancient Athens produce so many geniuses? Florence during the Renaissance? Silicon Valley? A journalist travels the world investigating. Connects your geography interest to your curiosity about how greatness happens.", amazon: "https://www.amazon.com/dp/1451691661", pillar: "Intellectual Sovereignty" },
+        { title: "The Wealth of Nations (abridged)", author: "Adam Smith", words: 60000, rating: 4.4, why: "The book that invented economics. Why nations get rich or stay poor. An abridged version makes it accessible. After Schiff and Sowell, you're ready for the original.", amazon: "https://www.amazon.com/dp/1840226889", pillar: "Economic Independence" }
       ]},
       { direction: "Writing Craft \u2192 Learn from Authors Who Argue, Not Just Report", summary: "Your Wonder Log is impressive. To level it up, study writers who don't just share facts \u2014 they build arguments.", books: [
         { title: "Politics and the English Language", author: "George Orwell", words: 5000, rating: 4.8, why: "You'll read this in your Q2 plan. Orwell's rules for clear writing. After this essay, you'll spot bad writing everywhere \u2014 in news, in textbooks, in political speeches. A weapon for your own writing.", amazon: "https://www.amazon.com/dp/0141036427", pillar: "Intellectual Sovereignty" },
@@ -1281,7 +1317,9 @@ function render() {
       { direction: "Business & Design \u2192 From Reading About Business to Building Things", summary: "You've read HBR, Sam Walton, and branding books. Time to connect knowledge to action.", books: [
         { title: "Start with Why", author: "Simon Sinek", words: 65000, rating: 4.6, why: "Why do some companies inspire loyalty and others don't? Sinek's answer is simple but changes how you think about any project \u2014 including your own. Directly useful for your school policy app.", amazon: "https://www.amazon.com/dp/1591846447", pillar: "Economic Independence" },
         { title: "Grit", author: "Angela Duckworth", words: 90000, rating: 4.5, christian: true, why: "Talent is overrated. What actually predicts success is sustained effort over time \u2014 grit. Backed by research, not motivational fluff. Duckworth's framework aligns with the biblical principle that perseverance produces character. You already have grit (4 years of Wonder Log proves it).", amazon: "https://www.amazon.com/dp/1501111116", pillar: "Rooted Character" },
-        { title: "The Visual Display of Quantitative Information", author: "Edward Tufte", words: 50000, rating: 4.7, why: "The most important book ever written about presenting data visually. You love design AND data. This book lives where those two interests meet. It'll change how you build Wonder Log forever.", amazon: "https://www.amazon.com/dp/1930824130", pillar: "Economic Independence" }
+        { title: "The Visual Display of Quantitative Information", author: "Edward Tufte", words: 50000, rating: 4.7, why: "The most important book ever written about presenting data visually. You love design AND data. This book lives where those two interests meet. It'll change how you build Wonder Log forever.", amazon: "https://www.amazon.com/dp/1930824130", pillar: "Economic Independence" },
+        { title: "Rework", author: "Jason Fried", words: 30000, rating: 4.4, why: "A business book that says: ignore most business advice. Build something small, ship it fast, don't overthink. Every chapter is 2-3 pages. You could read the whole thing in one afternoon and start building the next day.", amazon: "https://www.amazon.com/dp/0307463745", pillar: "Economic Independence" },
+        { title: "Steal Like an Artist", author: "Austin Kleon", words: 20000, rating: 4.5, why: "Ten rules for being creative. Short, illustrated, and immediately useful. Kleon says nothing is original \u2014 the trick is combining your influences in a way that's uniquely yours. Perfect for Wonder Log.", amazon: "https://www.amazon.com/dp/0761169253", pillar: "Economic Independence" }
       ]}
     ]
   };
@@ -1289,50 +1327,82 @@ function render() {
   document.getElementById("analysis-section").innerHTML = analysisHtml;
 
   // ── Suggestions Section (separate panel) ──
-  var sugHtml = '<h2>Reading Suggestions</h2>';
-  sugHtml += '<div class="analysis-card"><h3>Curated Book Recommendations</h3>';
-  var recs = RECS[activeChild] || [];
-  recs.forEach(function(dir) {
-    sugHtml += '<div class="direction-card">' +
-      '<div class="dir-header"><span class="dir-icon">\u27A4</span><strong>' + dir.direction + '</strong></div>' +
-      '<div class="dir-summary">' + dir.summary + '</div>' +
-      '<div class="rec-books">';
-    dir.books.forEach(function(bk) {
-      var safeTitle = escHtml(bk.title).replace(/'/g, "\\'");
-      var alreadyRead = all.some(function(b) { return b.title.toLowerCase().indexOf(bk.title.toLowerCase()) >= 0; });
-      var addedToList = getWishlist(activeChild).some(function(w) { return w.title === bk.title; });
-      var stars = '';
-      if (bk.rating) {
-        var full = Math.floor(bk.rating);
-        var half = (bk.rating - full) >= 0.3;
-        for (var si = 0; si < full; si++) stars += '\u2605';
-        if (half) stars += '\u00BD';
-        stars = '<span style="color:var(--gold);font-size:0.88em;letter-spacing:1px" title="' + bk.rating + '/5">' + stars + ' ' + bk.rating + '</span>';
-      }
-      var christianBadge = bk.christian ? '<span style="background:rgba(87,217,163,0.15);color:var(--green);font-size:0.72em;padding:2px 8px;border-radius:10px;font-weight:600">\u271A Christian Value</span>' : '';
-      sugHtml += '<div class="rec-book">' +
-        '<div class="rec-book-header">' +
-          '<a href="' + bk.amazon + '" target="_blank" class="rec-title">' + escHtml(bk.title) + '</a>' +
-          '<span class="rec-author">by ' + escHtml(bk.author) + '</span>' +
-          stars +
-          christianBadge +
-          '<span class="rec-words">~' + fmt(bk.words) + ' words</span>' +
-          '<span class="rec-pillar">' + bk.pillar + '</span>' +
-        '</div>' +
-        '<div class="rec-why">' + bk.why + '</div>' +
-        '<div class="rec-actions">' +
-          (alreadyRead ? '<span class="rec-read-badge">\u2713 Already read</span>' :
-           addedToList ? '<span class="rec-read-badge">\u2713 On reading list</span>' :
-           '<button class="rec-add-btn" onclick="addToWishlist(\'' + safeTitle + '\', \'' + escHtml(bk.author).replace(/'/g, "\\'") + '\', ' + bk.words + ')">+ Add to Reading List</button>') +
-          '<a href="' + bk.amazon + '" target="_blank" class="rec-amazon-link">View on Amazon \u2192</a>' +
-        '</div>' +
-      '</div>';
-    });
-    sugHtml += '</div></div>';
-  });
-  sugHtml += '</div>';
+  renderSuggestions(all);
+  function renderSuggestions(allBooks) {
+    var hidden = getDismissed(activeChild);
+    var batchSize = 3; // books per direction per page
+    var recs = RECS[activeChild] || [];
+    var sugHtml = '<h2>Reading Suggestions</h2>';
 
-  document.getElementById("suggestions-section").innerHTML = sugHtml;
+    recs.forEach(function(dir, di) {
+      // Filter out hidden + already read
+      var visible = dir.books.filter(function(bk) {
+        if (hidden[bk.title]) {
+          // Reappear after 5 views
+          if (hidden[bk.title].views >= 5) { delete hidden[bk.title]; saveDismissed(activeChild, hidden); return true; }
+          hidden[bk.title].views = (hidden[bk.title].views || 0) + 1;
+          saveDismissed(activeChild, hidden);
+          return false;
+        }
+        return true;
+      });
+
+      if (visible.length === 0) return;
+
+      var pageKey = 'sug_page_' + activeChild + '_' + di;
+      var page = parseInt(localStorage.getItem(pageKey) || '0');
+      var start = 0;
+      var end = (page + 1) * batchSize;
+      var shown = visible.slice(start, end);
+      var hasMore = end < visible.length;
+
+      sugHtml += '<div class="direction-card">' +
+        '<div class="dir-header"><span class="dir-icon">\u27A4</span><strong>' + dir.direction + '</strong></div>' +
+        '<div class="dir-summary">' + dir.summary + '</div>' +
+        '<div class="rec-books">';
+
+      shown.forEach(function(bk) {
+        var safeTitle = escHtml(bk.title).replace(/'/g, "\\'");
+        var safeAuthor = escHtml(bk.author).replace(/'/g, "\\'");
+        var alreadyRead = allBooks.some(function(b) { return b.title.toLowerCase().indexOf(bk.title.toLowerCase()) >= 0; });
+        var addedToList = getWishlist(activeChild).some(function(w) { return w.title === bk.title; });
+        var stars = '';
+        if (bk.rating) {
+          var full = Math.floor(bk.rating);
+          var half = (bk.rating - full) >= 0.3;
+          for (var si = 0; si < full; si++) stars += '\u2605';
+          if (half) stars += '\u00BD';
+          stars = '<span style="color:var(--gold);font-size:0.88em;letter-spacing:1px" title="' + bk.rating + '/5">' + stars + ' ' + bk.rating + '</span>';
+        }
+        var christianBadge = bk.christian ? '<span style="background:rgba(87,217,163,0.15);color:var(--green);font-size:0.72em;padding:2px 8px;border-radius:10px;font-weight:600">\u271A Christian Value</span>' : '';
+        sugHtml += '<div class="rec-book">' +
+          '<div class="rec-book-header">' +
+            '<a href="' + bk.amazon + '" target="_blank" class="rec-title">' + escHtml(bk.title) + '</a>' +
+            '<span class="rec-author">by ' + escHtml(bk.author) + '</span>' +
+            stars + christianBadge +
+            '<span class="rec-words">~' + fmt(bk.words) + ' words</span>' +
+            '<span class="rec-pillar">' + bk.pillar + '</span>' +
+          '</div>' +
+          '<div class="rec-why">' + bk.why + '</div>' +
+          '<div class="rec-actions">' +
+            (alreadyRead ? '<span class="rec-read-badge">\u2713 Already read</span>' :
+             addedToList ? '<span class="rec-read-badge">\u2713 On reading list</span>' :
+             '<button class="rec-add-btn" onclick="addToWishlist(\'' + safeTitle + '\', \'' + safeAuthor + '\', ' + bk.words + ')">+ Add to Reading List</button>') +
+            '<a href="' + bk.amazon + '" target="_blank" class="rec-amazon-link">View on Amazon \u2192</a>' +
+            '<button class="rec-dismiss-btn" onclick="dismissBook(\'' + safeTitle + '\')" title="Don\'t show again">Hide</button>' +
+          '</div>' +
+        '</div>';
+      });
+
+      sugHtml += '</div>';
+      if (hasMore) {
+        sugHtml += '<button class="show-more-btn" onclick="showMoreRecs(' + di + ')">Show more \u2192</button>';
+      }
+      sugHtml += '</div>';
+    });
+
+    document.getElementById("suggestions-section").innerHTML = sugHtml;
+  }
 
   // Store year total for planner integration
   updateYearTotal(activeChild);
