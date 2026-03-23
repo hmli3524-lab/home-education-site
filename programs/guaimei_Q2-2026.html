@@ -158,6 +158,17 @@
   </div>
 </div>
 
+<div class="progress-wrap" style="border-bottom:1px solid var(--border)">
+  <div class="progress-inner">
+    <div class="progress-title">📚 Reading</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-label"><span id="reading-label">Loading...</span><span class="pct" id="reading-pct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="reading-fill" style="width:0%; background: linear-gradient(90deg, var(--accent2), var(--teal));"></div></div>
+    </div>
+    <a href="../reading-log.html#guaimei" style="color:var(--green);font-size:0.82em;font-weight:600;text-decoration:none;white-space:nowrap;">+ Log Book</a>
+  </div>
+</div>
+
 <div class="tab-page active" id="tab-overview">
   <div class="pillars">
     <div class="pillar"><div class="icon">🧠</div><h3>Intellectual Sovereignty</h3><p>Think independently when machines think for you</p></div>
@@ -437,10 +448,21 @@ function saveAll() {
   m.textContent = `✅ Saved ${new Date().toLocaleTimeString()}`;
   setTimeout(() => m.textContent = "", 3000);
 }
+function updateReadingProgress() {
+  var GOAL = 8000000;
+  var total = parseInt(localStorage.getItem("reading_total_guaimei_2025") || "0");
+  var pct = Math.min(100, Math.round(total / GOAL * 100));
+  document.getElementById("reading-label").textContent = (total/1000000).toFixed(1) + "M / 8M words";
+  document.getElementById("reading-pct").textContent = pct + "%";
+  document.getElementById("reading-fill").style.width = pct + "%";
+}
+
 _dbReady.then(function() {
   state = loadState();
   render();
+  updateReadingProgress();
   setInterval(() => saveState(state), 30000);
+  setInterval(updateReadingProgress, 5000);
 });
 </script>
 </body>

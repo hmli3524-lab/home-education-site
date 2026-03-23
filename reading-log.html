@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Log</title>
+<script src="db.js"></script>
+<style>
+  :root {
+    --bg: #2b2d31; --surface: #313338; --card: #383a40; --accent: #e8555a;
+    --accent2: #9b6dd7; --gold: #e0a82e; --text: #e0e0e0; --muted: #999;
+    --green: #57d9a3; --teal: #4ecdc4; --border: #44464d;
+    --shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.65;
+  }
+
+  /* Top bar */
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 12px 20px; position: sticky; top: 0; z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .back-link {
+    color: var(--muted); text-decoration: none; font-size: 0.9em;
+    display: flex; align-items: center; gap: 6px; transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--text); }
+  .page-title { font-weight: 700; font-size: 1.1em; color: #fff; }
+
+  /* Pill toggle */
+  .pill-toggle {
+    display: flex; background: var(--card); border-radius: 24px;
+    padding: 3px; gap: 2px;
+  }
+  .pill-btn {
+    padding: 8px 20px; border: none; border-radius: 20px;
+    background: transparent; color: var(--muted); font-family: inherit;
+    font-size: 0.88em; font-weight: 600; cursor: pointer; transition: all 0.25s;
+  }
+  .pill-btn.active-tepi { background: var(--accent2); color: #fff; }
+  .pill-btn.active-guaimei { background: var(--gold); color: #1a1a1a; }
+
+  /* Main content */
+  .main { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* Stats cards */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px; text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-value { font-size: 1.6em; font-weight: 800; margin-bottom: 2px; }
+  .stat-label { font-size: 0.78em; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-sub { font-size: 0.72em; color: var(--muted); margin-top: 4px; }
+  .stat-card.words .stat-value { color: var(--teal); }
+  .stat-card.books .stat-value { color: var(--green); }
+  .stat-card.year .stat-value { color: var(--accent2); }
+  .stat-card.rereads .stat-value { color: var(--gold); }
+
+  /* Progress bar */
+  .progress-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .progress-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .progress-title { font-weight: 600; font-size: 0.95em; }
+  .progress-pct { color: var(--teal); font-weight: 700; font-size: 1.1em; }
+  .progress-track {
+    height: 14px; background: var(--card); border-radius: 7px;
+    overflow: hidden; position: relative;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 7px; transition: width 0.8s ease;
+    background: linear-gradient(90deg, #4ecdc4, #57d9a3);
+  }
+  .progress-detail {
+    display: flex; justify-content: space-between;
+    font-size: 0.78em; color: var(--muted); margin-top: 6px;
+  }
+
+  /* Add book form */
+  .add-form-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .add-form-card h3 {
+    font-size: 1em; margin-bottom: 14px; color: #fff;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .form-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .form-group { display: flex; flex-direction: column; flex: 1; min-width: 120px; }
+  .form-group label { font-size: 0.78em; color: var(--muted); margin-bottom: 4px; }
+  .form-group input[type="text"],
+  .form-group input[type="number"] {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; color: var(--text); font-family: inherit; font-size: 0.9em;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: var(--teal); }
+  .checkbox-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  }
+  .checkbox-row input[type="checkbox"] {
+    accent-color: var(--gold); width: 18px; height: 18px; cursor: pointer;
+  }
+  .checkbox-row label { font-size: 0.88em; cursor: pointer; }
+  .btn-add {
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    color: #1a1a1a; border: none; border-radius: 8px; padding: 10px 28px;
+    font-family: inherit; font-size: 0.9em; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-add:hover { opacity: 0.85; }
+
+  /* Year group */
+  .year-group { margin-bottom: 28px; }
+  .year-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 2px solid var(--border); margin-bottom: 8px;
+  }
+  .year-header h3 { font-size: 1.05em; color: #fff; }
+  .year-header .year-stats { font-size: 0.82em; color: var(--muted); }
+  .year-header .year-stats span { margin-left: 12px; }
+
+  /* Book table */
+  .book-table { width: 100%; border-collapse: collapse; }
+  .book-table th {
+    text-align: left; font-size: 0.75em; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 10px;
+    border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
+  }
+  .book-table th:hover { color: var(--text); }
+  .book-table th.sortable::after { content: ' \u2195'; font-size: 0.85em; }
+  .book-table td {
+    padding: 10px; border-bottom: 1px solid rgba(68,70,77,0.4);
+    font-size: 0.9em; vertical-align: middle;
+  }
+  .book-table tr:hover { background: rgba(78,205,196,0.04); }
+  .book-title { font-weight: 500; }
+  .reread-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(224,168,46,0.15); color: var(--gold);
+    padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: 600;
+  }
+  .notes-text { font-size: 0.82em; color: var(--muted); }
+  .word-col { font-variant-numeric: tabular-nums; }
+  .source-badge {
+    display: inline-block; font-size: 0.7em; padding: 1px 6px;
+    border-radius: 6px; background: rgba(155,109,215,0.15); color: var(--accent2);
+    margin-left: 6px; font-weight: 600;
+  }
+
+  /* Favorites section */
+  .favorites-section { margin-top: 36px; }
+  .favorites-section h2 {
+    font-size: 1.15em; margin-bottom: 16px; color: #fff;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .favorites-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+  }
+  .fav-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 4px solid var(--gold); border-radius: 12px;
+    padding: 16px; box-shadow: var(--shadow);
+  }
+  .fav-card .fav-title { font-weight: 600; margin-bottom: 4px; }
+  .fav-card .fav-meta { font-size: 0.82em; color: var(--muted); }
+  .fav-card .fav-year { font-size: 0.78em; color: var(--gold); margin-top: 6px; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .stat-value { font-size: 1.3em; }
+    .pill-btn { padding: 7px 14px; font-size: 0.82em; }
+    .form-row { flex-direction: column; }
+    .book-table { font-size: 0.85em; }
+    .book-table th, .book-table td { padding: 8px 6px; }
+    .top-bar { flex-wrap: wrap; gap: 8px; }
+    .page-title { order: -1; width: 100%; text-align: center; }
+    .favorites-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <a href="index.html" class="back-link">&#8592; Home</a>
+  <span class="page-title">Reading Log</span>
+  <div class="pill-toggle">
+    <button class="pill-btn active-tepi" id="btn-tepi" onclick="switchChild('tepi')">TePi</button>
+    <button class="pill-btn" id="btn-guaimei" onclick="switchChild('guaimei')">GuaiMei</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Stats cards -->
+  <div class="stats-row">
+    <div class="stat-card words">
+      <div class="stat-value" id="stat-total-words">--</div>
+      <div class="stat-label">Total Words</div>
+      <div class="stat-sub">Lifetime</div>
+    </div>
+    <div class="stat-card books">
+      <div class="stat-value" id="stat-total-books">--</div>
+      <div class="stat-label">Books Read</div>
+      <div class="stat-sub">Lifetime</div>
+    </div>
+    <div class="stat-card year">
+      <div class="stat-value" id="stat-year-words">--</div>
+      <div class="stat-label">This Year</div>
+      <div class="stat-sub" id="stat-year-sub">2025-2026</div>
+    </div>
+    <div class="stat-card rereads">
+      <div class="stat-value" id="stat-rereads">--</div>
+      <div class="stat-label">Rereads</div>
+      <div class="stat-sub">Favorites</div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <span class="progress-title">2025-2026 Annual Goal</span>
+      <span class="progress-pct" id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-detail">
+      <span id="progress-current">0 words</span>
+      <span id="progress-target">Target: 0</span>
+    </div>
+  </div>
+
+  <!-- Add book form -->
+  <div class="add-form-card">
+    <h3>+ Add New Book</h3>
+    <div class="form-row">
+      <div class="form-group" style="flex:3">
+        <label>Book Title</label>
+        <input type="text" id="input-title" placeholder="Enter book title...">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label>Pages</label>
+        <input type="number" id="input-pages" placeholder="0" min="0">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label>Word Count</label>
+        <input type="number" id="input-words" placeholder="auto" min="0">
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="input-reread">
+      <label for="input-reread">This is a reread (favorite)</label>
+    </div>
+    <button class="btn-add" onclick="addBook()">Add Book</button>
+  </div>
+
+  <!-- Book list -->
+  <div id="book-list"></div>
+
+  <!-- Favorites section -->
+  <div id="favorites-section" class="favorites-section"></div>
+</div>
+
+<script>
+// ── Historical data from reading_data.json ──
+const HISTORICAL_DATA = {
+  "tepi": [
+    {"title":"The Giver * 4","words":240000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Hobbit *3","words":300000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Dragons in our midst * 4","words":400000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Labrador on the lawn","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Redwall","words":101289,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"shadow over mousehaven manor","words":40000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Oracles Of Fire - Eye of the oracle","words":180000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Oracles Of Fire - Enox ghost","words":200000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Oracles Of Fire- Last of the Nephilim","words":200000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Oracles Of Fire- Bones Of Makaidos","words":169000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"I funny","words":60000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The best halloween","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"daniel boone biography book","words":60000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"hidden gold hardy boy","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Endangered","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Hatched","words":169312,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Healthy foods","words":30000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Dragonspell","words":421368,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Stuart Little","words":18841,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Mrs Frisby and the Rats of Nimh","words":60000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"My father's dragon","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"king arthur and the knights of the round table","words":100000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"the dreamer the schemer and the robe","words":100000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Esperanza","words":41905,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Chicken in the space","words":517,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Swinldle","words":34653,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Falling up","words":42750,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Wing feather saga","words":187500,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"On the Court with...Michael Jordan","words":22476,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Children of the Bard","words":109500,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Gullivuer","words":82500,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Peter Pan","words":47821,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Wing feather tales","words":80000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Guardians of Ga'Hoole","words":168000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Minecraft - the underworld","words":168000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"A children classic Robinhood","words":139000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Smoky the cow horse","words":78567,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The prince warriors","words":320000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Runaway Ralph","words":24176,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Dragon Rider","words":314139,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Lily and Fin","words":48000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Matt Christopher Sports book","words":120000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Secret of the Planet Makon","words":30000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Our Supreme Court: A History with 14 Activities (20)","words":0,"year":"2022-2023","reread":false,"notes":"Added non-frictional weight 2"},
+    {"title":"Andrew Christian Hans Complete Fairy Tale","words":606000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The Swiss Family Robinson","words":63979,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The elijah project","words":20480,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Jullie of the wolves","words":36049,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The Solor system - Asteroids","words":40000,"year":"2022-2023","reread":false,"notes":"Added non-frictional weight 2"},
+    {"title":"The Pendragon Cycle","words":224000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"King Arthur","words":40000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The Seven Sleepers Series","words":300000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The Heroes of Olympus","words":644700,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Artifical Inteligence","words":40000,"year":"2022-2023","reread":false,"notes":"Added non-frictional weight 2"},
+    {"title":"Math inspectors Series","words":280000,"year":"2022-2023","reread":true,"notes":"Read and Reread"},
+    {"title":"Left Behind Series","words":768000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Genetic Modified food","words":48000,"year":"2022-2023","reread":false,"notes":"Added non-frictional weight 3"},
+    {"title":"The parthenon of Ancient Greece","words":48000,"year":"2022-2023","reread":false,"notes":"Added non-frictional weight 3"},
+    {"title":"M113 Armored Personnel Vehicld","words":2000,"year":"2022-2023","reread":false,"notes":"Added non-frictional weight 2"},
+    {"title":"Danger lies ahead","words":52000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The war of worlds","words":32000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Our Supreme Court: A History with 14 Activities (20) (For Kids series)","words":96000,"year":"2022-2023","reread":false,"notes":"Added non-frictional weight 3"},
+    {"title":"City of Ember","words":59937,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Adventure of Odyssey","words":103360,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The Razorland Trilogy","words":288000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Phantom Tollbooth","words":42156,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The Hidden Oracle","words":83801,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The revenge of the shadow king","words":57600,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Voyagers","words":312000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"City of Ember","words":280800,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Tales of Starlight Series","words":374400,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Hisotry Mystery Kds","words":102700,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Harry Potter","words":464644,"year":"2023-2024","reread":true,"notes":""},
+    {"title":"History;s Mysteries","words":80600,"year":"2023-2024","reread":false,"notes":"non-fiction double"},
+    {"title":"The Chronicles of Narnia","words":345535,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Out of the Silent Planet","words":114766,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Escape from Chernobyl","words":28160,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Escape from Stalkn","words":28160,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Magnus Chase","words":415453,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Chronicles of the nephelym","words":345600,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Escape from East Berlin","words":28160,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Trials of Apollo","words":488220,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Hunger game","words":157872,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Chronicles of the Apocalypse","words":192000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The hero of olympus","words":572000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The Demigod","words":117000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Beverly Cleary","words":32000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Ribsy","words":30400,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The Sun and the star","words":122200,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Chronicles of the Watchers","words":168000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"the inheritance cycle","words":648000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The count of monte cristo","words":745200,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Murtagh","words":120000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"To sleep n a sea of starts","words":480000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Throne of glass","words":300000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Math","words":62400,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Book - Micah","words":6354,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Kane Chronicles","words":248610,"year":"2023-2024","reread":true,"notes":"re-read"},
+    {"title":"A Series of Unfortunate Events series","words":801970,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The course of series (SJM)","words":1474019,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The house of series","words":861300,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Genghis Series","words":1360000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Genghis Khhan and the making of the modern world","words":237600,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Encyclopedia brown","words":168000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"life of pi","words":98783,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The house of the scorpion series","words":331266,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The series of the sea of trolls","words":450000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Chronicles of Ancient Darness series","words":531405,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Gods and warriors","words":672000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Chonicles of Narnia","words":646200,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The simarilion","words":420000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Ender's game","words":197087,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The ascendant series by Jennifer A Nielsen","words":344080,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The music of prime numbers","words":345072,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The math behind the music","words":155448,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Mark of the thief by Jennifer A Nielsen","words":247860,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"The Traders' game by Jennifer A Nielsen","words":502200,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"How to listen to great music","words":313140,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Elliot by Jennifer A Nielsen","words":160050,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Rescure by Jennifer A Nielsen","words":108108,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Resistance by Jennifer A Nielsen","words":108108,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Lines of courage by Jennifer A Nielsen","words":108108,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Words on Fire by Jennifer A Nielsen","words":108108,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Uprising by Jennifer A Nielsen","words":108108,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Magnus Chase","words":392800,"year":"2025-2026","reread":true,"notes":"re-read"},
+    {"title":"Kane Chronicles","words":248610,"year":"2025-2026","reread":true,"notes":"re-read"},
+    {"title":"Left Behind The Kids","words":2160000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Swallows and Amazons Series","words":438750,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Diary of Anne Frank","words":88000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"swipe series","words":210000,"year":"2025-2026","reread":false,"notes":""}
+  ],
+  "guaimei": [
+    {"title":"Old Yeller","words":35000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Where the red fern grows","words":75000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Shiloh","words":240000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Wish","words":75000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Humphery","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Minecraft Journal","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"the black stallion","words":200000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"the borrowers aloft","words":39292,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Dragons in our midst","words":400000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Muttley; Spirit","words":120000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Amelia bedelia","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Wings of fire","words":1177020,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"who was","words":60000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Chicken in the space","words":517,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"I Funny","words":60000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Falling up","words":42750,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Matt christopher world cup","words":15000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Heirs of Neverland (Dust and others)","words":208104,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"A wolf called wonder","words":80000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The prince warriors","words":320000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Starlighter","words":100000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Wing feather saga","words":350000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The land of stories","words":600000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"King Arthur and His Knights of the Round Table (RLG)","words":56800,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Kane Chronicles","words":372915,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Oracles Of Fire - Eye of the oracle","words":540000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Tale of Troy","words":51750,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Math inspectors Series","words":140000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"On the run","words":36800,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Tale of the norseman","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Tale of the Acient Egypt","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The extraordnary cases of sherlock holmes","words":50000,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"My side of Mountain","words":40355,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The elijah project","words":20480,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"Stuart Little","words":18841,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"City of Ember","words":59937,"year":"2022-2023","reread":false,"notes":""},
+    {"title":"The Giver * 4","words":240000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Left Behind Series","words":768000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Children of the Bard seri","words":308480,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Oracles Of Fire #4","words":180000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Island of blue dolphin","words":40000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Big Ideas for Curious Minds","words":90000,"year":"2023-2024","reread":false,"notes":"non-ficton triple"},
+    {"title":"Financal 101 + 102","words":143520,"year":"2023-2024","reread":false,"notes":"non-ficton triple"},
+    {"title":"The Chronicles of Narnia","words":138671,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Piercing the Darkness","words":232960,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"who/where/what","words":936000,"year":"2023-2024","reread":false,"notes":"non-fiction double"},
+    {"title":"The story of texas","words":109200,"year":"2023-2024","reread":false,"notes":"non-fiction double"},
+    {"title":"behind rebel lines","words":66040,"year":"2023-2024","reread":false,"notes":"non-fiction double"},
+    {"title":"Walk Two Moon","words":59400,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Bridge to Trabithia","words":36000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Aesop's Fables","words":38500,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Who was first","words":25920,"year":"2023-2024","reread":false,"notes":"non-fiction double"},
+    {"title":"The Fangs Far memeries","words":19520,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Stowaway","words":133774,"year":"2023-2024","reread":false,"notes":"non-fiction double"},
+    {"title":"The Graveyard Book","words":49120,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Magnus Chase","words":274960,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The case of the mssng minds","words":20320,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"George Washington's socks","words":36816,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"George Washington's spies","words":41351,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Trials of Apollo","words":488220,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Hunger game","words":157872,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Chronicles of the nephelym","words":43200,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Andrew Clements","words":312000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The secret of old hot rod","words":20160,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Matt Christopher Sports book","words":120000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Revolution is not dinner party","words":43520,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Tales of Starlight Series","words":64000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The hero of olympus","words":572000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The Demigod","words":117000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The Sun and the star","words":122200,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Beverly Cleary","words":32000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Ribsy","words":30400,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The Constitution Decoded","words":74400,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"dragons of starlight","words":216000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Ground Zero","words":48000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Spies code brakers and secrect agents","words":19200,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Judy Moody","words":192000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Alan Gratz","words":144000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Impossible quest","words":152000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Bad Kitty & Puppy Pirate","words":45000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Summer","words":0,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The way things work","words":41600,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The great battle for boys","words":179200,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Math","words":46560,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Chasing Space","words":30400,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Accounting book","words":8000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Archtect Book","words":20400,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Historiy's misteries","words":49600,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Kane Chronicles","words":248610,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"Shiloh","words":240000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"A Series of Unfortunate Events series","words":800000,"year":"2023-2024","reread":false,"notes":""},
+    {"title":"The way things work","words":41600,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The great battle for boys","words":179200,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Math","words":46560,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Chasing Space","words":30400,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Accounting book","words":8000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Archtect Book","words":32400,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Historiy's misteries","words":49600,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Kane Chronicles","words":248610,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The Giver * 4","words":240000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Shiloh","words":240000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"A Series of Unfortunate Events series","words":801970,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Magnus Chase","words":392800,"year":"2024-2025","reread":true,"notes":"re-read"},
+    {"title":"No summit out of sight","words":112000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Percy Jackson","words":513892,"year":"2024-2025","reread":true,"notes":""},
+    {"title":"Beverly Cleary - Ramona Quimby","words":160520,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Beverly Cleary - Ralph s mouse","words":25600,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Constitution Decoded","words":26400,"year":"2024-2025","reread":false,"notes":"triple"},
+    {"title":"The history mystery kids","words":63200,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Beverly Cleary - Henry Huggins","words":100325,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Beverly Cleary - Ellen Tebbits","words":20065,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Beverly Cleary - Otis spofford","words":20065,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"What's the points of Math","words":40000,"year":"2024-2025","reread":false,"notes":"double"},
+    {"title":"George washington biography","words":80000,"year":"2024-2025","reread":false,"notes":"double"},
+    {"title":"Who was","words":128000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Finance 102 + 101","words":64000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Marval at the moon","words":28800,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"School fairy fantacy book","words":2600,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Beverly Cleary -  First love","words":106000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"BlastBack - the space race","words":67200,"year":"2024-2025","reread":false,"notes":"double"},
+    {"title":"Reading context","words":1120000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"I survived","words":396000,"year":"2024-2025","reread":false,"notes":"double"},
+    {"title":"life of pi","words":98783,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"How I became a spy","words":47438,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Nancy Drew series","words":324000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The original advantures of hank the cowdog","words":26000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Imagine the micracle of Jesus","words":80000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"British colonist in North America","words":24400,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Sarah Plain and Tall","words":14000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Q is for Quark","words":24000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Hardy Boys","words":210000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Frannie in Pieces","words":74800,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The 50 states","words":50000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"The Story of declaration of independence","words":12000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Tax Book","words":1897600,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"What as underground railroad","words":33600,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Humphery","words":24000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Hunger game","words":504000,"year":"2024-2025","reread":false,"notes":""},
+    {"title":"Tax Book","words":830000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"50 states","words":50000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"What's the point of Math","words":50000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Constitution Decoded","words":114000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"High School Geometry","words":32000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Trials of apollo series","words":471452,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"100 dollar startup","words":152000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"The bible of color","words":152000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Designing Brand Identity","words":243000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Kane Chronicles","words":248610,"year":"2025-2026","reread":true,"notes":"re-read"},
+    {"title":"The 7 Habits of Highly Effective People","words":216000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Our supreme court","words":124800,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Prisoners of geography kids","words":145500,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"HBR On Strategic Marketing","words":9000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"starting point a conversation about faith","words":56000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"reaching for the moon by katherine johnson","words":71000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"the phantom of tollbooth","words":42000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Fifteen by Beverly Cleary","words":46000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Financial literacy for teens and yound adults","words":80000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"National Geogrphic Atlas books","words":180000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Hunger game 5","words":60000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Brilliant Maps For Curious Minds","words":40000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"[Justics] [Judge Bio] Scalia: Rise to Greatness","words":170000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Unites States Atlas Third Edition","words":96000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Around The World in 80 Maps","words":36000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Swallows and Amazons Series","words":361530,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Geo Bee","words":500000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"History text book","words":44000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Worth Dying for (Tim Marshall)","words":33000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Prisoners of geography","words":224000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Percy Jackson (greek god and greek hero)","words":115000,"year":"2025-2026","reread":true,"notes":"reread"},
+    {"title":"Egyption handbook","words":32000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"No summit out of sight","words":112000,"year":"2025-2026","reread":true,"notes":"reread"},
+    {"title":"Sam Walton: Made in America","words":175000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"The Art of Learning","words":162000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"[Justics] [Judge Bio] The majasty of the Law","words":180000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"[Justics] [Judge Bio] My Grandfather's Son","words":180000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"How to listen to great music","words":313140,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Finance 102 + 101","words":64000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"[Justics] [Judge Bio] Life law and liberty - anthony kennedy","words":180000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"[Justics] [Judge Bio] Listening to the law - Amy Coney Barrett","words":180000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"A whack on the side of the head","words":100000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"The Non-Designer's Designer Book","words":60000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Red Scarf Girl","words":70000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Chronicles of Narnia","words":24000,"year":"2025-2026","reread":false,"notes":""},
+    {"title":"Hey Whipple, Squeeze This","words":132000,"year":"2025-2026","reread":false,"notes":""}
+  ]
+};
+
+// ── Config ──
+const ANNUAL_TARGETS = { tepi: 9000000, guaimei: 8000000 };
+const CURRENT_YEAR = "2025-2026";
+const META_TITLES = ["Total", "Goal 9M", "Target: 9M", "Target: 8M", "Goal 8M"];
+
+let activeChild = "tepi";
+let sortState = { col: null, asc: true };
+
+// ── Helpers ──
+function fmt(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+  if (n >= 1000) return (n / 1000).toFixed(0) + "K";
+  return n.toString();
+}
+function fmtFull(n) { return n.toLocaleString(); }
+
+function getStorageKey(child) { return "reading_log_" + child; }
+
+function getNewBooks(child) {
+  try {
+    const raw = localStorage.getItem(getStorageKey(child));
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveNewBooks(child, books) {
+  localStorage.setItem(getStorageKey(child), JSON.stringify(books));
+}
+
+function getAllBooks(child) {
+  const historical = (HISTORICAL_DATA[child] || []).filter(b => !META_TITLES.includes(b.title));
+  const added = getNewBooks(child);
+  return [...historical, ...added];
+}
+
+function updateYearTotal(child) {
+  const all = getAllBooks(child);
+  const yearWords = all.filter(b => b.year === CURRENT_YEAR).reduce((s, b) => s + (b.words || 0), 0);
+  localStorage.setItem("reading_total_" + child + "_2025", yearWords.toString());
+}
+
+// ── Switch child ──
+function switchChild(child) {
+  activeChild = child;
+  document.getElementById("btn-tepi").className = "pill-btn" + (child === "tepi" ? " active-tepi" : "");
+  document.getElementById("btn-guaimei").className = "pill-btn" + (child === "guaimei" ? " active-guaimei" : "");
+  render();
+}
+
+// ── Add book ──
+function addBook() {
+  const title = document.getElementById("input-title").value.trim();
+  if (!title) return;
+  const pages = parseInt(document.getElementById("input-pages").value) || 0;
+  let words = parseInt(document.getElementById("input-words").value);
+  if (isNaN(words) || words === 0) words = pages * 250;
+  const reread = document.getElementById("input-reread").checked;
+
+  const book = {
+    title, words, pages,
+    year: CURRENT_YEAR,
+    reread,
+    notes: "",
+    date: new Date().toISOString().slice(0, 10),
+    source: "manual"
+  };
+
+  const books = getNewBooks(activeChild);
+  books.push(book);
+  saveNewBooks(activeChild, books);
+  updateYearTotal(activeChild);
+
+  // Clear form
+  document.getElementById("input-title").value = "";
+  document.getElementById("input-pages").value = "";
+  document.getElementById("input-words").value = "";
+  document.getElementById("input-reread").checked = false;
+
+  render();
+}
+
+// ── Auto-calc words from pages ──
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("input-pages").addEventListener("input", function() {
+    const wordsInput = document.getElementById("input-words");
+    if (!wordsInput.value || wordsInput.dataset.auto === "true") {
+      wordsInput.value = (parseInt(this.value) || 0) * 250;
+      wordsInput.dataset.auto = "true";
+    }
+  });
+  document.getElementById("input-words").addEventListener("input", function() {
+    this.dataset.auto = "false";
+  });
+  render();
+});
+
+// ── Render everything ──
+function render() {
+  const all = getAllBooks(activeChild);
+  const target = ANNUAL_TARGETS[activeChild];
+
+  // Stats
+  const totalWords = all.reduce((s, b) => s + (b.words || 0), 0);
+  const totalBooks = all.length;
+  const yearBooks = all.filter(b => b.year === CURRENT_YEAR);
+  const yearWords = yearBooks.reduce((s, b) => s + (b.words || 0), 0);
+  const rereadCount = all.filter(b => b.reread).length;
+
+  document.getElementById("stat-total-words").textContent = fmt(totalWords);
+  document.getElementById("stat-total-books").textContent = totalBooks;
+  document.getElementById("stat-year-words").textContent = fmt(yearWords);
+  document.getElementById("stat-year-sub").textContent = yearWords.toLocaleString() + " / " + fmt(target);
+  document.getElementById("stat-rereads").textContent = rereadCount;
+
+  // Progress bar
+  const pct = Math.min(100, (yearWords / target * 100));
+  document.getElementById("progress-pct").textContent = pct.toFixed(1) + "%";
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("progress-current").textContent = fmtFull(yearWords) + " words";
+  document.getElementById("progress-target").textContent = "Target: " + fmt(target);
+
+  // Group by year
+  const yearMap = {};
+  all.forEach(b => {
+    if (!yearMap[b.year]) yearMap[b.year] = [];
+    yearMap[b.year].push(b);
+  });
+
+  // Sort years (most recent first)
+  const yearOrder = Object.keys(yearMap).sort((a, b) => {
+    const ya = parseInt(a.split("-")[0]);
+    const yb = parseInt(b.split("-")[0]);
+    return yb - ya;
+  });
+
+  // Build book list
+  let html = "";
+  yearOrder.forEach(year => {
+    let books = yearMap[year];
+    const yearTotal = books.reduce((s, b) => s + (b.words || 0), 0);
+    const yearCount = books.length;
+
+    // Apply sort if active
+    if (sortState.col === "words") {
+      books = [...books].sort((a, b) => sortState.asc ? a.words - b.words : b.words - a.words);
+    }
+
+    html += `<div class="year-group">
+      <div class="year-header">
+        <h3>${year}</h3>
+        <div class="year-stats">
+          <span>${fmtFull(yearTotal)} words</span>
+          <span>${yearCount} books</span>
+        </div>
+      </div>
+      <table class="book-table">
+        <thead><tr>
+          <th>Title</th>
+          <th class="sortable" onclick="toggleSort('words')">Words</th>
+          <th>Reread</th>
+          <th>Notes</th>
+        </tr></thead>
+        <tbody>`;
+
+    books.forEach(b => {
+      const rereadHtml = b.reread ? '<span class="reread-badge">&#9733; Fav</span>' : '';
+      const sourceHtml = b.source === "planner" ? '<span class="source-badge">planner</span>' : (b.source === "manual" ? '<span class="source-badge">new</span>' : '');
+      html += `<tr>
+        <td class="book-title">${escHtml(b.title)}${sourceHtml}</td>
+        <td class="word-col">${fmtFull(b.words || 0)}</td>
+        <td>${rereadHtml}</td>
+        <td class="notes-text">${escHtml(b.notes || '')}</td>
+      </tr>`;
+    });
+
+    html += `</tbody></table></div>`;
+  });
+
+  document.getElementById("book-list").innerHTML = html;
+
+  // Favorites section
+  const rereads = all.filter(b => b.reread);
+  let favHtml = "";
+  if (rereads.length > 0) {
+    favHtml = `<h2>&#9733; Favorites &amp; Rereads</h2><div class="favorites-grid">`;
+    rereads.forEach(b => {
+      favHtml += `<div class="fav-card">
+        <div class="fav-title">${escHtml(b.title)}</div>
+        <div class="fav-meta">${fmtFull(b.words || 0)} words</div>
+        <div class="fav-year">${b.year}${b.notes ? ' &middot; ' + escHtml(b.notes) : ''}</div>
+      </div>`;
+    });
+    favHtml += `</div>`;
+  }
+  document.getElementById("favorites-section").innerHTML = favHtml;
+
+  // Store year total for planner integration
+  updateYearTotal(activeChild);
+}
+
+function toggleSort(col) {
+  if (sortState.col === col) {
+    sortState.asc = !sortState.asc;
+  } else {
+    sortState.col = col;
+    sortState.asc = false;
+  }
+  render();
+}
+
+function escHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ── Planner integration: exported concept ──
+// When the planner logs a book, it calls:
+//   window.addBookFromPlanner = function(child, {title, pages, words, date}) { ... }
+window.addBookFromPlanner = function(child, data) {
+  const book = {
+    title: data.title || "Untitled",
+    words: data.words || (data.pages || 0) * 250,
+    pages: data.pages || 0,
+    year: CURRENT_YEAR,
+    reread: false,
+    notes: "",
+    date: data.date || new Date().toISOString().slice(0, 10),
+    source: "planner"
+  };
+  const books = getNewBooks(child);
+  books.push(book);
+  saveNewBooks(child, books);
+  updateYearTotal(child);
+  if (child === activeChild) render();
+};
+</script>
+</body>
+</html>
