@@ -703,7 +703,7 @@ function renderQuestions() {
     const n = i + 1;
     return `<div class="question-card"><div class="q-top"><span class="q-badge q-badge-${n}">${n}</span>` +
       `<div><div class="q-label q-label-${n}">${q.label}</div><div class="q-text">${q.text}</div></div></div>` +
-      `<textarea id="answer-${n}" placeholder="Write your thoughts..." oninput="scheduleAutoSave()"></textarea>` +
+      `<textarea id="answer-${n}" placeholder="Write your thoughts..." oninput="scheduleAutoSave()" onblur="saveAnswers()"></textarea>` +
       `<div class="q-save-indicator" id="save-ind-${n}"></div></div>`;
   }).join("");
 }
@@ -720,7 +720,7 @@ function saveAnswers() {
   QUESTIONS.forEach((_, i) => {
     const ind = document.getElementById(`save-ind-${i+1}`);
     const ta = document.getElementById(`answer-${i+1}`);
-    if (ind && ta && ta.value.trim()) { ind.textContent = "Saved"; setTimeout(() => { if (ind.textContent === "Saved") ind.textContent = ""; }, 2000); }
+    if (ind && ta && ta.value.trim()) { ind.textContent = "\u2713 Saved"; }
   });
 }
 function scheduleAutoSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveAnswers, 800); }
@@ -787,6 +787,7 @@ _dbReady.then(function() {
   document.addEventListener("touchend", (e) => { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 350); });
   document.addEventListener("mousedown", (e) => { if (document.getElementById("vocab-popup").style.display === "block" && !document.getElementById("vocab-popup").contains(e.target)) dismissPopup(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") dismissPopup(); });
+  window.addEventListener("beforeunload", saveAnswers);
 });
 </script>
 </body>

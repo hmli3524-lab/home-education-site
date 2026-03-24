@@ -501,7 +501,11 @@ const WEEKS = [
 
 const STORAGE_KEY = "tepi_q2_2026";
 function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } }
-function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+function saveState(s) {
+  var stored = loadState();
+  for (var k in stored) { if (!(k in s)) s[k] = stored[k]; }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
 let state = loadState();
 
 function render() {
