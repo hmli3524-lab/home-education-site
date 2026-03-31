@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 1 Reading Assessment — TePi &amp; GuaiMei</title>
+<style>
+  :root {
+    --bg: #2b2d31; --surface: #313338; --card: #383a40;
+    --accent: #e8555a; --accent2: #9b6dd7; --gold: #e0a82e;
+    --text: #e0e0e0; --muted: #999; --green: #57d9a3; --teal: #4ecdc4;
+    --border: #44464d; --shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; }
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 1.6em; color: #fff; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.92em; margin-bottom: 32px; }
+  h2 { font-size: 1.3em; color: #fff; margin: 36px 0 16px; display: flex; align-items: center; gap: 10px; }
+  h3 { font-size: 1.05em; color: var(--teal); margin: 20px 0 10px; }
+  .child-badge { display: inline-block; padding: 3px 12px; border-radius: 12px; font-size: 0.78em; font-weight: 700; }
+  .badge-tepi { background: rgba(155,109,215,0.2); color: var(--accent2); }
+  .badge-guaimei { background: rgba(224,168,46,0.2); color: var(--gold); }
+
+  .response-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
+  }
+  .response-card .q-label {
+    font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.05em;
+    font-weight: 700; margin-bottom: 6px;
+  }
+  .q-label-thesis { color: var(--teal); }
+  .q-label-evidence { color: var(--gold); }
+  .q-label-missing { color: var(--accent); }
+  .response-text {
+    font-size: 0.95em; line-height: 1.7; padding: 12px 16px;
+    background: var(--card); border-radius: 8px; margin-bottom: 12px;
+    border-left: 3px solid var(--border);
+  }
+  .assessment {
+    font-size: 0.92em; line-height: 1.7;
+  }
+  .assessment strong { color: var(--teal); }
+  .strength { color: var(--green); font-weight: 600; }
+  .growth { color: var(--gold); font-weight: 600; }
+  .concern { color: var(--accent); font-weight: 600; }
+
+  .score-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;
+  }
+  .score-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px; text-align: center;
+  }
+  .score-card .name { font-weight: 700; font-size: 0.92em; margin-bottom: 10px; }
+  .score-card .name.tepi { color: var(--accent2); }
+  .score-card .name.guaimei { color: var(--gold); }
+  .score-row { display: flex; justify-content: space-between; font-size: 0.85em; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .score-row:last-child { border-bottom: none; }
+  .score-label { color: var(--muted); }
+  .score-val { font-weight: 600; }
+  .score-high { color: var(--green); }
+  .score-mid { color: var(--gold); }
+  .score-low { color: var(--accent); }
+
+  .rec-section {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; margin: 16px 0;
+  }
+  .rec-section h3 { margin-top: 0; }
+  .rec-item {
+    display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.92em;
+  }
+  .rec-icon { color: var(--teal); font-size: 1.1em; flex-shrink: 0; margin-top: 2px; }
+  .rec-text { line-height: 1.6; }
+
+  .summary-box {
+    background: rgba(78,205,196,0.06); border: 1px solid rgba(78,205,196,0.2);
+    border-radius: 12px; padding: 20px; margin: 24px 0;
+  }
+  .summary-box h3 { color: var(--teal); margin-top: 0; }
+
+  .back-link { color: var(--teal); text-decoration: none; font-size: 0.9em; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+  .back-link:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .score-grid { grid-template-columns: 1fr; }
+    .container { padding: 20px 16px 40px; }
+    h1 { font-size: 1.3em; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<a href="../index.html" class="back-link">&larr; Home</a>
+
+<h1>Week 1 Reading Response Assessment</h1>
+<div class="subtitle">Quanta: "Lonely Runner Problem" &middot; Orwell: "Shooting an Elephant" &middot; March 2026</div>
+
+<!-- ============================================================ -->
+<h2>Assessment Scores</h2>
+
+<div class="score-grid">
+  <div class="score-card">
+    <div class="name tepi">TePi (age 14)</div>
+    <div class="score-row"><span class="score-label">Comprehension</span><span class="score-val score-high">Strong</span></div>
+    <div class="score-row"><span class="score-label">Thesis clarity</span><span class="score-val score-high">Strong</span></div>
+    <div class="score-row"><span class="score-label">Evidence use</span><span class="score-val score-high">Strong</span></div>
+    <div class="score-row"><span class="score-label">Critical depth</span><span class="score-val score-mid">Developing</span></div>
+    <div class="score-row"><span class="score-label">Originality</span><span class="score-val score-high">Strong</span></div>
+    <div class="score-row"><span class="score-label">Writing mechanics</span><span class="score-val score-mid">Developing</span></div>
+  </div>
+  <div class="score-card">
+    <div class="name guaimei">GuaiMei (age 12)</div>
+    <div class="score-row"><span class="score-label">Comprehension</span><span class="score-val score-high">Strong</span></div>
+    <div class="score-row"><span class="score-label">Thesis clarity</span><span class="score-val score-mid">Developing</span></div>
+    <div class="score-row"><span class="score-label">Evidence use</span><span class="score-val score-high">Strong</span></div>
+    <div class="score-row"><span class="score-label">Critical depth</span><span class="score-val score-high">Strong</span></div>
+    <div class="score-row"><span class="score-label">Originality</span><span class="score-val score-mid">Developing</span></div>
+    <div class="score-row"><span class="score-label">Writing mechanics</span><span class="score-val score-high">Strong</span></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="child-badge badge-tepi">TePi</span> Quanta: Lonely Runner Problem</h2>
+
+<div class="response-card">
+  <div class="q-label q-label-thesis">Q1 &mdash; The Big Idea</div>
+  <div class="response-text">A certain amount of people, let's say 10, have to all be running at diffrent paces constantly around a track. Assuming the track is 10 meters, is it possible that in one point in time that everyone is track/amount of people length apart (in this case each person 1 meter apart)? This may seem easy but is actually really hard to answer simple because there's no obvious equation or simply way to aproasch this problem to get a concrete solution.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> He rephrases the conjecture in his own words with a concrete numerical example (10 runners, 10 meters, 1 meter apart). This shows genuine understanding, not copy-paste. He also grasps <em>why</em> it's hard &mdash; "no obvious equation."<br>
+    <span class="growth">Growth area:</span> The explanation of the conjecture is slightly imprecise &mdash; it asks whether each runner will be <em>lonely</em> at some point, not whether they're all separated simultaneously. This is a subtle but important distinction he missed.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-evidence">Q2 &mdash; How They Did It</div>
+  <div class="response-text">Ronsfeld using his equation, showed that in any counter example, the product of all the speeds would far exceed the threshold (it's impossible) and therefore any and all counter examples are impossible.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> He correctly identifies the core proof strategy: show counterexamples exceed a threshold, therefore they're impossible.<br>
+    <span class="growth">Growth area:</span> This is the thinnest response &mdash; he compresses the two-step logic into one sentence and skips the middle (prime number divisibility, Tao's threshold). The question asked him to walk through the <em>two</em> key steps; he gave a summary instead. He needs to practice <strong>slowing down and explaining each step</strong> rather than jumping to the conclusion.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-missing">Q3 &mdash; The Bigger Picture</div>
+  <div class="response-text">As Isaac newton ounce said "If I could see further, it's only because I stood on the shoulders of giants", and I think this quote perfectly incapsulates Paul's advancements. You get to a point in which you yourself can't go any further, unless you could base your studies off of studies others have already done. Im certain that Paul is very talented, but I think that this story isn't one about a kid overtaking an adult in a race (get it?) of brains, but a collaborative effort that helped Paul see as far as he did.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Excellent. The Newton quote is perfectly chosen and self-sourced (not in the article). The "get it?" joke about the race shows intellectual playfulness. And his actual insight &mdash; that this is about collaboration, not individual genius &mdash; is sophisticated and correct. This is his best answer.<br>
+    <span class="growth">Growth area:</span> Spelling/mechanics: "ounce" (once), "incapsulates" (encapsulates). The argument could push further &mdash; <em>what specifically</em> did Paul build on from Rosenfeld?
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="child-badge badge-tepi">TePi</span> Orwell: Shooting an Elephant</h2>
+
+<div class="response-card">
+  <div class="q-label q-label-thesis">Q1 &mdash; Thesis</div>
+  <div class="response-text">Orwell's Central Argument of power is essentially, although imperialism puts certain people in charge, the mass of the crowds are really who's in charge, dictating your every move and desicion; being powerful doesn't give you options, it actually strips you of it.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Nails it. "Being powerful doesn't give you options, it actually strips you of it" is a sharp, one-sentence thesis that captures Orwell's paradox perfectly. This is above-age insight.<br>
+    <span class="growth">Growth area:</span> Minor: "desicion" (decision). The semicolon usage is correct, which is notable.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-evidence">Q2 &mdash; Evidence</div>
+  <div class="response-text">When he says that he "first grasped&hellip;" he was sort using an analogy of how his struggles here show the reality of colonialism and imperialism. Although he, a white man, has a gun, a symbol of power, he still can't really do what he wants simply because of the crowd's will. In life and when colonizing, you want people to like you in order to make them obey you. But this can lead you to opening the door of people having a way to pressure to doing what you don't want to. In the end, the colonization may seem like a take over, but it's really more like a new symbol. Although the flag of this country may have changed, although the people with power have changed, the desicions made and the people who make these have and will not.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> This is remarkable for a 14-year-old. He extends Orwell's specific incident to a <em>general theory of colonialism</em>: "colonization may seem like a takeover, but it's really more like a new symbol." He independently arrives at a nuanced political insight &mdash; that colonial power structures often adopt local power dynamics rather than replacing them. This shows genuine intellectual reach.<br>
+    <span class="growth">Growth area:</span> The phrase "sort using an analogy" is unclear. He should be pushed to <strong>name the specific textual evidence</strong> more precisely (quote, then analyze) rather than paraphrasing loosely. Structure: his ideas are excellent but the paragraph wanders. Practice: thesis sentence first, then evidence, then implication.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-missing">Q3 &mdash; What's Missing</div>
+  <div class="response-text">I think that in Orwell's argument, he does take in some of the crowd's reasons; The main 2 are wanting entertainment from the white man, and for vengeance/food. I think this actually helps his argument: they simply want to kill the elephant for entertainment, and this white man has the power to do it. Like he said, Orwell doesn't actually have any power in this, it's what the public wants to happen that happens.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> He pushes back on the question's premise &mdash; arguing that Orwell <em>does</em> account for the Burmese perspective. This shows he's thinking critically about the question itself, not just obediently answering it. Good instinct.<br>
+    <span class="growth">Growth area:</span> He identifies "entertainment" and "vengeance/food" as the crowd's motives but doesn't interrogate them. Were the Burmese really there for entertainment? Or was there a deeper political dimension &mdash; wanting to see the colonizer humiliated, forced to serve <em>their</em> will? This is where he could push deeper.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="child-badge badge-guaimei">GuaiMei</span> Quanta: Lonely Runner Problem</h2>
+
+<div class="response-card">
+  <div class="q-label q-label-thesis">Q1 &mdash; The Big Idea</div>
+  <div class="response-text">Imagine a group of runners running around a track, at different constant speeds. Will each and every one of them end up separate from each other the entire time, or will there be a group that is close at one point? This problem is tricky because it includes many areas of math and has many parts to the question.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Clear, accessible rephrasing. She writes as if explaining to someone &mdash; exactly what the question asked.<br>
+    <span class="growth">Growth area:</span> "It includes many areas of math" is vague &mdash; which areas? The article names them (number theory, geometry, graph theory). She should practice <strong>being specific when she makes a claim</strong>. Also, like TePi, she slightly misframes the conjecture &mdash; it's about each runner being lonely <em>at some point</em>, not about group separation.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-evidence">Q2 &mdash; How They Did It</div>
+  <div class="response-text">First, he showed that if he multiplied all the speeds together, the product would be divisible by several specific prime numbers. Second, he went to an amended version of Tao's threshold, which said that, in short, if the conjecture was true for products up a a given limit, it was true for all. But Rosenfeld proved that such a number needed to be divisible by certain prime numbers, and that product would be too high and exceed the limit, defeating any counterexample.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Excellent. She actually walks through both steps: (1) prime divisibility constraint, (2) Tao's threshold. She connects them logically &mdash; the product must be divisible by certain primes, which makes it too large, which exceeds the threshold. This is a <strong>significantly more detailed</strong> explanation than TePi's. At age 12, this level of logical reconstruction from a math article is impressive.<br>
+    <span class="growth">Growth area:</span> Minor &mdash; "an amended version" should be "a modified version." She could add: <em>why</em> this approach (proof by contradiction) is more powerful than trying to prove it directly.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-missing">Q3 &mdash; The Bigger Picture</div>
+  <div class="response-text">To make a breakthrough, it takes several key things, but there are several other things that are not always needed but sometimes used. For example, Trakulthongchai was just in college when he made a major breakthrough, showing that you did not need tons of experience, but rather just a clever and determined mind. Trakulthongchai did build off Rosenfeld, but I believe that it is not neccessary for breakthroughs to build off other people's work. For example, the man who found the wheel did not have anyone to build off, but I would say that is still a major accomplishment and breakthrough. So, I believe that, according to the article, all it takes it a smart and determined mind.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> She brings in an external example (the wheel) to support her point &mdash; good argumentative instinct. She correctly notes that Paul was young, which matters to the question.<br>
+    <span class="growth">Growth area:</span> Her conclusion &mdash; "all it takes is a smart and determined mind" &mdash; is a bit too clean. The article actually shows that Paul <em>specifically</em> built on Rosenfeld's work and was mentored by Kravitz. She dismisses the building-on-others angle too quickly. This is her known pattern: <strong>she writes to prove a conclusion she's already reached, rather than letting the evidence complicate her view.</strong> Compare with TePi, who arrived at the opposite (and more nuanced) conclusion about collaboration.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="child-badge badge-guaimei">GuaiMei</span> Orwell: Shooting an Elephant</h2>
+
+<div class="response-card">
+  <div class="q-label q-label-thesis">Q1 &mdash; Thesis</div>
+  <div class="response-text">Power does not come in strength, but in numbers.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Concise and punchy. She gets to the core fast.<br>
+    <span class="growth">Growth area:</span> Too concise. One sentence for a thesis question is underweight. Orwell's argument is about more than numbers vs. strength &mdash; it's about the <em>paradox</em> that the person with apparent power is actually the least free. She should be pushed to <strong>add a "because" clause</strong>: Power doesn't come from strength but from numbers <em>because...</em>
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-evidence">Q2 &mdash; Evidence</div>
+  <div class="response-text">"I looked at the sea of yellow faces above the garish clothes-faces all happy and excited over this bit of fun, all certain that the elephant was going to be shot...The people expected it of me and I had got to do it"  These details show that it didn't matter about Orwell's power or rank over the people. The people wanted it, and so he did it. As we heard in the beginning, Orwell didn't want to shoot the elephant, but after seeing the crowd, he decided to shoot it. And if he didn't, well..."To come all that way, rifle in hand, with two thousand people marching at my heels, and then to trail feebly away, having done nothing – no, that was impossible. The crowd would laugh at me." This shows the absolute power of the crowd, forcing Orwell into the situation of being powerless to do what he needs to do and instead being forced to do what the crowd wants him to do. I do not see any point in which Orwell contradicts himself.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Excellent textual evidence. She quotes <em>twice</em> and analyzes both quotes. The structure is: quote &rarr; explain &rarr; quote &rarr; explain &rarr; conclusion. This is <strong>proper analytical writing</strong> at a level well beyond her age. The final sentence ("I do not see any point in which Orwell contradicts himself") directly addresses the question's challenge to find weak evidence.<br>
+    <span class="growth">Growth area:</span> The analysis stays on the surface of what the quotes say rather than what they <em>reveal</em>. She could push into: why does being laughed at matter so much to Orwell? What does that fear tell us about the psychology of power?
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-missing">Q3 &mdash; What's Missing</div>
+  <div class="response-text">I think this essay would weaken its key meaning if he included the Burmese point of view. That is because this story is about how Orwell was controlled by the power of the crowd, against his better judgement. However, if he had included the Burmese view of things, it would have been that he was justifying the Burmese, which makes it look like he actually agreed with the Burmese. This would contradict his point of doing something he disagreed with, thus weakening his argument.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Strong argumentative logic. She identifies that including the Burmese perspective would undermine Orwell's rhetorical strategy &mdash; it would make the shooting seem justified rather than coerced. This is a sophisticated understanding of how essays <em>work</em>: what you leave out shapes the argument as much as what you include.<br>
+    <span class="growth">Growth area:</span> She could acknowledge the tension: is it <em>right</em> for Orwell to exclude the Burmese perspective just because it serves his argument? This is where ethical thinking meets craft &mdash; the exact edge she should be developing.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Summary &amp; Comparison</h2>
+
+<div class="summary-box">
+  <h3>TePi (14)</h3>
+  <p><strong>Overall:</strong> His strongest quality is <strong>original thinking</strong>. The Newton quote, the colonialism insight, the pushback on Q3 &mdash; these show a mind that reaches beyond the text. His ideas consistently outpace his writing craft.</p>
+  <p><strong>Key pattern:</strong> He jumps to conclusions. His Quanta Q2 compresses a multi-step proof into one sentence. His Orwell Q2 has brilliant ideas buried in a wandering paragraph. He needs to learn to <strong>slow down and show his work</strong> &mdash; state the point, give the evidence, explain the connection.</p>
+  <p><strong>Mechanics:</strong> Persistent spelling errors (desicion, ounce, incapsulates, aproasch). These won't fix themselves &mdash; he needs deliberate practice or vocabulary work.</p>
+</div>
+
+<div class="summary-box">
+  <h3>GuaiMei (12)</h3>
+  <p><strong>Overall:</strong> Her strongest quality is <strong>structured analysis</strong>. She quotes, then explains, then concludes. Her Quanta Q2 walks through both proof steps methodically. Her evidence use on Orwell is textbook-quality for any age.</p>
+  <p><strong>Key pattern:</strong> She writes to <strong>prove conclusions she's already reached</strong> rather than to discover. Her Quanta Q3 dismisses the collaboration angle too quickly. Her Orwell Q1 is too brief &mdash; she arrives at the answer and stops, rather than exploring it. She needs to practice <strong>sitting in uncertainty longer</strong>.</p>
+  <p><strong>Comparison to TePi:</strong> Where TePi is creative but structurally loose, GuaiMei is structured but intellectually cautious. They are almost perfect complements.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Recommendations: Next Steps</h2>
+
+<div class="rec-section">
+  <h3><span class="child-badge badge-tepi">TePi</span> Skill Building</h3>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Structure practice:</strong> For the next 4 essays, require a one-sentence thesis as the first sentence. Then evidence. Then "this matters because..." He has the ideas; he needs the scaffolding.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Quote-then-analyze:</strong> Every evidence paragraph must contain at least one direct quote followed by 2-3 sentences explaining what it reveals. He tends to paraphrase instead of quoting.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Spelling:</strong> Word Power Made Easy will help. Also consider having him re-read his own responses aloud before submitting &mdash; he'd catch most errors himself.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Push his Orwell insight further:</strong> His colonialism observation ("really more like a new symbol") is publishable-quality thinking. Ask him to develop it into a full paragraph &mdash; give him the experience of turning a flash of insight into a sustained argument.</div></div>
+</div>
+
+<div class="rec-section">
+  <h3><span class="child-badge badge-guaimei">GuaiMei</span> Skill Building</h3>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Practice complicating her own thesis:</strong> After she writes a conclusion, ask: "What's the strongest argument against what you just said?" Force her to address the counterargument <em>before</em> concluding. Her Quanta Q3 needed this.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Expand short answers:</strong> Her Orwell Q1 (one sentence) should be a paragraph. Rule: no answer under 3 sentences. She has the skill to go deeper &mdash; she just needs the habit.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Be specific when making claims:</strong> "Many areas of math" should name which areas. "Several key things" should name them. Push her to replace every vague claim with a concrete one.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Lean into what she does well:</strong> Her quote-analyze-conclude structure on the Orwell evidence question is genuinely excellent. Name it. Tell her: "This is what analytical writing looks like. Do this every time."</div></div>
+</div>
+
+<div class="rec-section">
+  <h3>For Both: Perspective Building</h3>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Cross-pollinate:</strong> Have them read each other's responses (without names). Ask: "Which answer do you wish you'd written? What does the other person see that you missed?" They complement each other &mdash; TePi's creativity + GuaiMei's structure.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Week 2 Orwell ("A Hanging") will test them differently:</strong> This essay has no stated thesis. Both kids will have to infer the argument from pure description. Watch whether TePi over-interprets (adding meaning that isn't there) and whether GuaiMei under-interprets (staying too close to "what happened").</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Quanta "Limits of Mathematical Truth" will push both:</strong> The concept of undecidability is philosophically deeper than the Lonely Runner. The final question ("Is this depressing or liberating?") has no right answer &mdash; it tests whether they can reason about their own emotional response to an abstract idea.</div></div>
+</div>
+
+<div style="margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-size:0.82em;color:var(--muted);">
+  Generated from Firebase response data &middot; Week 1 articles &middot; Assessment date: March 30, 2026
+</div>
+
+</div>
+</body>
+</html>
