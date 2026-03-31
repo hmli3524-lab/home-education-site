@@ -31,6 +31,7 @@ var FIREBASE_DB = "https://home-education-1ee3d-default-rtdb.firebaseio.com/data
   };
 
   // On page load: pull all Firebase data into localStorage
+  // Merge strategy: Firebase wins UNLESS the value is empty/default and local has real content
   window._dbReady = fetch(FIREBASE_DB + '.json')
     .then(function(r) { return r.json(); })
     .then(function(data) {
@@ -38,7 +39,28 @@ var FIREBASE_DB = "https://home-education-1ee3d-default-rtdb.firebaseio.com/data
       for (var key in data) {
         if (!data.hasOwnProperty(key)) continue;
         var val = data[key];
-        _setItem(key, typeof val === 'object' && val !== null ? JSON.stringify(val) : String(val));
+        var serialized = typeof val === 'object' && val !== null ? JSON.stringify(val) : String(val);
+
+        // For answer keys: don't overwrite local content with empty Firebase answers
+        if (key.indexOf('answers_') === 0 && typeof val === 'object' && val !== null) {
+          var local = null;
+          try { local = JSON.parse(localStorage.getItem(key)); } catch(e) {}
+          if (local) {
+            // Merge: keep whichever has more content
+            var fbHasContent = (val.q1 || val.q2 || val.q3);
+            var localHasContent = (local.q1 || local.q2 || local.q3);
+            if (!fbHasContent && localHasContent) {
+              // Local has content but Firebase is empty — push local to Firebase
+              fetch(FIREBASE_DB + '/' + encodeURIComponent(key) + '.json', {
+                method: 'PUT',
+                body: JSON.stringify(local)
+              }).catch(function() {});
+              continue; // don't overwrite local
+            }
+          }
+        }
+
+        _setItem(key, serialized);
       }
     })
     .catch(function() {

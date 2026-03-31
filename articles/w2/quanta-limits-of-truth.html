@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lonely Runner Problem — Quanta Magazine</title>
+<title>Limits of Mathematical Truth — Quanta Magazine</title>
 <style>
   :root {
     --bg: #2b2d31; --surface: #313338; --card: #383a40; --accent: #e8555a;
@@ -117,9 +117,9 @@
 <div class="top-bar">
   <a class="back-btn" onclick="history.back()">&#8592; Back to Plan</a>
   <div class="top-meta">
-    <span class="tag">Week 1</span>
+    <span class="tag">Week 2</span>
     <span class="tag-source">Quanta Magazine</span>
-    <span>Math &middot; ~1,800 words &middot; ~12 min</span>
+    <span>Math &middot; ~3,000 words &middot; ~18 min</span>
   </div>
   <div class="reader-name" id="reader-name"></div>
 </div>
@@ -129,93 +129,119 @@
   <!-- Left Column: Article -->
   <div class="article-column">
     <div class="article-header">
-      <h1>New Strides Made on Deceptively Simple 'Lonely Runner' Problem</h1>
-      <div class="subtitle">Mathematicians proved a conjecture about runners on a circular track for up to 10 runners &mdash; including one breakthrough by an undergraduate.</div>
-      <div class="author">Paulina Rowi&#324;ska</div>
+      <h1>New Proofs Probe the Limits of Mathematical Truth</h1>
+      <div class="subtitle">Mathematicians proved that a famous problem about equations is unsolvable &mdash; not just for integers, but for every ring of integers.</div>
+      <div class="author">Joseph Howlett</div>
       <div class="pub-info">
-        <span>March 6, 2026</span>
+        <span>February 3, 2025</span>
         <span>Quanta Magazine</span>
       </div>
     </div>
 
     <div class="guide-box">
       <h3>Before You Read</h3>
-      <p>This article is about a math problem that sounds simple &mdash; runners going around a track &mdash; but has stumped mathematicians for decades. Pay attention to <em>how</em> they finally proved new cases: not by solving it directly, but by showing that any counterexample would be impossible.</p>
+      <p>This article is about a discovery that some math problems can never be solved &mdash; not because we're not smart enough, but because it's mathematically impossible. The key idea: Hilbert dreamed of a complete mathematics. Pay attention to how that dream was shattered, step by step.</p>
       <p class="tip">Tip: Select any unfamiliar word to look it up and save it to your vocabulary list.</p>
     </div>
 
     <div class="essay-text" id="essay-text">
 
-<p>Picture a bizarre training exercise: A group of runners starts jogging around a circular track, with each runner maintaining a unique, constant pace. Will every runner end up "lonely," or relatively far from everyone else, at least once, no matter their speeds?</p>
+<p>The world of mathematics is full of unreachable corners, where unsolvable problems live. Now, yet another has been exposed.</p>
 
-<p>Mathematicians conjecture that the answer is yes.</p>
+<p>In 1900, the eminent mathematician David Hilbert announced a list of 23 key problems to guide the next century of mathematical research. His problems not only provided a road map for the field but reflected a more ambitious vision &mdash; to build a firm foundation from which all mathematical truths could be derived.</p>
 
-<p>The "lonely runner" problem might seem simple and inconsequential, but it crops up in many guises throughout math. It's equivalent to questions in number theory, geometry, graph theory, and more &mdash; about when it's possible to get a clear line of sight in a field of obstacles, or where billiard balls might move on a table, or how to organize a network. "It has so many facets. It touches so many different mathematical fields," said Matthias Beck of San Francisco State University.</p>
+<p>A key part of this vision was that mathematics should be &ldquo;complete.&rdquo; That is, all its statements should be provably true or false.</p>
 
-<p>For just two or three runners, the conjecture's proof is elementary. Mathematicians proved it for four runners in the 1970s, and by 2007, they'd gotten as far as seven. But for the past two decades, no one has been able to advance any further.</p>
+<p>In the 1930s, Kurt G&ouml;del demonstrated that this is impossible: In any mathematical system, there are statements that can be neither proved nor disproved. A few years later, Alan Turing and others built on his work, showing that mathematics is riddled with &ldquo;undecidable&rdquo; statements &mdash; problems that cannot be solved by any computer algorithm.</p>
 
-<p>Then last year, Matthieu Rosenfeld, a mathematician at the Laboratory of Computer Science, Robotics, and Microelectronics of Montpellier, settled the conjecture for eight runners. And within a few weeks, a second-year undergraduate at the University of Oxford named Tanupat (Paul) Trakulthongchai built on Rosenfeld's ideas to prove it for nine and 10 runners.</p>
+<p>These results demonstrated that there are fundamental limits to what proof and computation are capable of. Some mathematics can simply never be known.</p>
 
-<p>The sudden progress has renewed interest in the problem. "It's really a quantum leap," said Beck, who was not involved in the work. Adding just one runner makes the task of proving the conjecture "exponentially harder," he said. "Going from seven runners to now 10 runners is amazing."</p>
+<p>Hilbert&rsquo;s dream was dead. But it lived on in fragments. Many of the questions from his turn-of-the-century list still evoked his vision, allowing the idea of a complete mathematics to survive in narrower contexts.</p>
 
-<h2>The Starting Dash</h2>
+<p>Chief among them was his 10th problem. It concerns Diophantine equations: polynomials with integer coefficients, such as x&sup2; + y&sup2; = 5. These familiar equations are one of the most central objects of study in mathematics. For millennia, mathematicians have sought integer solutions to them. In this example, for instance, one solution is x = 1, y = 2 (since 1&sup2; + 2&sup2; = 5). Another is x = 2, y = &minus;1.</p>
 
-<p>At first, the lonely runner problem had nothing to do with running.</p>
+<p>Other Diophantine equations, such as x&sup2; + y&sup2; = 3, don&rsquo;t have any integer solutions. Hilbert&rsquo;s 10th problem asked whether it&rsquo;s always possible to tell if a given Diophantine equation has integer solutions. Does an algorithm exist to determine this for every equation, or is the problem undecidable? There might be no hope for a complete and systematic approach to all of mathematics &mdash; or even all 23 of Hilbert&rsquo;s problems &mdash; but one might still exist when it comes to Diophantine equations, forming a microcosm of his original program. This problem represents &ldquo;a very natural version of that dream,&rdquo; according to Peter Koymans of Utrecht University.</p>
 
-<p>Instead, mathematicians were interested in a seemingly unrelated problem: how to use fractions to approximate irrational numbers such as pi, a task that has a vast number of applications. In the 1960s, a graduate student named J&ouml;rg M. Wills conjectured that a century-old method for doing so is optimal &mdash; that there's no way to improve it.</p>
+<p>In 1970, a Russian mathematician named Yuri Matiyasevich shattered this dream. He showed that there is no general algorithm that can determine whether any given Diophantine equation has integer solutions &mdash; that Hilbert&rsquo;s 10th is an undecidable problem. You might be able to come up with an algorithm that can assess most equations, but it won&rsquo;t work for every single one.</p>
 
-<p>In 1998, a group of mathematicians rewrote that conjecture in the language of running. Say N runners start from the same spot on a circular track that's 1 unit in length, and each runs at a different constant speed. Wills' conjecture is equivalent to saying that each runner will always end up lonely at some point, no matter what the other runners' speeds are. More precisely, each runner will at some point find themselves at a distance of at least 1/N from any other runner.</p>
+<p>In even this most straightforward kind of math, unknowability lurks.</p>
 
-<p>When Wills saw the lonely runner paper, he emailed one of the authors, Luis Goddyn of Simon Fraser University, to congratulate him on "this wonderful and poetic name." (Goddyn's reply: "Oh, you are still alive.")</p>
+<p>Mathematicians wanted to test the reach of Matiyasevich&rsquo;s conclusion. Say you allow your Diophantine equations to have complex solutions (numbers that can be written with real and imaginary parts, and that aren&rsquo;t limited to integers). In this case, every Diophantine equation has a solution, and the answer to Hilbert&rsquo;s 10th problem is a resounding yes. But there&rsquo;s a whole range of Diophantine equations between ones with solutions that must be integers and ones with solutions that can be complex.</p>
 
-<p>Mathematicians also showed that the lonely runner problem is equivalent to yet another question. Imagine an infinite sheet of graph paper. In the center of every grid, place a small square. Then start at one of the grid corners and draw a straight line. (The line can point in any direction other than perfectly vertical or horizontal.) How big can the smaller squares get before the line must hit one?</p>
+<p>&ldquo;It&rsquo;s unsolvable for integers, then when you pass to much larger systems of numbers, you get solvability all of a sudden,&rdquo; said Barry Mazur of Harvard University. &ldquo;Where is the cutoff?&rdquo;</p>
 
-<p>As versions of the lonely runner problem proliferated throughout mathematics, interest in the question grew. Mathematicians proved different cases of the conjecture using completely different techniques. Sometimes they relied on tools from number theory; at other times they turned to geometry or graph theory.</p>
+<p>In the 50 years since Hilbert&rsquo;s 10th problem was resolved, mathematicians have been searching for this cutoff. Now, Koymans and his longtime collaborator, Carlo Pagano of Concordia University in Montreal &mdash; as well as another team of researchers working independently &mdash; have taken a major step toward that goal. Both groups have proved that, for a vast and important collection of settings beyond integers, there is likewise no general algorithm to determine if any given Diophantine equation has a solution. The work not only allows mathematicians to get a more precise view of what they can and cannot know but gives them an entirely new level of control over one of the most central objects in mathematics.</p>
 
-<p>But this meant that they didn't have a general strategy for how to tackle the problem. Rather, they had a bunch of clever but ad hoc techniques that might work for four runners, say, but not five. With each additional runner, they had to go back to the starting line.</p>
+<h2>Extending From Integers</h2>
 
-<p>By the mid-2000s, mathematicians had proved that when there are seven or fewer runners sprinting around a track, each of them will eventually get lonely. They'd also found ways to simplify the problem. For instance, they realized that they didn't need to prove the conjecture for all (infinitely many) combinations of speeds. Instead, if they could show that it was true for any combination of whole-number speeds, it would have to be true more generally; they could ignore fractions and irrationals.</p>
+<p>The new proofs focused on a natural extension of Hilbert&rsquo;s 10th problem. The extension deals with Diophantine equations whose solutions belong to number systems that are close relatives of the integers.</p>
 
-<p>This was a much easier task, but it still involved dealing with infinitely many possible speeds. Something more was needed.</p>
+<p>If you start with the numbers 1 and &minus;1, you can add them in different combinations to get every other integer. But say you start with a different finite set of numbers &mdash; like 1, &minus;1 and &radic;2. You can add those numbers in different combinations to get a new number system, called a ring of integers (so named even though the ring need not contain only integers). Other rings of integers can be built out of sets of numbers that include, say, the square root of &minus;1 (the imaginary number that mathematicians call i), or the cube root of 2. Is there an algorithm that can always determine whether a given Diophantine equation has solutions that fall in one of these rings of integers?</p>
 
-<h2>Speed Limits</h2>
+<p>Mathematicians suspected that, for every single ring of integers &mdash; that is, infinitely many systems of numbers &mdash; the problem is still undecidable. This would extend the conclusion well beyond the initial, integer-focused scope of Hilbert&rsquo;s 10th problem.</p>
 
-<p>In 2015, Terence Tao of the University of California, Los Angeles planted the first seed. He showed that if the lonely runner conjecture held for relatively low speeds, it would also hold for high speeds. For any given number of runners, mathematicians would only have to consider whole-number speeds up to a particular threshold.</p>
+<p>To prove this, they hoped to follow in the footsteps of the proof of that original problem &mdash; the one involving only integer solutions.</p>
 
-<p>This reduced the problem to a finite number of calculations &mdash; at least in theory. In practice, even when you're dealing with only a few runners, the number of combinations of speeds you have to check is still "astronomical and completely impractical," said Noah Kravitz of the University of Oxford.</p>
+<p>In general, undecidability proofs &mdash; proofs that determine whether there is a general algorithm that can answer a given question &mdash; follow the same recipe: They show that the problem of interest is equivalent to a famous undecidable problem in computer science called the halting problem. The halting problem asks whether an idealized computational device called a Turing machine, when fed a given input, will run forever or eventually halt. It&rsquo;s known that there&rsquo;s no algorithm that can answer this for every Turing machine.</p>
 
-<p>Tao's advance would eventually catch the eye of Rosenfeld, who was interested in proofs that use a computer to check many examples.</p>
+<p>It&rsquo;s possible to think of Diophantine equations as computational devices, too. Consider the equation y = x&sup2;. It has infinitely many integer solutions. If you plug in different integers for x and solve for y, the values you get all belong to a famous set of integers: the perfect squares. It is easy to imagine a computer program (that is, a Turing machine) that performs an equivalent task: &ldquo;Compute the sequence of perfect squares.&rdquo;</p>
 
-<p>He reframed the problem by considering possible counterexamples to the conjecture: What features would the runners' speeds have to have so that at least one runner would never end up alone?</p>
+<p>Other Diophantine equations can encode other kinds of computations.</p>
 
-<p>It turned out that their speeds would need to be highly constrained. Rosenfeld used a computer program, along with ideas from number theory, to show that if he multiplied all the speeds together, their product would have to be divisible by certain prime numbers. Now all he needed to do was prove that no combination of speeds could satisfy this condition.</p>
+<p>To settle Hilbert&rsquo;s original 10th problem, mathematicians built on this idea. In work that began with Julia Robinson and others around 1950 and culminated in Matiyasevich&rsquo;s 1970 result, it was shown that for every Turing machine, there is a corresponding Diophantine equation. &ldquo;It was completely unexpected,&rdquo; said Hector Pasten of the Pontifical Catholic University of Chile in Santiago. &ldquo;Diophantine equations over the integers are enough to define, basically, anything you can imagine.&rdquo;</p>
 
-<p>To do so, he returned to a modified version of Tao's threshold. He then rewrote it in terms of the product of speeds: If the lonely runner conjecture was true for products up to a given size, it had to be true in general. This implied that if the conjecture was false, it would be possible to find a counterexample with a product below the threshold.</p>
+<p>Moreover, the mathematicians set up this elegant correspondence so that if a Turing machine halted for a given input, its corresponding Diophantine equation would have an integer solution. If the Turing machine ran forever, its corresponding Diophantine equation would have no solution. But this meant that Hilbert&rsquo;s 10th problem encoded the halting problem: An algorithm that could sort Diophantine equations based on whether or not they had integer solutions would also be able to sort Turing machines based on whether or not they halted.</p>
 
-<p>But Rosenfeld had already shown that in any counterexample, the product would have to be divisible by all those primes. Such a product would have to be massive. So massive, in fact, that it would far exceed the threshold.</p>
+<p>In other words, Hilbert&rsquo;s 10th problem is undecidable.</p>
 
-<p>In other words, a counterexample to the lonely runner conjecture couldn't exist &mdash; at least, not for eight runners. The conjecture was true.</p>
+<p>Mathematicians hoped to follow the same approach to prove the extended, rings-of-integers version of the problem &mdash; but they hit a snag.</p>
 
-<h2>Off Track</h2>
+<h2>Gumming Up the Works</h2>
 
-<p>Rosenfeld started thinking about how to extend his proof to nine runners. In the meantime, Kravitz saw Rosenfeld's paper and showed it to a promising undergraduate he'd been mentoring at Oxford, Paul Trakulthongchai. He advised Trakulthongchai to work on the conjecture for nine runners.</p>
+<p>The useful correspondence between Turing machines and Diophantine equations falls apart when the equations are allowed to have non-integer solutions. For instance, consider again the equation y = x&sup2;. If you&rsquo;re working in a ring of integers that includes &radic;2, then you&rsquo;ll end up with some new solutions, such as x = &radic;2, y = 2. The equation no longer corresponds to a Turing machine that computes perfect squares &mdash; and, more generally, the Diophantine equations can no longer encode the halting problem.</p>
 
-<p>Trakulthongchai used Rosenfeld's overall approach, but he developed a more efficient computational technique for pinpointing the prime divisors that a counterexample would have to have. This allowed him to more quickly rule out all counterexamples for both nine and 10 runners: The conjecture was true in both cases. (Rosenfeld independently proved the conjecture for nine runners as well, just a few days after Trakulthongchai did. He was happy to see the other mathematician's burst of progress. But "at the same time, I was a bit bummed out," he said with a laugh.)</p>
+<p>But in 1988, a graduate student at New York University named Sasha Shlapentokh started to play with ideas for how to get around this problem. By 2000, she and others had formulated a plan. Say you were to add a bunch of extra terms to an equation like y = x&sup2; that magically forced x to be an integer again, even in a different number system. Then you could salvage the correspondence to a Turing machine. Could the same be done for all Diophantine equations? If so, it would mean that Hilbert&rsquo;s problem could encode the halting problem in the new number system.</p>
 
-<p>Both Rosenfeld's and Trakulthongchai's methods are too computationally expensive to work for more runners, leaving them stuck on the problem's next case. "In order to achieve 11, I think you need an entirely new sort of way of looking at things," Trakulthongchai said.</p>
+<p>Over the years, Shlapentokh and other mathematicians figured out what terms they had to add to the Diophantine equations for various kinds of rings, which allowed them to demonstrate that Hilbert&rsquo;s problem was still undecidable in those settings. They then boiled down all remaining rings of integers to one case: rings that involve the imaginary number i. Mathematicians realized that in this case, the terms they&rsquo;d have to add could be determined using a special equation called an elliptic curve.</p>
 
-<p>But mathematicians are excited by these recent advances &mdash; and by the fact that a single approach solved three cases at once, when previously each new case had required an entirely new proof. "I really see a new way of getting a hold on the whole conjecture by this new idea," said Matthias Schymura of the University of Rostock in Germany.</p>
+<p>But the elliptic curve would have to satisfy two properties. First, it would need to have infinitely many solutions. Second, if you switched to a different ring of integers &mdash; if you removed the imaginary number from your number system &mdash; then all the solutions to the elliptic curve would have to maintain the same underlying structure.</p>
 
-<p>Although a proof of the whole conjecture still feels far off &mdash; and mathematicians don't yet agree on whether it will hold true for any N runners &mdash; "things are starting to move after not moving for a while," Kravitz said.</p>
+<p>As it turned out, building such an elliptic curve that worked for every remaining ring was an extremely subtle and difficult task. But Koymans and Pagano &mdash; experts on elliptic curves who had worked closely together since they were in graduate school &mdash; had just the right tool set to try.</p>
 
-<p>Inspired by the new results, Schymura and others are organizing a workshop on the lonely runner conjecture, to be held in Rostock this October. It will bring together researchers from the different fields in which the conjecture appears. The hope is that they'll approach the problem from various angles and "communicate and bridge the different areas," Schymura said, to find a potential proof or counterexample.</p>
+<h2>Sleepless Nights</h2>
 
-<p>"I'm convinced the problem will be solved," Wills said. "But it might be some 20, 30 more years."</p>
+<p>Since his time as an undergraduate, Koymans had been thinking about Hilbert&rsquo;s 10th problem. Throughout graduate school, and throughout his collaboration with Pagano, it beckoned. &ldquo;I spent a few days every year thinking about it and getting horribly stuck,&rdquo; Koymans said. &ldquo;I&rsquo;d try three things and they&rsquo;d all blow up in my face.&rdquo;</p>
+
+<p>In 2022, while at a conference in Banff, Canada, he and Pagano ended up chatting about the problem. They hoped that together, they could build the special elliptic curve needed to resolve the problem. After finishing some other projects, they got to work.</p>
+
+<p>They started with a simple equation for an elliptic curve that didn&rsquo;t satisfy either of the required properties. They knew they could use a well-established technique called a quadratic twist &mdash; something they&rsquo;d been studying for the better part of a decade &mdash; to tweak the equation so that it would meet the first condition. They simply had to multiply one of the equation&rsquo;s variables by a specific number, and they&rsquo;d get a new elliptic curve with infinitely many solutions.</p>
+
+<p>But this left them with a problem. They had no way to guarantee that this new curve satisfied the second property &mdash; that its solutions would look similar for rings that differed by an imaginary number. The mathematicians needed to get better control over the quadratic twist.</p>
+
+<p>They got stuck. &ldquo;I had this dark feeling,&rdquo; Koymans said. &ldquo;I started to get suspicious that we were missing something.&rdquo;</p>
+
+<p>Then, in summer 2024, while working on a different problem, the pair had to use quadratic twists again. One night, in the middle of this research, Koymans found himself lying awake, unable to stop thinking about Hilbert&rsquo;s 10th problem.</p>
+
+<p>That other work, Koymans realized, gave them an important hint, one of those strange and surprising mathematical concordances that sometimes appear: If the number they used in the quadratic twist was the product of exactly three prime numbers, then they&rsquo;d get the control they needed to guarantee the second property. But because their elliptic curve had to be constructed so carefully and meet so many specifications, there were lots of additional constraints on what those three primes could be. Could Koymans and Pagano find ones that worked &mdash; no matter which ring they were using?</p>
+
+<p>Pagano happened to have planned a visit to the Swiss Federal Institute of Technology Zurich, where Koymans was working at the time, a few days later. They spent the next week struggling at the blackboard together, trying to find primes that would meet all the constraints. Finally, they figured out that they had to use four primes, rather than three, to construct their quadratic twist. This allowed them to apply a method from an entirely separate area of math, called additive combinatorics, to ensure that the right combination of primes existed for every ring.</p>
+
+<p>That was the final piece: They&rsquo;d built their elliptic curve. It gave them the recipe they needed to add terms to their Diophantine equations, which then enabled them to encode Turing machines &mdash; and the halting problem &mdash; in those equations, regardless of what number system they used. It was settled. Hilbert&rsquo;s 10th problem is undecidable for every ring of integers.</p>
+
+<p>The result was solidified further last Thursday, when, less than two months after Koymans and Pagano posted their paper online, an independent team of four mathematicians announced a new proof of the same result. Instead of looking for a special elliptic curve, they had relied on a different kind of equation to do the same job.</p>
+
+<p>Both groups hope to use their techniques &mdash; which give them unprecedented control over elliptic curves and related equations &mdash; to make progress on other problems as well. &ldquo;There&rsquo;s a possibility that the two methods could be used together to do even more,&rdquo; said Manjul Bhargava, a mathematician at Princeton University and one of the authors of the second proof.</p>
+
+<p>Meanwhile, the search for where undecidability ends and decidability begins is not over: Mathematicians are continuing to explore Hilbert&rsquo;s 10th problem in new settings.</p>
+
+<p>This is just one of many questions that &ldquo;reflect the philosophical side of what in the world is true,&rdquo; according to Andrew Granville of the University of Montreal.</p>
+
+<p>All knowledge has limits. &ldquo;It reminds us there are things that are just not doable,&rdquo; Granville said. &ldquo;It doesn&rsquo;t matter who you are or what you are.&rdquo;</p>
 
     </div>
 
     <div class="source-note">
-      Originally published on <a href="https://www.quantamagazine.org/new-strides-made-on-deceptively-simple-lonely-runner-problem-20260306/">Quanta Magazine</a>, March 6, 2026.
+      Originally published on <a href="https://www.quantamagazine.org/new-proofs-probe-the-limits-of-mathematical-truth-20250203/">Quanta Magazine</a>, February 3, 2025.
     </div>
 
   </div>
@@ -246,7 +272,7 @@
 </div>
 
 <div class="bottom-bar">
-  <span class="stat">~1,800 words</span>
+  <span class="stat">~3,000 words</span>
   <span class="stat">Units: <strong>2-3</strong></span>
   <button class="done-btn" id="done-btn" onclick="toggleDone()">Mark as Read</button>
   <button class="reopen-btn" id="reopen-btn" onclick="toggleDone()" style="display:none">Reopen</button>
@@ -257,17 +283,17 @@
 <script>
 // === Config ===
 const CHILD = (window.location.hash || "#tepi").slice(1).toLowerCase() || "tepi";
-const ARTICLE_ID = "w1_quanta_lonely_runner";
-const ARTICLE_TITLE = "Lonely Runner Problem (Quanta)";
+const ARTICLE_ID = "w2_quanta_limits_of_truth";
+const ARTICLE_TITLE = "Limits of Mathematical Truth (Quanta)";
 const QUESTIONS = [
-  { level: 1, label: "The Big Idea", text: "Imagine you\u2019re explaining this to a friend who\u2019s never heard of it. How would you describe the Lonely Runner Conjecture in your own words \u2014 and why is it surprising that such a simple-sounding question is so hard to answer?" },
-  { level: 2, label: "How They Did It", text: "Rosenfeld didn\u2019t prove the conjecture directly \u2014 he proved that any counterexample would be impossible. It\u2019s like proving nobody ate the cookies by showing nobody could reach the cookie jar. Walk through his two key steps: what did he show about the prime numbers, and how did that kill all possible counterexamples?" },
-  { level: 3, label: "The Bigger Picture", text: "Paul Trakulthongchai was a second-year undergraduate \u2014 barely older than you \u2014 when he proved this for 9 and 10 runners. What does his story suggest about what it actually takes to make a breakthrough? Is it years of experience, being clever, building on someone else\u2019s work, or something else? Use evidence from the article." }
+  { level: 1, label: "The Big Idea", text: "Hilbert believed all math questions could be answered. G\u00f6del and Turing proved him wrong. In your own words, what does it mean for a problem to be \u2018undecidable\u2019 \u2014 and why should that matter to anyone who isn\u2019t a mathematician?" },
+  { level: 2, label: "How They Did It", text: "Koymans and Pagano didn\u2019t solve Hilbert\u2019s 10th problem directly \u2014 they showed it\u2019s equivalent to the halting problem. Explain the connection: how does a Diophantine equation act like a computer program? What\u2019s the \u2018trick\u2019 that links equations to Turing machines?" },
+  { level: 3, label: "The Bigger Picture", text: "The article ends with: \u2018All knowledge has limits. It doesn\u2019t matter who you are or what you are.\u2019 Do you find this idea depressing or liberating? If there are math problems that can never be solved, does that make math less valuable \u2014 or more interesting?" }
 ];
 
 const PLAN_SYNC = {
-  tepi: { storageKey: "tepi_q2_2026", taskKey: "w1_t1" },
-  guaimei: { storageKey: "guaimei_q2_2026", taskKey: "w1_t0" }
+  tepi: { storageKey: "tepi_q2_2026", taskKey: "w2_t1" },
+  guaimei: { storageKey: "guaimei_q2_2026", taskKey: "w2_t0" }
 };
 const SUB_INDEX = 0; // Quanta is the first reading sub-task (s0)
 
@@ -419,7 +445,6 @@ function saveAnswers() {
     data["q" + (i+1)] = val;
     if (val.trim()) hasContent = true;
   });
-  // Only save if at least one answer has content (don't overwrite with empty)
   if (!hasContent) return;
   try { localStorage.setItem(STORAGE_ANSWERS, JSON.stringify(data)); } catch(e) {}
   QUESTIONS.forEach(function(_, i) {
