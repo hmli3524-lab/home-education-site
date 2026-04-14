@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 2 Reading Assessment — TePi &amp; GuaiMei</title>
+<style>
+  :root {
+    --bg: #2b2d31; --surface: #313338; --card: #383a40;
+    --accent: #e8555a; --accent2: #9b6dd7; --gold: #e0a82e;
+    --text: #e0e0e0; --muted: #999; --green: #57d9a3; --teal: #4ecdc4;
+    --border: #44464d; --shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; }
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 1.6em; color: #fff; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.92em; margin-bottom: 32px; }
+  h2 { font-size: 1.3em; color: #fff; margin: 36px 0 16px; display: flex; align-items: center; gap: 10px; }
+  h3 { font-size: 1.05em; color: var(--teal); margin: 20px 0 10px; }
+  .child-badge { display: inline-block; padding: 3px 12px; border-radius: 12px; font-size: 0.78em; font-weight: 700; }
+  .badge-tepi { background: rgba(155,109,215,0.2); color: var(--accent2); }
+  .badge-guaimei { background: rgba(224,168,46,0.2); color: var(--gold); }
+  .response-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .response-card .q-label { font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 6px; }
+  .q-label-thesis { color: var(--teal); } .q-label-evidence { color: var(--gold); } .q-label-missing { color: var(--accent); }
+  .response-text { font-size: 0.95em; line-height: 1.7; padding: 12px 16px; background: var(--card); border-radius: 8px; margin-bottom: 12px; border-left: 3px solid var(--border); }
+  .assessment { font-size: 0.92em; line-height: 1.7; }
+  .assessment strong { color: var(--teal); }
+  .strength { color: var(--green); font-weight: 600; }
+  .growth { color: var(--gold); font-weight: 600; }
+  .notable { color: var(--accent2); font-weight: 600; }
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .score-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center; }
+  .score-card .name { font-weight: 700; font-size: 0.92em; margin-bottom: 10px; }
+  .score-card .name.tepi { color: var(--accent2); } .score-card .name.guaimei { color: var(--gold); }
+  .score-row { display: flex; justify-content: space-between; font-size: 0.85em; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .score-row:last-child { border-bottom: none; }
+  .score-label { color: var(--muted); } .score-val { font-weight: 600; }
+  .score-high { color: var(--green); } .score-mid { color: var(--gold); } .score-low { color: var(--accent); }
+  .trend { font-size: 0.78em; margin-left: 6px; } .trend-up { color: var(--green); } .trend-down { color: var(--accent); } .trend-same { color: var(--muted); }
+  .rec-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 16px 0; }
+  .rec-section h3 { margin-top: 0; }
+  .rec-item { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.92em; }
+  .rec-icon { color: var(--teal); font-size: 1.1em; flex-shrink: 0; margin-top: 2px; }
+  .summary-box { background: rgba(78,205,196,0.06); border: 1px solid rgba(78,205,196,0.2); border-radius: 12px; padding: 20px; margin: 24px 0; }
+  .summary-box h3 { color: var(--teal); margin-top: 0; }
+  .highlight-box { background: rgba(224,168,46,0.06); border: 1px solid rgba(224,168,46,0.2); border-radius: 12px; padding: 16px 20px; margin: 16px 0; font-size: 0.92em; }
+  .highlight-box strong { color: var(--gold); }
+  .back-link { color: var(--teal); text-decoration: none; font-size: 0.9em; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+  .back-link:hover { text-decoration: underline; }
+  .nav-links { display: flex; gap: 16px; margin-bottom: 20px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.88em; }
+  .nav-links a:hover { color: var(--teal); }
+  @media (max-width: 640px) { .score-grid { grid-template-columns: 1fr; } .container { padding: 20px 16px 40px; } h1 { font-size: 1.3em; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="nav-links">
+  <a href="../index.html">&larr; Home</a>
+  <a href="w1-reading-assessment.html">W1 Assessment</a>
+  <span style="color:var(--teal);font-weight:600">W2 Assessment</span>
+</div>
+
+<h1>Week 2 Reading Response Assessment</h1>
+<div class="subtitle">Quanta: &ldquo;Limits of Mathematical Truth&rdquo; &middot; Orwell: &ldquo;Why I Write&rdquo; &middot; April 2026</div>
+
+<!-- ============================================================ -->
+<h2>Assessment Scores (W1 &rarr; W2)</h2>
+
+<div class="score-grid">
+  <div class="score-card">
+    <div class="name tepi">TePi (age 14)</div>
+    <div class="score-row"><span class="score-label">Comprehension</span><span class="score-val score-high">Strong <span class="trend trend-same">&mdash;</span></span></div>
+    <div class="score-row"><span class="score-label">Thesis clarity</span><span class="score-val score-high">Strong <span class="trend trend-same">&mdash;</span></span></div>
+    <div class="score-row"><span class="score-label">Evidence use</span><span class="score-val score-mid">Developing <span class="trend trend-down">&darr;</span></span></div>
+    <div class="score-row"><span class="score-label">Critical depth</span><span class="score-val score-high">Strong <span class="trend trend-up">&uarr;</span></span></div>
+    <div class="score-row"><span class="score-label">Originality</span><span class="score-val score-high">Exceptional <span class="trend trend-up">&uarr;</span></span></div>
+    <div class="score-row"><span class="score-label">Honesty/self-awareness</span><span class="score-val score-high">Strong <span class="trend">NEW</span></span></div>
+  </div>
+  <div class="score-card">
+    <div class="name guaimei">GuaiMei (age 12)</div>
+    <div class="score-row"><span class="score-label">Comprehension</span><span class="score-val score-high">Strong <span class="trend trend-same">&mdash;</span></span></div>
+    <div class="score-row"><span class="score-label">Thesis clarity</span><span class="score-val score-high">Strong <span class="trend trend-up">&uarr;</span></span></div>
+    <div class="score-row"><span class="score-label">Evidence use</span><span class="score-val score-mid">Developing <span class="trend trend-down">&darr;</span></span></div>
+    <div class="score-row"><span class="score-label">Critical depth</span><span class="score-val score-high">Strong <span class="trend trend-same">&mdash;</span></span></div>
+    <div class="score-row"><span class="score-label">Originality</span><span class="score-val score-high">Exceptional <span class="trend trend-up">&uarr;</span></span></div>
+    <div class="score-row"><span class="score-label">Honesty/self-awareness</span><span class="score-val score-high">Exceptional <span class="trend">NEW</span></span></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="child-badge badge-tepi">TePi</span> Quanta: Limits of Mathematical Truth</h2>
+
+<div class="response-card">
+  <div class="q-label q-label-thesis">Q1 &mdash; The Big Idea</div>
+  <div class="response-text">This should matter to people who don&rsquo;t focus on math because it, in its own way, is an analogy. Although certain concepts may be imagined, perfection sometimes isn&rsquo;t possible; not because of a lack of skill but because of impossibility. This can encourage people stuck in life.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> He does something genuinely impressive here &mdash; he immediately translates undecidability into a <em>life lesson</em>: &ldquo;perfection sometimes isn&rsquo;t possible; not because of a lack of skill but because of impossibility.&rdquo; This is philosophical thinking. He sees the analogy between mathematical limits and human limits.<br>
+    <span class="growth">Growth area:</span> He skips the actual explanation of undecidability entirely. The question asked him to explain it in his own words &mdash; he jumped straight to the metaphor. Pattern from W1 continues: <strong>ideas outpace explanation</strong>.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-evidence">Q2 &mdash; How They Did It</div>
+  <div class="response-text">The link between Turing Machines and the equations is that although the polynomial may seem like algebra, it&rsquo;s more of a constant computation. This is very abstract and I have no idea what is happening</div>
+  <div class="assessment">
+    <span class="notable">Notable:</span> &ldquo;I have no idea what is happening&rdquo; &mdash; this is actually a <strong>positive signal</strong>. He&rsquo;s honest about hitting his comprehension limit rather than faking understanding. This article was harder than the Lonely Runner, and he correctly identifies where it gets abstract.<br>
+    <span class="growth">Growth area:</span> He gives up too quickly. He <em>does</em> grasp the basic link (&ldquo;more of a constant computation&rdquo;) but doesn&rsquo;t push through the difficulty. <strong>Next step:</strong> teach him that &ldquo;I don&rsquo;t fully understand, but here&rsquo;s what I think is happening&hellip;&rdquo; is better than stopping.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-missing">Q3 &mdash; The Bigger Picture</div>
+  <div class="response-text">I find this liberating because we will eventually reach a peak in human mathematics ourselves, not constantly climbing a mountain blindfolded. I also think this makes math more interesting because it shows how if math can&rsquo;t solve it, leave it alone. Now, we officially have an excuse to skip math! Yay!</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> The &ldquo;climbing a mountain blindfolded&rdquo; metaphor is vivid and original. And the joke at the end (&ldquo;an excuse to skip math!&rdquo;) shows he&rsquo;s comfortable enough with the material to play with it. His answer to the philosophical question &mdash; &ldquo;liberating&rdquo; &mdash; is actually well-reasoned: knowing limits means you know the mountain has a top.<br>
+    <span class="growth">Growth area:</span> The joke slightly undermines the seriousness of his insight. He should learn to <strong>land the plane</strong> &mdash; end on the strong thought, not the punchline.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="child-badge badge-tepi">TePi</span> Orwell: Why I Write</h2>
+
+<div class="response-card">
+  <div class="q-label q-label-thesis">Q1 &mdash; Your Motives</div>
+  <div class="response-text">I write partly because of historical impulse. Firstly, I&rsquo;m on the skeptical side, I careful and scrutinize a lot of stuff, so I sometimes write to simply see the truth in things. Writing also helps me better understand what I&rsquo;m articulating and fighting for. Secondly, I write so adults that are both tangible and virtual.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> He identifies &ldquo;historical impulse&rdquo; and gives a genuine reason: &ldquo;I write to simply see the truth in things.&rdquo; This is a real and honest self-assessment. The phrase &ldquo;what I&rsquo;m articulating and fighting for&rdquo; suggests he sees writing as a tool for clarity, which is exactly what Orwell argued.<br>
+    <span class="growth">Growth area:</span> The second sentence trails off (&ldquo;I write so adults that are both tangible and virtual&rdquo;) &mdash; clearly unfinished. He needs to <strong>re-read before submitting</strong>. This was also an issue in W1 (spelling). The incomplete thought suggests he had something interesting to say about writing for adults but ran out of patience.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-evidence">Q2 &mdash; The Continuous Story</div>
+  <div class="response-text">I have done this before. This habit tells me and many others that true writing comes from within and not from sitting at a desk devoid of joy. We all draw inspirations, and in this case, this is from our surroundings. This isn&rsquo;t something inherently learned but something that come to people naturally.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> He connects Orwell&rsquo;s childhood habit to a broader claim about the nature of writing: it &ldquo;comes from within,&rdquo; not from formal study. The phrase &ldquo;sitting at a desk devoid of joy&rdquo; is evocative and original &mdash; this is <em>his</em> voice, not echoing Orwell.<br>
+    <span class="growth">Growth area:</span> &ldquo;This isn&rsquo;t something inherently learned but something that comes to people naturally&rdquo; &mdash; is this actually true? Orwell himself says he had to &ldquo;search for the right words.&rdquo; TePi should be pushed to <strong>complicate</strong> his own thesis: maybe it&rsquo;s both natural AND learned?
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-missing">Q3 &mdash; Clarity vs. Beauty</div>
+  <div class="response-text">Well, I don&rsquo;t think this question really understood what Orwell was talking about. Either that or I&rsquo;m completely missing understanding what &ldquo;betrayed into&rdquo; means. But from what I&rsquo;m gathering, Orwell says &ldquo;Good prose is like windowpane.&rdquo; But never says he enjoyed writing about &ldquo;Purple Passages&rdquo;, instead he described these as &ldquo;Lifeless&rdquo; and &ldquo;Without Meaning&rdquo;. I do, however think a writer can apply both. By using literary language in moderate, you can prevent yourself from rambling and &ldquo;Writing lifeless books&rdquo;, while enhancing you &ldquo;Window Pan&rdquo;. After all, it&rsquo;s not the clearest window that is the most appealing, but the picture frame of sky that truly please viewers/readers.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> This is his <strong>best answer across both weeks</strong>. He challenges the question itself (&ldquo;I don&rsquo;t think this question really understood&rdquo;), re-reads Orwell carefully, distinguishes between what Orwell <em>enjoyed</em> vs what he <em>described</em>, and then produces an original metaphor: &ldquo;it&rsquo;s not the clearest window that is the most appealing, but the picture frame of sky.&rdquo; That is genuinely beautiful writing.<br>
+    <span class="notable">Notable:</span> He pushes back on the question&rsquo;s premise for the second time (did this in W1 Orwell Q3 too). This is becoming a pattern &mdash; and it&rsquo;s a <em>good</em> one. He doesn&rsquo;t accept the frame he&rsquo;s given; he interrogates it. This is exactly the &ldquo;intellectual sovereignty&rdquo; the program aims to build.<br>
+    <span class="growth">Growth area:</span> &ldquo;Window Pan&rdquo; (windowpane). Spelling continues to be his weakness. But the thinking is exceptional.
+  </div>
+</div>
+
+<div class="highlight-box">
+  <strong>W1 &rarr; W2 Progress (TePi):</strong> His ideas have deepened significantly. The &ldquo;picture frame of sky&rdquo; metaphor and the life-lesson reading of undecidability show a mind that&rsquo;s reaching further each week. His main barrier remains structural: unfinished sentences, spelling errors, and jokes that undercut serious insights. The thinking is 11th-grade level; the execution is 8th-grade. Closing that gap is the priority.
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="child-badge badge-guaimei">GuaiMei</span> Quanta: Limits of Mathematical Truth</h2>
+
+<div class="response-card">
+  <div class="q-label q-label-thesis">Q1 &mdash; The Big Idea</div>
+  <div class="response-text">For a problem to be undecidable, it means that it cannot be solved by any computer algorithm. Undecidable problems matter, even to non-mathematicians, because they show that there are limits to what computers and proofs can accomplish.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Clear, correct, and concise. She explains undecidability accurately in two sentences.<br>
+    <span class="growth">Growth area:</span> This reads like a textbook definition. Compared to TePi, who immediately saw the <em>human</em> implication (&ldquo;this can encourage people stuck in life&rdquo;), GuaiMei stays in the safe zone of summarizing. She should be pushed: <strong>&ldquo;Why should a 12-year-old care about this?&rdquo;</strong>
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-evidence">Q2 &mdash; How They Did It</div>
+  <div class="response-text">When you use a Diophantine equation, the values of the solution are a sequence/set. You can use a computer program to calculate this sequence. A Turing machine is one such computer program.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> She correctly identifies the key link: equations produce sequences, Turing machines produce sequences, therefore they&rsquo;re equivalent. This is the correct conceptual bridge.<br>
+    <span class="growth">Growth area:</span> Like W1, she gives the right answer but stops short. She doesn&rsquo;t explain the <em>implication</em>: if equations = Turing machines, and the halting problem is undecidable for Turing machines, then&hellip; She has the pieces but doesn&rsquo;t connect the final dot. <strong>Pattern confirmed:</strong> she states facts accurately but doesn&rsquo;t build arguments from them.
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-missing">Q3 &mdash; The Bigger Picture</div>
+  <div class="response-text">This statement is not true. Specifically the part about &ldquo;It doesn&rsquo;t matter who you are or what you are&rdquo;. There is somebody who knows all things, and that is God. He knows all things, so he knows the answer, the solution.</div>
+  <div class="assessment">
+    <span class="notable">Notable:</span> This is a <strong>remarkable response</strong>. She directly challenges the article&rsquo;s concluding claim using her Christian faith as her framework. &ldquo;There is somebody who knows all things, and that is God.&rdquo; She&rsquo;s not wrong within her worldview &mdash; mathematical undecidability says <em>no algorithm</em> can solve these problems, not that <em>no being</em> can know the answers.<br>
+    <span class="strength">Strength:</span> She integrates faith with intellectual engagement. She doesn&rsquo;t reject the math &mdash; she accepts the result but challenges the <em>philosophical</em> interpretation. This is exactly the kind of thinking the &ldquo;Rooted Character&rdquo; pillar aims for: faith that engages with, rather than retreats from, difficult ideas.<br>
+    <span class="growth">Growth area:</span> The answer is bold but underdeveloped. She should be pushed: <strong>&ldquo;How would a mathematician respond to your argument? Is there a difference between God knowing the answer and us being able to prove it?&rdquo;</strong> The distinction between <em>omniscience</em> and <em>computability</em> is philosophically rich territory she&rsquo;s standing right at the edge of.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="child-badge badge-guaimei">GuaiMei</span> Orwell: Why I Write</h2>
+
+<div class="response-card">
+  <div class="q-label q-label-thesis">Q1 &mdash; Your Motives</div>
+  <div class="response-text">I never write outside of when I am told to. So my main motive for writing is because I am told to write by another person, most often an elder&hellip; I don&rsquo;t know which category this falls into. But if I stretch a little bit into the small exceptions in my life, I can fit in some of Orwell&rsquo;s reasons. I can see that I write so that I do not appear illiterate in front of my peers. This is the main reason of my main motive&hellip; this falls into the category of egoism. When I have to write and the prompt is quite broad, then I sometimes reach into Aesthetic enthusiasm&hellip; When my elders tell me to write an essay, this is when I reach into historical impulse&hellip; Lastly, I really don&rsquo;t see any political purpose in my writing.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> This is her <strong>longest and most honest answer ever</strong>. She systematically goes through all four of Orwell&rsquo;s motives and tests each against her own experience. She admits she mostly writes because she&rsquo;s told to, identifies her egoism (&ldquo;I do not want to appear stupid&rdquo;), and honestly says she sees no political purpose in her writing. This level of self-awareness is exceptional for 12.<br>
+    <span class="notable">Notable:</span> She says she &ldquo;never writes outside of when told to&rdquo; &mdash; but she has maintained a <strong>personal website (Wonder Log) since age 8</strong>. She doesn&rsquo;t count that as &ldquo;writing.&rdquo; This disconnect is deeply interesting: she sees writing-as-assignment and writing-as-Wonder-Log as different activities. <strong>Ask her about this.</strong><br>
+    <span class="growth">Growth area:</span> The structure is excellent (goes through all 4 motives) but she never challenges Orwell&rsquo;s framework. Are there motives he missed? Is &ldquo;because I&rsquo;m told to&rdquo; actually a fifth motive, or does it reduce to one of his four?
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-evidence">Q2 &mdash; The Continuous Story</div>
+  <div class="response-text">I really don&rsquo;t do this habit and I can&rsquo;t really see myself doing this. From Orwell&rsquo;s description, this habit does make him use words he would never use otherwise. This could mean that good writing skills might not come from dedicated work sessions and studying, but from daily habits in our lives.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> She arrives at a genuine insight: &ldquo;good writing skills might not come from dedicated work sessions and studying, but from daily habits.&rdquo; Ironically, this describes exactly what Wonder Log has been doing for her for 4 years.<br>
+    <span class="growth">Growth area:</span> She says she doesn&rsquo;t do this, but is that true? Does she narrate or organize her thoughts before posting to Wonder Log? <strong>The question to ask:</strong> &ldquo;When you see something interesting and think &lsquo;I should put this on Wonder Log,&rsquo; what happens in your head between seeing it and writing it?&rdquo;
+  </div>
+</div>
+
+<div class="response-card">
+  <div class="q-label q-label-missing">Q3 &mdash; Clarity vs. Beauty</div>
+  <div class="response-text">I think that clarity in a prose is more important than good-sounding words. People might not like it, but it&rsquo;s the cold, hard truth. However, if you only use words that are pleasing to hear, you may mask the true meaning of the writing, rendering the writing to just an article that is just for your ears and not for your brain.</div>
+  <div class="assessment">
+    <span class="strength">Strength:</span> Her distinction between &ldquo;for your ears&rdquo; and &ldquo;for your brain&rdquo; is crisp and memorable. She takes a clear side (clarity wins) and defends it.<br>
+    <span class="growth">Growth area:</span> Compare with TePi, who said a writer can be both (&ldquo;the picture frame of sky&rdquo;). GuaiMei sees it as either/or. She should be pushed toward: <strong>can clarity itself be beautiful?</strong> Orwell&rsquo;s own prose proves it can &mdash; his plainest sentences are often his most powerful.
+  </div>
+</div>
+
+<div class="highlight-box">
+  <strong>W1 &rarr; W2 Progress (GuaiMei):</strong> Two major breakthroughs this week. First, the God/undecidability response shows she can bring her faith into intellectual terrain without flinching &mdash; this is &ldquo;Rooted Character&rdquo; in action. Second, the Orwell Q1 response is her longest and most honest piece of self-reflection to date. Her writing is becoming more personal and less formulaic. The main gap: she still stops analyzing one step too early. She states conclusions but doesn&rsquo;t defend them against counterarguments.
+</div>
+
+<!-- ============================================================ -->
+<h2>Summary &amp; Comparison</h2>
+
+<div class="summary-box">
+  <h3>TePi &mdash; W2 Profile</h3>
+  <p><strong>Best moment:</strong> &ldquo;It&rsquo;s not the clearest window that is the most appealing, but the picture frame of sky that truly pleases viewers.&rdquo; This is original literary criticism written by a 14-year-old. It deserves to be celebrated.</p>
+  <p><strong>Biggest concern:</strong> Unfinished sentences and unchecked work. His Orwell Q1 trails off mid-thought. This isn&rsquo;t a thinking problem &mdash; it&rsquo;s a discipline problem. He needs a rule: <strong>read your answer once before moving on.</strong></p>
+  <p><strong>W1 &rarr; W2 trend:</strong> Thinking is getting deeper. Execution is flat. The gap between his insight quality and his writing quality is widening, not closing.</p>
+</div>
+
+<div class="summary-box">
+  <h3>GuaiMei &mdash; W2 Profile</h3>
+  <p><strong>Best moment:</strong> &ldquo;There is somebody who knows all things, and that is God.&rdquo; She walks into a math article and, without apologizing, applies her faith. That takes intellectual courage.</p>
+  <p><strong>Biggest surprise:</strong> She says she &ldquo;never writes outside of when told to&rdquo; while maintaining a 4-year personal website. She doesn&rsquo;t see Wonder Log as writing. <strong>This belief is limiting her.</strong> If she recognized what she already does as writing, she might own it more.</p>
+  <p><strong>W1 &rarr; W2 trend:</strong> Self-awareness is blooming. Her answers are longer, more personal, more honest. Evidence use has slightly declined (shorter, less quotation). She needs to combine her new honesty with her W1-level analytical rigor.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Recommendations: Week 3-4</h2>
+
+<div class="rec-section">
+  <h3><span class="child-badge badge-tepi">TePi</span></h3>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>The one rule:</strong> Read your answer out loud before submitting. Every time. This alone would fix the trailing sentences, the spelling, and the jokes-that-undercut. His thinking doesn&rsquo;t need improvement; his editing does.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Develop the &ldquo;picture frame of sky&rdquo;:</strong> Ask him to expand that metaphor into a full paragraph. He has the instinct for original imagery; he needs practice turning a flash into sustained writing.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>When he says &ldquo;I have no idea&rdquo;:</strong> Don&rsquo;t let him stop there. Teach the phrase: &ldquo;I don&rsquo;t fully understand, but I think what&rsquo;s happening is&hellip;&rdquo; Struggling with hard material publicly is a skill. He&rsquo;s honest enough to admit confusion; now teach him to think through it.</div></div>
+</div>
+
+<div class="rec-section">
+  <h3><span class="child-badge badge-guaimei">GuaiMei</span></h3>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Ask her:</strong> &ldquo;Is Wonder Log writing?&rdquo; She said she never writes unless told to. Help her see that she&rsquo;s been a self-directed writer for 4 years. Reframing this could unlock confidence.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Follow up on God &amp; undecidability:</strong> Ask: &ldquo;If God knows the answer to every Diophantine equation, does that mean the problem isn&rsquo;t really undecidable? Or does &lsquo;undecidable&rsquo; only apply to algorithms, not to beings?&rdquo; She&rsquo;s standing at the intersection of faith and philosophy &mdash; push her gently deeper.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Combine honesty with evidence:</strong> Her W1 Orwell had great quotes; her W2 Orwell has great honesty. Challenge: write one answer that has both &mdash; a personal claim supported by a direct quote from the text.</div></div>
+</div>
+
+<div class="rec-section">
+  <h3>For Both</h3>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>The Orwell &ldquo;windowpane&rdquo; exercise:</strong> Both kids wrote about clarity vs. beauty. Have them each rewrite one paragraph from their own responses in the plainest possible English. Then ask: did it get better or worse? This makes Orwell&rsquo;s principle concrete.</div></div>
+  <div class="rec-item"><span class="rec-icon">&rarr;</span><div class="rec-text"><strong>Word Power Made Easy is well-timed:</strong> TePi&rsquo;s spelling (&ldquo;windowpan,&rdquo; &ldquo;incapsulates,&rdquo; &ldquo;desicion&rdquo;) will benefit directly. GuaiMei&rsquo;s precision (&ldquo;for your ears vs. for your brain&rdquo;) will deepen. Both are at the right level to start building vocabulary systematically.</div></div>
+</div>
+
+<div style="margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-size:0.82em;color:var(--muted);">
+  Generated from Firebase response data &middot; Week 2 articles &middot; Assessment date: April 13, 2026
+</div>
+
+</div>
+</body>
+</html>
