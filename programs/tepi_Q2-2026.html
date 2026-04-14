@@ -590,12 +590,6 @@ function updateProgress() {
     });
     const we = document.getElementById(`wp-${w.week}`);
     if (we) { const p = wt ? Math.round(wd/wt*100) : 0; we.textContent = p === 100 ? "✅" : `${p}%`; }
-    const btn = document.querySelector(`.week-tab[data-tab="w${w.week}"]`);
-    if (btn) {
-      const p = wt ? Math.round(wd/wt*100) : 0;
-      if (p === 100) { btn.style.color = "var(--green)"; btn.textContent = `W${w.week} ✅`; }
-      else if (p > 0) { btn.style.color = "var(--text)"; }
-    }
   });
   const pct = total ? Math.round(done/total*100) : 0;
   document.getElementById("progress-pct").textContent = `${pct}%`;
