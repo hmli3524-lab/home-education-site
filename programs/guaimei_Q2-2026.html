@@ -136,19 +136,19 @@
   <a href="../index.html" class="tab-btn" style="text-decoration:none;color:var(--muted);">🏠</a>
   <a href="../reading-log.html#guaimei" class="tab-btn" style="text-decoration:none;color:var(--muted);">📚</a>
   <a href="../reports/w2-reading-assessment.html" class="tab-btn" style="text-decoration:none;color:var(--muted);">📊</a>
-  <button class="tab-btn active" onclick="showTab('overview')">📋 Overview</button>
-  <button class="tab-btn" onclick="showTab('w1')">W1</button>
-  <button class="tab-btn" onclick="showTab('w2')">W2</button>
-  <button class="tab-btn" onclick="showTab('w3')">W3</button>
-  <button class="tab-btn" onclick="showTab('w4')">W4</button>
-  <button class="tab-btn" onclick="showTab('w5')">W5</button>
-  <button class="tab-btn" onclick="showTab('w6')">W6</button>
-  <button class="tab-btn" onclick="showTab('w7')">W7</button>
-  <button class="tab-btn" onclick="showTab('w8')">W8</button>
-  <button class="tab-btn" onclick="showTab('w9')">W9</button>
-  <button class="tab-btn" onclick="showTab('w10')">W10</button>
-  <button class="tab-btn" onclick="showTab('w11')">W11</button>
-  <button class="tab-btn" onclick="showTab('w12')">W12</button>
+  <button class="tab-btn week-tab active" data-tab="overview" onclick="showTab('overview')">📋 Overview</button>
+  <button class="tab-btn week-tab" data-tab="w1" onclick="showTab('w1')">W1</button>
+  <button class="tab-btn week-tab" data-tab="w2" onclick="showTab('w2')">W2</button>
+  <button class="tab-btn week-tab" data-tab="w3" onclick="showTab('w3')">W3</button>
+  <button class="tab-btn week-tab" data-tab="w4" onclick="showTab('w4')">W4</button>
+  <button class="tab-btn week-tab" data-tab="w5" onclick="showTab('w5')">W5</button>
+  <button class="tab-btn week-tab" data-tab="w6" onclick="showTab('w6')">W6</button>
+  <button class="tab-btn week-tab" data-tab="w7" onclick="showTab('w7')">W7</button>
+  <button class="tab-btn week-tab" data-tab="w8" onclick="showTab('w8')">W8</button>
+  <button class="tab-btn week-tab" data-tab="w9" onclick="showTab('w9')">W9</button>
+  <button class="tab-btn week-tab" data-tab="w10" onclick="showTab('w10')">W10</button>
+  <button class="tab-btn week-tab" data-tab="w11" onclick="showTab('w11')">W11</button>
+  <button class="tab-btn week-tab" data-tab="w12" onclick="showTab('w12')">W12</button>
   <div style="margin-left:auto;display:flex;padding:4px;gap:2px">
     <a href="tepi_Q2-2026.html" class="tab-btn" style="text-decoration:none;color:var(--muted);padding:8px 12px;font-size:0.88em">TePi</a>
     <span class="tab-btn" style="color:var(--teal);border-bottom-color:var(--teal);font-weight:700;padding:8px 12px;font-size:0.88em">GuaiMei</span>
@@ -433,7 +433,7 @@ function updateProgress() {
     });
     const we = document.getElementById(`wp-${w.week}`);
     if (we) { const p = wt ? Math.round(wd/wt*100) : 0; we.textContent = p === 100 ? "✅" : `${p}%`; }
-    const btn = document.querySelectorAll(".tab-btn")[w.week];
+    const btn = document.querySelector(`.week-tab[data-tab="w${w.week}"]`);
     if (btn) { const p = wt ? Math.round(wd/wt*100) : 0; if (p === 100) { btn.style.color = "var(--teal)"; btn.textContent = `W${w.week} ✅`; } else if (p > 0) btn.style.color = "var(--text)"; }
   });
   const pct = total ? Math.round(done/total*100) : 0;
@@ -442,12 +442,11 @@ function updateProgress() {
 }
 function showTab(id) {
   document.querySelectorAll(".tab-page").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".week-tab").forEach(b => b.classList.remove("active"));
   const t = document.getElementById(`tab-${id}`);
   if (t) t.classList.add("active");
-  const btns = document.querySelectorAll(".tab-btn");
-  if (id === "overview") btns[0].classList.add("active");
-  else { const i = parseInt(id.replace("w","")); if (btns[i]) btns[i].classList.add("active"); }
+  const btn = document.querySelector(`.week-tab[data-tab="${id}"]`);
+  if (btn) btn.classList.add("active");
 }
 function saveAll() {
   saveState(state);
