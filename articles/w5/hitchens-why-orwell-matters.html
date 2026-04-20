@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Orwell Matters — Christopher Hitchens</title>
+<style>
+  :root {
+    --bg: #2b2d31; --surface: #313338; --card: #383a40; --accent: #e8555a;
+    --accent2: #9b6dd7; --gold: #e0a82e; --text: #e0e0e0; --muted: #999;
+    --green: #57d9a3; --teal: #4ecdc4; --border: #44464d; --shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+
+  .top-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); flex-wrap: wrap; }
+  .back-btn { background: var(--card); border: 1px solid var(--border); color: var(--teal); padding: 6px 16px; border-radius: 6px; font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; text-decoration: none; }
+  .back-btn:hover { background: var(--border); }
+  .top-meta { font-size: 0.85em; color: var(--muted); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .top-meta .tag { background: rgba(78,205,196,0.15); color: var(--teal); padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+  .top-meta .tag-source { background: rgba(224,168,46,0.15); color: var(--gold); padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+  .reader-name { margin-left: auto; background: var(--accent2); color: #fff; padding: 5px 16px; border-radius: 8px; font-size: 0.88em; font-weight: 700; }
+
+  /* Two-Column Grid */
+  .page-grid { display: grid; grid-template-columns: 1fr 380px; gap: 0; max-width: 1200px; margin: 0 auto; }
+  .article-column { padding: 40px 32px 80px; min-width: 0; }
+  .sidebar-column { position: sticky; top: 60px; height: calc(100vh - 60px); border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); }
+  .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .sidebar-tab { flex: 1; padding: 12px; text-align: center; background: none; border: none; color: var(--muted); font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; }
+  .sidebar-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .sidebar-tab:hover:not(.active) { color: var(--text); }
+  .sidebar-content { flex: 1; overflow-y: auto; padding: 16px; }
+  .sidebar-panel { display: none; }
+  .sidebar-panel.active { display: block; }
+  @media (max-width: 900px) {
+    .page-grid { grid-template-columns: 1fr; }
+    .sidebar-column { position: static; height: auto; border-left: none; border-top: 2px solid var(--border); }
+  }
+
+  /* Article */
+  .article-header { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .article-header h1 { font-size: 1.8em; font-weight: 700; line-height: 1.3; margin-bottom: 8px; color: #fff; }
+  .article-header .subtitle { font-size: 1.02em; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+  .article-header .author { font-size: 1em; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
+  .article-header .pub-info { font-size: 0.9em; color: var(--muted); display: flex; flex-wrap: wrap; gap: 16px; }
+  .guide-box { background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.25); border-radius: 10px; padding: 18px 22px; margin-bottom: 32px; }
+  .guide-box h3 { color: var(--teal); font-size: 0.95em; margin-bottom: 8px; }
+  .guide-box p { font-size: 0.92em; line-height: 1.7; }
+  .guide-box .tip { margin-top: 10px; font-size: 0.88em; color: var(--muted); font-style: italic; }
+  .essay-text { user-select: text; -webkit-user-select: text; }
+  .essay-text p { margin-bottom: 1.4em; font-size: 1.02em; text-align: justify; }
+  .essay-text h2 { font-size: 1.2em; color: var(--gold); margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .source-note { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.82em; color: var(--muted); font-style: italic; }
+  .source-note a { color: var(--muted); }
+
+  /* Vocab Popup */
+  #vocab-popup { display: none; position: fixed; z-index: 200; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); padding: 16px 18px; max-width: 340px; min-width: 240px; }
+  #vocab-popup .popup-word { font-size: 1.1em; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  #vocab-popup .popup-phonetic { font-size: 0.82em; color: var(--muted); margin-bottom: 8px; }
+  #vocab-popup .popup-def { font-size: 0.9em; color: var(--text); line-height: 1.6; margin-bottom: 12px; max-height: 120px; overflow-y: auto; }
+  #vocab-popup .popup-loading { color: var(--muted); font-size: 0.9em; padding: 8px 0; }
+  #vocab-popup .popup-error { color: var(--accent); font-size: 0.88em; margin-bottom: 8px; }
+  #vocab-popup .popup-manual { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: inherit; font-size: 0.88em; padding: 6px 10px; margin-bottom: 10px; resize: none; }
+  #vocab-popup .popup-manual:focus { border-color: var(--teal); outline: none; }
+  #vocab-popup .popup-btns { display: flex; gap: 8px; }
+  #vocab-popup .popup-btns button { flex: 1; padding: 7px 10px; border: none; border-radius: 6px; font-family: inherit; font-size: 0.82em; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  #vocab-popup .popup-btns button:hover { opacity: 0.85; }
+  .btn-add { background: var(--accent2); color: #fff; }
+  .btn-added { background: var(--green) !important; color: #1a1a1a !important; }
+  #vocab-popup .popup-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--muted); font-size: 1.1em; cursor: pointer; line-height: 1; }
+  #vocab-popup .popup-close:hover { color: var(--text); }
+
+  /* Questions (sidebar) */
+  .question-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .question-card .q-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .q-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82em; font-weight: 700; color: #1a1a1a; flex-shrink: 0; }
+  .q-badge-1 { background: var(--teal); } .q-badge-2 { background: var(--gold); } .q-badge-3 { background: var(--accent); color: #fff; }
+  .q-label { font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .q-label-1 { color: var(--teal); } .q-label-2 { color: var(--gold); } .q-label-3 { color: var(--accent); }
+  .q-text { font-size: 0.95em; font-weight: 600; line-height: 1.5; }
+  .question-card textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.92em; padding: 12px 14px; resize: vertical; min-height: 200px; line-height: 1.7; }
+  .question-card textarea:focus { border-color: var(--teal); outline: none; }
+  .question-card textarea::placeholder { color: #555; }
+  .q-save-indicator { font-size: 0.8em; color: var(--green); margin-top: 6px; min-height: 18px; }
+
+  /* Vocab Panel (sidebar) */
+  .vocab-instruction { font-size: 0.88em; color: var(--muted); font-style: italic; margin-bottom: 16px; padding: 10px 12px; background: rgba(78,205,196,0.06); border-radius: 8px; line-height: 1.6; }
+  .vocab-entry { display: flex; align-items: flex-start; gap: 12px; padding: 10px 4px; border-bottom: 1px solid var(--border); }
+  .vocab-entry:last-child { border-bottom: none; }
+  .vocab-entry .v-word { font-weight: 700; color: var(--teal); min-width: 80px; font-size: 0.92em; }
+  .vocab-entry .v-def { font-size: 0.88em; color: var(--muted); flex: 1; line-height: 1.5; }
+  .vocab-entry .v-remove { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 1em; padding: 0 4px; flex-shrink: 0; }
+  .vocab-entry .v-remove:hover { color: #ff7777; }
+  .vocab-empty { padding: 16px 4px; font-size: 0.88em; color: var(--muted); font-style: italic; }
+  .vocab-count-badge { font-size: 0.82em; color: var(--teal); font-weight: 600; margin-bottom: 12px; }
+
+  /* Bottom Bar */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 10px 24px; display: flex; justify-content: center; align-items: center; gap: 20px; z-index: 100; box-shadow: 0 -2px 8px rgba(0,0,0,0.15); font-size: 0.88em; }
+  .bottom-bar .stat { color: var(--muted); } .bottom-bar .stat strong { color: var(--teal); }
+  .done-btn { background: var(--teal); color: #1a1a1a; border: none; padding: 6px 24px; border-radius: 6px; font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; }
+  .done-btn:hover { opacity: 0.9; } .done-btn.completed { background: var(--green); }
+  .reopen-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 6px 16px; border-radius: 6px; font-family: inherit; font-size: 0.82em; cursor: pointer; }
+  .reopen-btn:hover { color: var(--text); border-color: var(--text); }
+  .done-msg { color: var(--green); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .article-header h1 { font-size: 1.4em; }
+    .article-column { padding: 24px 16px 80px; }
+    .top-bar { padding: 10px 14px; gap: 10px; }
+    .reader-name { margin-left: 0; }
+    #vocab-popup { max-width: 90vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-btn" onclick="history.back()">&#8592; Back to Plan</a>
+  <div class="top-meta">
+    <span class="tag">Week 5</span>
+    <span class="tag-source">Hitchens</span>
+    <span>Speech &middot; ~6,000 words &middot; ~30 min</span>
+  </div>
+  <div class="reader-name" id="reader-name"></div>
+</div>
+
+<div class="page-grid">
+
+  <!-- Left Column: Article -->
+  <div class="article-column">
+    <div class="article-header">
+      <h1>Why Orwell Matters</h1>
+      <div class="subtitle">Christopher Hitchens explains why George Orwell got the three great crises of the 20th century right &mdash; and why his insights about power and language still matter.</div>
+      <div class="author">Christopher Hitchens</div>
+      <div class="pub-info">
+        <span>The Commonwealth Club, 2005</span>
+        <span>Speech Transcript</span>
+      </div>
+    </div>
+
+    <div class="guide-box">
+      <h3>Before You Read</h3>
+      <p>This is Christopher Hitchens &mdash; one of the greatest essayists of his generation &mdash; explaining why George Orwell still matters. Hitchens argues that Orwell understood three things most people miss: the true nature of power, the corruption of language, and the danger of trading freedom for security. This is a speech, so it reads like someone talking to you. Pay attention to the moments where Hitchens makes you uncomfortable &mdash; that&rsquo;s where the real thinking starts.</p>
+      <p class="tip">Tip: Select any unfamiliar word to look it up and save it to your vocabulary list.</p>
+    </div>
+
+    <div class="essay-text" id="essay-text">
+
+<p>Ladies and gentlemen, brothers and sisters, and any trisexual element present, thank you for coming on such a beautiful afternoon, and thank you for such a handsome introduction. I had no idea the American Library Association had said that.</p>
+
+<p>Here&rsquo;s my promise to you: I won&rsquo;t leave until there is no one present who has a question that I haven&rsquo;t answered. And not until it&rsquo;s cocktail hour, at any rate. I wouldn&rsquo;t come to a group of this kind without doing a little bit of homework about who you are and who you were. I&rsquo;ve done some checking, and I was told that quite a lot of people knew about the required lot of fuel here, and quite a lot of people cared about it. There were quite a lot of people who didn&rsquo;t know about it, and quite a lot who didn&rsquo;t care. I&rsquo;m going to speak at first to those who are in the latter category and see if I can win you over. In my effort to do that, I hope I&rsquo;ll have something to say that&rsquo;s of interest to those who consider themselves experts on the subject, specialists, or just interested.</p>
+
+<p>I make one other promise: is there anyone here who&rsquo;s been told they have to come here by their professor, or who&rsquo;s here for credit? Well, I&rsquo;ll just tell you now that I am an adjunct professor at New School University of New York, and I can sign a piece of paper if you want that says you don&rsquo;t have to stay. I don&rsquo;t do captive audiences. I said I don&rsquo;t do them in the name of war, so no one who has been told they have to be here has to remain. Let&rsquo;s just see now; the doors have been locked, as I requested. Yes, very well.</p>
+
+<p>All right, I have to start with disappointment. When I arrived, I asked if anyone happened to have a copy of my book. I might not need it, but I might, and a very kindly professor here said he could go to the library and get it. The reason I most wanted it initially was for the photograph that&rsquo;s on the jacket. So, this is unfortunate. How your library has done this. And I&rsquo;m glad to think the book is worth stealing, that it would be this identifiable on a secondhand shop. But I did, in fact, want to ask you to begin by inviting you to, in a sense, close your eyes and pretend you haven&rsquo;t had this as a subject before or as a syllabus matter before. And actually, just have a picture in your head. The one that I have all the time.</p>
+
+<p>What you would have, and perhaps some of you have seen pictures of the author, is that of a slightly tall, angular, shy, but not unconfident Englishman with a hollow chest look. A rather dolorous look in some ways, or a solemn look. But yet, it&rsquo;s not the look of someone with no sense of humor. It&rsquo;s a look of someone who&rsquo;s been through quite a lot and has tried his best. But there is a final element of pessimism to it, as well as, I think, some of that hard-to-understand handsomeness for which we English people are so, and I think rightly, famed. It&rsquo;s an ironic look, actually. Here&rsquo;s what it is. It&rsquo;s a look of someone who has suffered a great deal. And I want to begin by proposing it in this manner.</p>
+
+<p>There were three great subjects in the century that&rsquo;s just closed, with rather a big slam of the door behind us. That&rsquo;s what you&rsquo;ve heard called the twentieth century. Some of you were just born in it, I guess. And there were three, as I say, three great dramas, great crises, great moral and intellectual and ideological confrontations in that period. And you all have had to know about some of them. And you&rsquo;ll carry on hearing about this, by the way, as you will keep hearing about this author, whether he&rsquo;s on a syllabus or not. You&rsquo;ll wonder why he keeps coming up, and part of my reply to that implied question is this: Of these three questions, which were the right of European countries (of white people in Western Europe, to be exact): the right of such people to govern the rest of the world; to govern Africa and Asia and large parts of South America and Australasia, as if it was right, as if it was a birthright; the grand confrontation between democracy and National Socialism (sometimes called Nazism or Fascism), totalitarian racist one-party military state concept, organized for war, organized for aggression; and third, and the one that ended most recently, the confrontation between the democratic way of life and the Communist alternative, where the citizen is declared to be the property of the state, and the state promises, in return for this trade, to make the citizen better off, better educated, better fed, with better healthcare, but eventually doesn&rsquo;t keep that promise either, but retains its hold on the citizen as property. I&rsquo;m paraphrasing, but that&rsquo;s roughly it. These were the things that preoccupied anyone who could read or feel or think in the last century, and George Orwell got all of them right in my judgment. This is, of course, a moral judgment of my own, but I&rsquo;m willing to back it up.</p>
+
+<p>George Orwell&rsquo;s father was involved in the opium trade from then British-controlled India to China. In other words, British gunboats and warships could force Chinese cities to buy in Chinese waterways to be open to the compulsory trade in opium made in India and other British possessions. In those days, the Empire believed in the war for drugs, not the war on drugs (not that there&rsquo;s much difference in some ways). In those days, they thought that if you gave people drugs, it would keep them quiet, as well as make money for the drug dealers. In other words, Orwell&rsquo;s family was built on a guilty secret, a dirty secret, the colonial secret. And he himself volunteered, in his early life, to become a policeman in a part of that Empire, Burma (now known as Myanmar), and living under a Stone Age dictatorship. And by the experience, I think, of disliking his father and his father&rsquo;s business and feeling guilty about the source of the family income and feeling sick about the job he was doing, he came to a very important conclusion, which is a very modern one, by the way. In some ways, post-colonial studies are founded by George Orwell and his writing, and so many of the works now written about the relationship between power and race and gender or sex. I&rsquo;ll put it this bluntly: If you were in colonial Burma, the most westernized Burmese man, and you&rsquo;d been to three European universities, and you spoke English better than most English people do, and you had five qualifications, it wouldn&rsquo;t make any difference to you.</p>
+
+<p>You would never be allowed to enter the Englishman&rsquo;s Club in Rangoon, the capital of the country. Your net would never be allowed in by the front door. You might possibly be allowed in on special occasions as a guest, but you&rsquo;d never get in there in your own country. You would be considered alien because you were born there. That would be a good definition of racism, I think. However, if you were the least educated, least empowered, and least literate Burmese woman, you could go into any Englishman&rsquo;s villa anytime you liked, as long as it was by the back door and as long as it was a money relationship. In fact, in his first novel, &ldquo;Burmese Days,&rdquo; he writes about a policeman who was clearly based on himself, who has a live-in mistress and servant who he has quite clearly bought from her family. He&rsquo;s not even renting her; he&rsquo;s bought her. She&rsquo;s a fettered slave, and it&rsquo;s my strong opinion, having studied this man&rsquo;s life and writing, that he threw up the job. We don&rsquo;t know why; he never said. He just resigned as a policeman and resigned from the colonial service and came home. But I think that he was very afraid that he would become part of the dirty secret himself, that he would either become a racist or a sadist or both by being in this situation, and wanted to repudiate this in himself. And by the way, I think that&rsquo;s an important point on its own because many of you know what, as it were, the right opinion is to have on something or what the liberal or decent view is to take on a topic and would shudder from anyone who was a bigot, and so you should.</p>
+
+<p>And a lot of work went into creating a society where that choice was a fairly easy one to make, but that wasn&rsquo;t the case with George Orwell at a time when assumptions of this kind were very common. And the critical thing about it is he didn&rsquo;t face this prejudice in other people. He wasn&rsquo;t a liberal humanitarian facing down policemen in Selma, Alabama who had hoses and dogs on their side. He was facing that policeman in himself. He was wondering what it would be like to be that person and decided he&rsquo;d have to vanquish it within his own personality. And that, I submit, is often the harder of the struggles to undertake, and it&rsquo;s worth remembering how tough that used to be, at any rate. What he understood when he&rsquo;d done with this, and he was then still quite young, he had never been to university, he&rsquo;d never had any money, he never had a safe or steady job, was he knew that there was a filthy secret at the heart, and that that secret was in a sense a pornographic secret. That some people don&rsquo;t even need the excuse to wield power. They won&rsquo;t even say we&rsquo;re doing it for your own good, or to civilize your colony, or to save you from communism, or to save you from fascism, or to liberate you from capitalism, or anything this time, no not even an excuse. We&rsquo;re in power because we enjoy punishing people. We&rsquo;re empowered as we enjoy owning people. We enjoy telling them what they can do. We enjoy telling them when we feel like having sex with them and when we don&rsquo;t. We do this for its own sake. The pornography element of power is a very important thing to understand. It&rsquo;s very common today among a number of dictators and despots.</p>
+
+<p>It&rsquo;s an exercise of sheer cruelty, and I think it was a tremendous insight for Orwell as a writer to have understood this right from the start: just strip away the hypocrisy that underlies authority. And he&rsquo;d done all this and come back to England, who decided to go out to be a tramp and then to take the dirtiest jobs he could find and pretend to be someone who was going to be arrested for drunkenness or thrown in the cells for a few nights, or sleeping in the doss houses or hanging around among the unemployed. He went native, as we used to say, as if he was in a colony, but in his own country. He&rsquo;d done all this by the time that what we call the &rsquo;30s, the great political decade of the century, had got underway. So that when the grand confrontation of our democracy, communism, Stalinism, and fascism, Nazism hit not just Europe but the world, he was ready for it. In a way, he knew what the subtexts were, and I believe that helped him to be prescient.</p>
+
+<p>It&rsquo;s an interesting thing about Orwell; he went to fight against fascism in Spain against the assault of Hitler and Mussolini on the democratically chosen Republican government of Spain in 1936. He went to fight earlier than most people did. He felt it evident to himself that he had to put his own body in the way. He had to become a soldier again, and a policeman again in the sense of a fighter disciplinarian again, and try to organize a resistance. He saw this coming more quickly than most men did. But you can read him exhaustively, as I have done. I can now claim to have read every word he&rsquo;s written. He hardly writes anything about fascism at all. He hardly writes a single essay saying why you should be against it. He takes it for granted that when you look down the gun barrel of Hitler and Mussolini and Franco and fascism and Nazism, that you don&rsquo;t need to be told what&rsquo;s wrong with it. Here&rsquo;s everything you hate: here&rsquo;s every bullying father, every crushed, repressed mother, every sadistic prison warden, every exploiting capitalist, every racist and Jew-baiter, every thuggish bully and sadist and exploiter that has ever been, all rolled into one, and then refined and double-distilled and redone again, so you&rsquo;ve got the absolutely pure essence of everything that&rsquo;s hateful.</p>
+
+<p>We tend to sneer more&mdash;I&rsquo;ve heard people say&mdash;at the use of the word &ldquo;evil&rdquo; by politicians. By politicians, one should probably suspect the use of this word. But it&rsquo;s not possible if you want to write more away or you want to write critically. You want to write historically. It&rsquo;s not possible to do without this word. Certain words are necessary. We can&rsquo;t do without it. Indeed, even the most delicate liberal these days will talk about the &ldquo;lesser evil,&rdquo; which shall I say is at least a concession to the use of the word. We can&rsquo;t take it out of our vocabulary. Well, he was looking at it straight in the eye, and he took a bullet through the throat in Spain from the fascist side. And he nearly got a bullet in the back from the communist side. But before I get to that bit, I just must tell you, in case I&rsquo;m sounding too solemn, that the bullet that went through his throat from the fascist sniper hit him right there. And it missed his larynx, it missed his carotid artery, it missed his spinal cord, and it just grazed his vocal cords.</p>
+
+<p>So from then on, he spoke with a slight rasp in his voice and had to go to a hospital because a bullet went in one side of his neck and came out the other. This meant he had to lie down for a bit, and everyone who came to see him knew that the bullet had gone right through him. Luckily, it missed his larynx, carotid artery, and spinal cord, and only grazed his vocal cords. All of them said the same thing: &lsquo;That was lucky!&rsquo; He replied, &lsquo;If I was lucky, I wouldn&rsquo;t have been shot in the throat at all.&rsquo; In other words, I should add and make it plain throughout this, George Orwell had no belief in any kind of supernatural salvation or any sort. He thought that this was the only world we had, and we&rsquo;d better make it the best we could. Actually, he said that the great problem of civilization and culture would be what to do about language, morality, and ethics. What to do when religion is dead? What to do when we know it&rsquo;s failed? What to do in the post-religious society? And that wasn&rsquo;t the least of his prescience in my view.</p>
+
+<p>Well, I mentioned I was going on to mention the bullet he nearly got in the back. At the time when this tremendous menace of fascism, this sadistic, pornographic evil, was assaulting civilization, there were a very large number of intellectuals and aesthetes, although that&rsquo;s not always the same thing. Artists, writers, intellectuals, and painters are not all to be grouped together as there sometimes are. Some painters have no idea what the hell is going on. Some have a better idea than many intellectuals do. Some intellectuals probably make good painters, though they don&rsquo;t make very good thinkers. But there was a widespread view among the anti-fascist artistic crowd, if you like, that this was not a question that had no answer. Because there was already on the other side of the Ural Mountains an ideal socialist society that would outlive Orwell&rsquo;s imperialism, the imperialism he didn&rsquo;t like, would defeat the capitalism that he didn&rsquo;t like when he went among the poor and the downtrodden of England and France, and that it would defeat fascism by definition. That, under the leadership of Comrade Stalin, a new world had been created in the East, that all questions would be answered, that no contradictions would exist anymore, that exploitation of man by man would cease, and that this was not just a potential thing but an actual thing, that this utopia was already present, and that it was the job of all decent progressive people to fight for it.</p>
+
+<p>I think probably this might well open an argument between something me and some of you. I think probably that Orwell&rsquo;s greatest achievement was to have been brave enough to say that it would be nice to think this, especially faced as we are with this deadly foe, but that what the Communists think is not just a deadly illusion, in other words, a romantic but wrong idea, but it&rsquo;s a poisonous delusion. It is a parody of reality, a negation of reality, and it will end up being evil itself. That took a lot of guts in those days. You must always think about thinkers and writers in the context in which they had to operate. Most of the people with whom Orwell had to circulate coexisted and at least half believed some of that about Soviet Russia. It&rsquo;s for this reason that he always had a hard time getting his articles published, his speeches heard, or even his books in print. So, I think I would like to nominate one of his great achievements, his novels. One of them I know some of you have read, and another I suspect some of you have been told to read. Never mind, it&rsquo;s better than not reading at all. The one that I know you will keep hearing about as long as you can continue to breathe and argue is 1984, and its partner novel Animal Farm. In these two novels, both of which Orwell thought of as total failures, which he wrote when he was very ill, 1984, which he wrote when he was dying of tuberculosis, he exposed once and for all time the idea of the Stalinist utopia, of the idea that if the citizen will give up his freedom, or her freedom, for security, if you&rsquo;ll give the state his right to decide, or her right to decide, if you&rsquo;ll give them all that and grant them power, then they will take care of his other needs. They said this bargain is fatal, you will end up with neither freedom nor security. You will end up with neither freedom nor food, neither freedom nor bread. You&rsquo;ll end up being starved and bullied and told you&rsquo;re being well-fed. And you will not dare to point out the discrepancy between reality and the promise because that party says the promise is the reality, and don&rsquo;t you dare go saying that you&rsquo;ve confused the two.</p>
+
+<p>It&rsquo;s more than your life is worth. And he wrote this in such a way that I know I don&rsquo;t have to tell those of you who&rsquo;ve read it, as to make it almost terrifying. Indeed, I still meet people younger than myself to whom 1984 is a date in their own past, who find the book frightening because it is designed to foreclose hope entirely. At the end of the book, there is nothing left to live for. The citizen is so much the property of the state that they&rsquo;re disposable. They&rsquo;re smashed. Their personality is emptied. Their emotions and fears, even their sex lives, are considered open, available, and contemptible by a party that runs everything. His hope, I think, was to make it so frightening that it would mobilize people to resist it, but it certainly had the effect on some, I fear, of making them feel there&rsquo;s nothing worth fighting for, or the resistance is futile. I don&rsquo;t know quite how to answer that question. I think I should leave it open to you, ladies and gentlemen. I probably should ask since I didn&rsquo;t bring a timepiece, how near I am to trespassing on my time. Very well. I didn&rsquo;t want to speak for very much more than half an hour, 45 minutes, because I imagined that many of you came here to speak as well as to listen, and I promise you I can keep talking, but I think there may come a point where I should invite your questions. Now, how did Orwell do this? What I&rsquo;ve sketched may seem like a lot to say about one individual, and of course, the last thing he would have wanted would have been to become a plaster saint figure or an object of hagiography. In fact, I&rsquo;m absolutely certain that had he survived, the thing that would have most surprised him posthumously would have been his success and his fame. As I began by saying, he died young. Actually, he died&hellip;well, let me put it like this. He only made it just into the second half of the 20th century. He died in early 1950 at the age of 46. He only just made it in the second half of the last century. That must seem to a lot of you, as it does to me.</p>
+
+<p>I was born in 1949. I look back quite a long time ago. In fact, we are as far from him as he was from Charles Dickens, about whom, by the way, he wrote very well. That&rsquo;s the leap of reverse memory you have to make. But he&rsquo;s still very modern to us. He writes about things we know: machinery, modern tyranny, modern warfare, modern fear and threat, psychiatry. How did he manage to do this, having died as he did of a disease that is practically Dickensian? He died of poverty. In fact, he died of tuberculosis, which is a disease we now think of as third world. He died of the poverty of his country and his own life, and he died of the lack of available medicine. There was a treatment in the United States available for free, but he didn&rsquo;t know how to get it and probably couldn&rsquo;t have afforded it. He died the death that some of you who have the romantic dream of being writers, which I hope you never give up, may have imagined for yourself: in the garret with no money but with the beautiful work just in the bottom drawer for someone to find. Don&rsquo;t give up that dream, by the way, if you have it. If any of you have ever thought of taking up the craft of writing as a dissident, as an oppositionist, this is the life I&rsquo;ve just been trying to describe as an exemplary one and worth your study.</p>
+
+<p>So, how did he manage this extraordinary feat of being right when everyone else was wrong? To put it bluntly, I think in two ways. One, by life experience. He knew that power was not its own justification, that authority didn&rsquo;t come from God, didn&rsquo;t come from tradition, it came from people who wanted power. He understood that, and he felt that he should never stop criticizing them and exposing them. That&rsquo;s the first thing. Second, he realized that often this trick is masked in language. If you only read one essay of his, you must read the one that&rsquo;s called &ldquo;Politics and the English Language,&rdquo; in which he exposes the fraud, the way in which you familiarize reality. If I was to give you an example now, I suppose I would say to take the most recent, most obvious one. I don&rsquo;t think now that any member of any American administration would use the word &ldquo;collateral damage&rdquo; again to describe what it does describe: civilian casualties. Those of you who know that expression or who&rsquo;ve known how to see through it have done in your way a well job, and you probably, without knowing it, have done it too well. That&rsquo;s the capacity that you have. But that&rsquo;s the trick, in effect: you find a nice name for a nasty thing, and you get it spread around by making it seem technical or technological.</p>
+
+<p>I could summarize it in one sentence: that would be it. He was onto that. He knew every time that the Stalin regime said, &ldquo;Well, you know, in extraordinary times, extraordinary measures must be taken,&rdquo; he thought of his mass graves. He knew, without being told by reading their own propaganda, that whatever the truth was, the propaganda was lying and using nice words for disgraceful things. This is a trick that should never desert you. You can all do it for yourselves. There&rsquo;s no reason not to do it. Interrogate what you read and what you&rsquo;re given in that spirit, and you&rsquo;ll find it all the time. It&rsquo;s remarkable to me, in fact, that he was able to do this and to be considered exceptional for it. But he did stick to it, and he did therefore understand how great, noble ideas can turn into their opposite, and thus that in 1984, freedom is slavery, and war is peace, and people live with the negation because they believe the party or the authority or the dictator who claimed it in the first place, and they didn&rsquo;t have the nerve to doubt it because if they were wrong, if they had themselves been fooled, then what would it make them?</p>
+
+<p>I&rsquo;ve talked up till now about power, and I think I&rsquo;ll stop at this point and invite your questions by just saying this: power is only what you allow it to be. Very many people put up with political lying, political illusions, and political propaganda because if they were to denounce it, they would have to admit that for many decades, they had themselves been fooled, that they had been taken for granted, that they had allowed themselves, so to speak, to be deceived. The con man&rsquo;s work is always done for him by the victim. The victim doesn&rsquo;t want to go to the police and say, &ldquo;I&rsquo;ve been conned. I was so stupid that I did this.&rdquo; They don&rsquo;t wish to admit it. So, in a subtle and deadly way, the dictator can dirty enough people up to make them all complicit in his rule or, I suppose, her rule. He can make them the tortured yet willing, masochistic, complicit element in his own sadistic mania.</p>
+
+<p>Now, what you can&rsquo;t necessarily do about power or about authority, you can do for yourselves and your fellow readers, and for those students and fellow citizens. You can resolve not to be a citizen like you can resolve not to do the work of power for it. You can resolve not to let lies be told in your hearing. You can resolve not to use sloppy language that is euphemism. And then, I think I&rsquo;ll leave it. I think, if you realize that the reading of Orwell is not an exercise in projecting blame on others, but is an exercise in accepting responsibility for yourself and/or for yourselves, and it&rsquo;s for that reason that he&rsquo;ll always be honored, and also that he&rsquo;ll always be hated, and I think he wouldn&rsquo;t have had it any other way. And as a chronicler of his, neither would I. So, I&rsquo;m now your hostage, ladies and gentlemen. Thank you for being mine for a bit.</p>
+
+    </div>
+
+    <div class="source-note">
+      Speech delivered at <a href="https://christophererichitchens.com/why-orwell-matters-the-commonwealth-club-2005/">The Commonwealth Club</a>, 2005. Transcript.
+    </div>
+
+  </div>
+
+  <!-- Right Column: Sidebar -->
+  <div class="sidebar-column">
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" id="tab-questions" onclick="switchTab('questions')">Questions</button>
+      <button class="sidebar-tab" id="tab-vocab" onclick="switchTab('vocab')">Vocab</button>
+    </div>
+    <div class="sidebar-content">
+      <div class="sidebar-panel active" id="panel-questions">
+        <div id="questions-container"></div>
+      </div>
+      <div class="sidebar-panel" id="panel-vocab">
+        <div class="vocab-instruction">Select any word in the article to look it up and save it to your vocabulary list.</div>
+        <div class="vocab-count-badge" id="vocab-count"></div>
+        <div id="vocab-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="vocab-popup">
+  <button class="popup-close" onclick="dismissPopup()">&times;</button>
+  <div id="popup-content"></div>
+</div>
+
+<div class="bottom-bar">
+  <span class="stat">~6,000 words</span>
+  <span class="stat">Units: <strong>5</strong></span>
+  <button class="done-btn" id="done-btn" onclick="toggleDone()">Mark as Read</button>
+  <button class="reopen-btn" id="reopen-btn" onclick="toggleDone()" style="display:none">Reopen</button>
+  <span class="done-msg" id="done-msg"></span>
+</div>
+
+<script src="../../db.js"></script>
+<script>
+// === Config ===
+const CHILD = (window.location.hash || "#tepi").slice(1).toLowerCase() || "tepi";
+const ARTICLE_ID = "w5_hitchens_why_orwell_matters";
+const ARTICLE_TITLE = "Why Orwell Matters (Hitchens)";
+const QUESTIONS = [
+  { level: 1, label: "The Big Idea", text: "Hitchens says Orwell understood the \u2018pornographic element\u2019 of power \u2014 that some people wield authority not for any reason, but because they enjoy it. Can you think of a real example of this, from history or from your own life? It doesn\u2019t have to be political \u2014 it could be a coach, a teacher, or anyone with authority." },
+  { level: 2, label: "Language as a Weapon", text: "Hitchens uses the example of \u2018collateral damage\u2019 \u2014 a technical term that hides the reality of civilian deaths. Why is it easier for people to accept a euphemism than plain language? What would change if news reports always said \u2018we killed civilians\u2019 instead?" },
+  { level: 3, label: "The Hardest Fight", text: "Hitchens says Orwell\u2019s hardest struggle wasn\u2019t fighting fascism in Spain \u2014 it was \u2018facing that policeman in himself.\u2019 He had to fight his own potential for racism and cruelty. Why is fighting something inside yourself harder than fighting an external enemy?" }
+];
+
+const PLAN_SYNC = {
+  tepi: { storageKey: "tepi_q2_2026", taskKey: "w5_t0" },
+  guaimei: { storageKey: "guaimei_q2_2026", taskKey: "w5_t0" }
+};
+const SUB_INDEX = 0; // first reading sub-task (s0)
+
+const STORAGE_DONE = `article_${CHILD}_${ARTICLE_ID}`;
+const STORAGE_ANSWERS = `answers_${CHILD}_${ARTICLE_ID}`;
+const STORAGE_VOCAB = `vocab_${CHILD}`;
+const childName = CHILD === "tepi" ? "TePi" : "GuaiMei";
+const defCache = new Map();
+
+document.getElementById("reader-name").textContent = childName;
+
+// === Sidebar Tabs ===
+function switchTab(tab) {
+  document.getElementById("tab-questions").classList.toggle("active", tab === "questions");
+  document.getElementById("tab-vocab").classList.toggle("active", tab === "vocab");
+  document.getElementById("panel-questions").classList.toggle("active", tab === "questions");
+  document.getElementById("panel-vocab").classList.toggle("active", tab === "vocab");
+}
+
+// === Vocab Popup ===
+function handleTextSelection() {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  let text = sel.toString().trim().replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, "");
+  if (!text || text.includes(" ") || text.length < 2) return;
+  const anchor = sel.anchorNode;
+  if (anchor && (anchor.nodeName === "TEXTAREA" || (anchor.parentElement && anchor.parentElement.nodeName === "TEXTAREA"))) return;
+  const range = sel.getRangeAt(0);
+  showPopup(text.toLowerCase(), range.getBoundingClientRect());
+}
+function showPopup(word, rect) {
+  const popup = document.getElementById("vocab-popup");
+  document.getElementById("popup-content").innerHTML = '<div class="popup-word">' + word + '</div><div class="popup-loading">Looking up...</div>';
+  popup.style.display = "block";
+  var top = rect.top - 210; if (top < 10) top = rect.bottom + 10;
+  var left = Math.max(10, Math.min(rect.left + rect.width/2 - 150, window.innerWidth - 350));
+  popup.style.top = top + "px"; popup.style.left = left + "px";
+  fetchDefinition(word);
+}
+async function fetchDefinition(word) {
+  if (defCache.has(word)) { renderPopupDef(word, defCache.get(word)); return; }
+  try {
+    const resp = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(word));
+    if (!resp.ok) throw new Error("Not found");
+    const data = await resp.json();
+    const phonetic = data[0].phonetic || (data[0].phonetics && data[0].phonetics.find(function(p){return p.text}) || {}).text || "";
+    var defText = "";
+    var meanings = data[0].meanings || [];
+    for (var mi = 0; mi < meanings.length; mi++) {
+      var m = meanings[mi];
+      defText += '<em>(' + m.partOfSpeech + ')</em> ' + ((m.definitions[0] || {}).definition || '') + '<br>';
+      if (defText.split("<br>").length > 3) break;
+    }
+    var result = { phonetic: phonetic, definition: defText || "No definition found." };
+    defCache.set(word, result);
+    renderPopupDef(word, result);
+  } catch(e) {
+    document.getElementById("popup-content").innerHTML =
+      '<div class="popup-word">' + word + '</div>' +
+      '<div class="popup-error">No definition found. Type your own:</div>' +
+      '<textarea class="popup-manual" id="manual-def" rows="2" placeholder="Type definition..."></textarea>' +
+      '<div class="popup-btns"><button class="btn-add" onclick="addFromPopup(\'' + word + '\',true)">+ Add to ' + childName + '\'s Vocab</button></div>';
+  }
+}
+function renderPopupDef(word, result) {
+  var inVocab = getVocab().some(function(v) { return v.word === word; });
+  document.getElementById("popup-content").innerHTML =
+    '<div class="popup-word">' + word + '</div>' +
+    (result.phonetic ? '<div class="popup-phonetic">' + result.phonetic + '</div>' : '') +
+    '<div class="popup-def">' + result.definition + '</div>' +
+    '<div class="popup-btns">' +
+    (inVocab
+      ? '<button class="btn-added" disabled>Already in ' + childName + '\'s list</button>'
+      : '<button class="btn-add" onclick="addFromPopup(\'' + word + '\',false)">+ Add to ' + childName + '\'s Vocab</button>') +
+    '</div>';
+}
+function addFromPopup(word, manual) {
+  var def = "";
+  if (manual) {
+    var ta = document.getElementById("manual-def");
+    def = ta ? ta.value.trim() : "";
+    if (!def) { ta.style.borderColor = "var(--accent)"; return; }
+  } else {
+    var cached = defCache.get(word);
+    def = cached ? cached.definition.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : word;
+  }
+  addToVocab(word, def);
+  var btn = event.target;
+  btn.textContent = "Added!"; btn.classList.add("btn-added"); btn.disabled = true;
+  // Auto-switch to vocab tab to show the new word
+  switchTab('vocab');
+  setTimeout(dismissPopup, 500);
+}
+function dismissPopup() { document.getElementById("vocab-popup").style.display = "none"; }
+
+// === Vocab Storage ===
+function getVocab() { try { return JSON.parse(localStorage.getItem(STORAGE_VOCAB)) || []; } catch(e) { return []; } }
+function saveVocabList(list) { try { localStorage.setItem(STORAGE_VOCAB, JSON.stringify(list)); } catch(e) {} }
+function addToVocab(word, definition) {
+  var list = getVocab();
+  if (list.some(function(v) { return v.word === word; })) return;
+  list.push({ word: word, definition: definition, source: ARTICLE_ID, sourceTitle: ARTICLE_TITLE, dateAdded: new Date().toISOString().slice(0,10) });
+  saveVocabList(list);
+  renderVocabPanel();
+}
+function removeFromVocab(word) {
+  saveVocabList(getVocab().filter(function(v) { return v.word !== word; }));
+  renderVocabPanel();
+}
+
+// === Vocab Panel (sidebar) ===
+function renderVocabPanel() {
+  var vocab = getVocab().filter(function(v) { return v.source === ARTICLE_ID; });
+  document.getElementById("vocab-count").textContent = vocab.length ? vocab.length + " word" + (vocab.length > 1 ? "s" : "") + " saved" : "";
+  var listEl = document.getElementById("vocab-list");
+  if (!vocab.length) {
+    listEl.innerHTML = '<div class="vocab-empty">No words saved yet. Select any word in the article to look it up.</div>';
+    return;
+  }
+  listEl.innerHTML = vocab.map(function(v) {
+    return '<div class="vocab-entry"><span class="v-word">' + v.word + '</span><span class="v-def">' + v.definition + '</span>' +
+      '<button class="v-remove" onclick="removeFromVocab(\'' + v.word + '\')" title="Remove">&times;</button></div>';
+  }).join("");
+}
+
+// === Questions ===
+var saveTimer = null;
+function renderQuestions() {
+  document.getElementById("questions-container").innerHTML = QUESTIONS.map(function(q, i) {
+    var n = i + 1;
+    return '<div class="question-card"><div class="q-top"><span class="q-badge q-badge-' + n + '">' + n + '</span>' +
+      '<div><div class="q-label q-label-' + n + '">' + q.label + '</div><div class="q-text">' + q.text + '</div></div></div>' +
+      '<textarea id="answer-' + n + '" placeholder="Write your thoughts..." oninput="scheduleAutoSave()" onblur="saveAnswers()"></textarea>' +
+      '<div class="q-save-indicator" id="save-ind-' + n + '"></div></div>';
+  }).join("");
+}
+function loadAnswers() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORAGE_ANSWERS)) || {};
+    QUESTIONS.forEach(function(_, i) { var ta = document.getElementById("answer-" + (i+1)); if (ta) ta.value = saved["q" + (i+1)] || ""; });
+  } catch(e) {}
+}
+function saveAnswers() {
+  var data = { lastSaved: new Date().toISOString() };
+  var hasContent = false;
+  QUESTIONS.forEach(function(_, i) {
+    var ta = document.getElementById("answer-" + (i+1));
+    var val = ta ? ta.value : "";
+    data["q" + (i+1)] = val;
+    if (val.trim()) hasContent = true;
+  });
+  if (!hasContent) return;
+  try { localStorage.setItem(STORAGE_ANSWERS, JSON.stringify(data)); } catch(e) {}
+  QUESTIONS.forEach(function(_, i) {
+    var ind = document.getElementById("save-ind-" + (i+1));
+    var ta = document.getElementById("answer-" + (i+1));
+    if (ind && ta && ta.value.trim()) { ind.textContent = "\u2713 Saved"; }
+  });
+}
+function scheduleAutoSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveAnswers, 800); }
+
+// === Done / Reopen with Plan Sync ===
+function toggleDone() {
+  var current = localStorage.getItem(STORAGE_DONE);
+  var sync = PLAN_SYNC[CHILD];
+  if (current) {
+    localStorage.removeItem(STORAGE_DONE);
+    document.getElementById("done-btn").classList.remove("completed");
+    document.getElementById("done-btn").textContent = "Mark as Read";
+    document.getElementById("done-btn").style.display = "";
+    document.getElementById("reopen-btn").style.display = "none";
+    document.getElementById("done-msg").textContent = "";
+    if (sync) {
+      var ps = JSON.parse(localStorage.getItem(sync.storageKey)) || {};
+      ps[sync.taskKey + "_s" + SUB_INDEX] = false;
+      ps[sync.taskKey] = false;
+      localStorage.setItem(sync.storageKey, JSON.stringify(ps));
+    }
+  } else {
+    var now = new Date().toLocaleDateString();
+    localStorage.setItem(STORAGE_DONE, now);
+    document.getElementById("done-btn").classList.add("completed");
+    document.getElementById("done-btn").textContent = "Completed";
+    document.getElementById("done-btn").style.display = "none";
+    document.getElementById("reopen-btn").style.display = "";
+    document.getElementById("done-msg").textContent = "Done " + now;
+    if (sync) {
+      var ps2 = JSON.parse(localStorage.getItem(sync.storageKey)) || {};
+      ps2[sync.taskKey + "_s" + SUB_INDEX] = true;
+      if (ps2[sync.taskKey + "_s0"] && ps2[sync.taskKey + "_s1"]) { ps2[sync.taskKey] = true; }
+      localStorage.setItem(sync.storageKey, JSON.stringify(ps2));
+    }
+  }
+}
+function restoreDone() {
+  var done = localStorage.getItem(STORAGE_DONE);
+  if (done) {
+    document.getElementById("done-btn").classList.add("completed");
+    document.getElementById("done-btn").textContent = "Completed";
+    document.getElementById("done-btn").style.display = "none";
+    document.getElementById("reopen-btn").style.display = "";
+    document.getElementById("done-msg").textContent = "Done " + done;
+  }
+}
+
+// === Init ===
+_dbReady.then(function() {
+  renderQuestions();
+  loadAnswers();
+  renderVocabPanel();
+  restoreDone();
+  document.addEventListener("mouseup", function(e) { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 50); });
+  document.addEventListener("touchend", function(e) { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 350); });
+  document.addEventListener("mousedown", function(e) { if (document.getElementById("vocab-popup").style.display === "block" && !document.getElementById("vocab-popup").contains(e.target)) dismissPopup(); });
+  document.addEventListener("keydown", function(e) { if (e.key === "Escape") dismissPopup(); });
+  window.addEventListener("beforeunload", saveAnswers);
+});
+</script>
+</body>
+</html>
