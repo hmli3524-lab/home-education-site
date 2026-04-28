@@ -255,6 +255,7 @@
 
 <script src="../../db.js"></script>
 <script>
+if (typeof _dbReady === "undefined") { window._dbReady = Promise.resolve(); }
 // === Config ===
 const CHILD = (window.location.hash || "#tepi").slice(1).toLowerCase() || "tepi";
 const ARTICLE_ID = "w1_quanta_lonely_runner";

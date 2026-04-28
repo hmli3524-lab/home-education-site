@@ -231,6 +231,8 @@
 
 <script src="../../db.js"></script>
 <script>
+// Fallback if db.js fails to load
+if (typeof _dbReady === 'undefined') { window._dbReady = Promise.resolve(); }
 // === Config ===
 const CHILD = (window.location.hash || "#tepi").slice(1).toLowerCase() || "tepi";
 const ARTICLE_ID = "w5_hitchens_why_orwell_matters";

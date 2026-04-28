@@ -401,6 +401,7 @@
 
 <script src="../db.js"></script>
 <script>
+if (typeof _dbReady === "undefined") { window._dbReady = Promise.resolve(); }
 const TASK_ICONS = {"Math":"🔢","Reading":"📰","Books":"📚","Vocab":"📖","Writing":"✍️","Project":"🛠️"};
 function iconFor(label) {
   for (const [k,v] of Object.entries(TASK_ICONS)) { if (label.includes(k)) return v; }

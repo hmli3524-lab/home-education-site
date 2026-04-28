@@ -614,6 +614,7 @@ Was Smith? Was Jones? Were you?
 
 <script src="../../db.js"></script>
 <script>
+if (typeof _dbReady === "undefined") { window._dbReady = Promise.resolve(); }
 // === Config ===
 const CHILD = (window.location.hash || "#tepi").slice(1).toLowerCase() || "tepi";
 const ARTICLE_ID = "w2_orwell_why_i_write";
