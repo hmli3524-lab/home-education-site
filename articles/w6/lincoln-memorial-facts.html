@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 Things You May Not Know About the Lincoln Memorial — Christopher Klein</title>
+<style>
+  :root {
+    --bg: #2b2d31; --surface: #313338; --card: #383a40; --accent: #e8555a;
+    --accent2: #9b6dd7; --gold: #e0a82e; --text: #e0e0e0; --muted: #999;
+    --green: #57d9a3; --teal: #4ecdc4; --border: #44464d; --shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+
+  .top-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); flex-wrap: wrap; }
+  .back-btn { background: var(--card); border: 1px solid var(--border); color: var(--teal); padding: 6px 16px; border-radius: 6px; font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; text-decoration: none; }
+  .back-btn:hover { background: var(--border); }
+  .top-meta { font-size: 0.85em; color: var(--muted); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .top-meta .tag { background: rgba(78,205,196,0.15); color: var(--teal); padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+  .top-meta .tag-source { background: rgba(224,168,46,0.15); color: var(--gold); padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+  .reader-name { margin-left: auto; background: var(--accent2); color: #fff; padding: 5px 16px; border-radius: 8px; font-size: 0.88em; font-weight: 700; }
+
+  /* Two-Column Grid */
+  .page-grid { display: grid; grid-template-columns: 1fr 380px; gap: 0; max-width: 1200px; margin: 0 auto; }
+  .article-column { padding: 40px 32px 80px; min-width: 0; }
+  .sidebar-column { position: sticky; top: 60px; height: calc(100vh - 60px); border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); }
+  .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .sidebar-tab { flex: 1; padding: 12px; text-align: center; background: none; border: none; color: var(--muted); font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; }
+  .sidebar-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .sidebar-tab:hover:not(.active) { color: var(--text); }
+  .sidebar-content { flex: 1; overflow-y: auto; padding: 16px; }
+  .sidebar-panel { display: none; }
+  .sidebar-panel.active { display: block; }
+  @media (max-width: 900px) {
+    .page-grid { grid-template-columns: 1fr; }
+    .sidebar-column { position: static; height: auto; border-left: none; border-top: 2px solid var(--border); }
+  }
+
+  /* Article */
+  .article-header { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .article-header h1 { font-size: 1.8em; font-weight: 700; line-height: 1.3; margin-bottom: 8px; color: #fff; }
+  .article-header .subtitle { font-size: 1.02em; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+  .article-header .author { font-size: 1em; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
+  .article-header .pub-info { font-size: 0.9em; color: var(--muted); display: flex; flex-wrap: wrap; gap: 16px; }
+  .guide-box { background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.25); border-radius: 10px; padding: 18px 22px; margin-bottom: 32px; }
+  .guide-box h3 { color: var(--teal); font-size: 0.95em; margin-bottom: 8px; }
+  .guide-box p { font-size: 0.92em; line-height: 1.7; }
+  .guide-box .tip { margin-top: 10px; font-size: 0.88em; color: var(--muted); font-style: italic; }
+  .essay-text { user-select: text; -webkit-user-select: text; }
+  .essay-text p { margin-bottom: 1.4em; font-size: 1.02em; text-align: justify; }
+  .essay-text h2 { font-size: 1.2em; color: var(--gold); margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .source-note { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.82em; color: var(--muted); font-style: italic; }
+  .source-note a { color: var(--muted); }
+
+  /* Vocab Popup */
+  #vocab-popup { display: none; position: fixed; z-index: 200; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); padding: 16px 18px; max-width: 340px; min-width: 240px; }
+  #vocab-popup .popup-word { font-size: 1.1em; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  #vocab-popup .popup-phonetic { font-size: 0.82em; color: var(--muted); margin-bottom: 8px; }
+  #vocab-popup .popup-def { font-size: 0.9em; color: var(--text); line-height: 1.6; margin-bottom: 12px; max-height: 120px; overflow-y: auto; }
+  #vocab-popup .popup-loading { color: var(--muted); font-size: 0.9em; padding: 8px 0; }
+  #vocab-popup .popup-error { color: var(--accent); font-size: 0.88em; margin-bottom: 8px; }
+  #vocab-popup .popup-manual { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: inherit; font-size: 0.88em; padding: 6px 10px; margin-bottom: 10px; resize: none; }
+  #vocab-popup .popup-manual:focus { border-color: var(--teal); outline: none; }
+  #vocab-popup .popup-btns { display: flex; gap: 8px; }
+  #vocab-popup .popup-btns button { flex: 1; padding: 7px 10px; border: none; border-radius: 6px; font-family: inherit; font-size: 0.82em; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  #vocab-popup .popup-btns button:hover { opacity: 0.85; }
+  .btn-add { background: var(--accent2); color: #fff; }
+  .btn-added { background: var(--green) !important; color: #1a1a1a !important; }
+  #vocab-popup .popup-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--muted); font-size: 1.1em; cursor: pointer; line-height: 1; }
+  #vocab-popup .popup-close:hover { color: var(--text); }
+
+  /* Questions (sidebar) */
+  .question-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .question-card .q-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .q-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82em; font-weight: 700; color: #1a1a1a; flex-shrink: 0; }
+  .q-badge-1 { background: var(--teal); } .q-badge-2 { background: var(--gold); } .q-badge-3 { background: var(--accent); color: #fff; }
+  .q-label { font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .q-label-1 { color: var(--teal); } .q-label-2 { color: var(--gold); } .q-label-3 { color: var(--accent); }
+  .q-text { font-size: 0.95em; font-weight: 600; line-height: 1.5; }
+  .question-card textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.92em; padding: 12px 14px; resize: vertical; min-height: 200px; line-height: 1.7; }
+  .question-card textarea:focus { border-color: var(--teal); outline: none; }
+  .question-card textarea::placeholder { color: #555; }
+  .q-save-indicator { font-size: 0.8em; color: var(--green); margin-top: 6px; min-height: 18px; }
+
+  /* Vocab Panel (sidebar) */
+  .vocab-instruction { font-size: 0.88em; color: var(--muted); font-style: italic; margin-bottom: 16px; padding: 10px 12px; background: rgba(78,205,196,0.06); border-radius: 8px; line-height: 1.6; }
+  .vocab-entry { display: flex; align-items: flex-start; gap: 12px; padding: 10px 4px; border-bottom: 1px solid var(--border); }
+  .vocab-entry:last-child { border-bottom: none; }
+  .vocab-entry .v-word { font-weight: 700; color: var(--teal); min-width: 80px; font-size: 0.92em; }
+  .vocab-entry .v-def { font-size: 0.88em; color: var(--muted); flex: 1; line-height: 1.5; }
+  .vocab-entry .v-remove { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 1em; padding: 0 4px; flex-shrink: 0; }
+  .vocab-entry .v-remove:hover { color: #ff7777; }
+  .vocab-empty { padding: 16px 4px; font-size: 0.88em; color: var(--muted); font-style: italic; }
+  .vocab-count-badge { font-size: 0.82em; color: var(--teal); font-weight: 600; margin-bottom: 12px; }
+
+  /* Bottom Bar */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 10px 24px; display: flex; justify-content: center; align-items: center; gap: 20px; z-index: 100; box-shadow: 0 -2px 8px rgba(0,0,0,0.15); font-size: 0.88em; }
+  .bottom-bar .stat { color: var(--muted); } .bottom-bar .stat strong { color: var(--teal); }
+  .done-btn { background: var(--teal); color: #1a1a1a; border: none; padding: 6px 24px; border-radius: 6px; font-family: inherit; font-size: 0.88em; font-weight: 600; cursor: pointer; }
+  .done-btn:hover { opacity: 0.9; } .done-btn.completed { background: var(--green); }
+  .reopen-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 6px 16px; border-radius: 6px; font-family: inherit; font-size: 0.82em; cursor: pointer; }
+  .reopen-btn:hover { color: var(--text); border-color: var(--text); }
+  .done-msg { color: var(--green); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .article-header h1 { font-size: 1.4em; }
+    .article-column { padding: 24px 16px 80px; }
+    .top-bar { padding: 10px 14px; gap: 10px; }
+    .reader-name { margin-left: 0; }
+    #vocab-popup { max-width: 90vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-btn" onclick="history.back()">&#8592; Back to Plan</a>
+  <div class="top-meta">
+    <span class="tag">Week 6</span>
+    <span class="tag-source">History.com</span>
+    <span>Article &middot; ~1,500 words &middot; ~8 min</span>
+  </div>
+  <div class="reader-name" id="reader-name"></div>
+</div>
+
+<div class="page-grid">
+
+  <!-- Left Column: Article -->
+  <div class="article-column">
+    <div class="article-header">
+      <h1>10 Things You May Not Know About the Lincoln Memorial</h1>
+      <div class="author">Christopher Klein</div>
+      <div class="pub-info">
+        <span><a href="https://www.history.com/articles/lincoln-memorial-facts" style="color:var(--muted);text-decoration:none;">History.com</a></span>
+        <span>Article</span>
+      </div>
+    </div>
+
+    <div class="guide-box">
+      <h3>Before You Read</h3>
+      <p>This article is about a building you&rsquo;ve probably seen in photos a hundred times. But there are secrets hiding in plain sight &mdash; a corrected typo, a bullet scar from WWII, an underground cave with stalactites, and a dedication ceremony that contradicted everything Lincoln stood for. Read this before your DC trip and you&rsquo;ll see the memorial differently than 99% of visitors.</p>
+      <p class="tip">Tip: Select any unfamiliar word to look it up and save it to your vocabulary list.</p>
+    </div>
+
+    <div class="essay-text" id="essay-text">
+
+<p>The Lincoln Memorial has been one of America&rsquo;s most iconic landmarks since opening in 1922. The neoclassical monument honoring Abraham Lincoln is the most visited tourist site in Washington, D.C. It appears on the back of pennies and five-dollar bills. It has been both a backdrop in memorable movie scenes and center stage for seminal moments in American history such as the 1939 concert by opera singer Marian Anderson and the 1963 &ldquo;I Have a Dream&rdquo; speech by Martin Luther King, Jr.</p>
+
+<h2>1. The memorial opened nearly 60 years after Lincoln&rsquo;s assassination.</h2>
+
+<p>Although calls to erect a national monument in Lincoln&rsquo;s honor started almost immediately after his assassination, the project dragged on for decades. After the U.S. Congress in 1867 authorized construction of a monument on the U.S. Capitol grounds, sculptor Clark Mills designed a memorial tiered like a wedding cake that was cluttered with dozens of statues and topped by a bronzed depiction of Lincoln signing the Emancipation Proclamation. Fundraising, however, sputtered during Reconstruction, and the project fizzled. Not until 1911 did Congress approve $2 million to build a national memorial. After three years of contentious debate over its location and design and a lengthy construction process slowed by World War I, the Lincoln Memorial opened in 1922.</p>
+
+<h2>2. Rejected designs included an Egyptian pyramid.</h2>
+
+<p>In selecting architect Henry Bacon&rsquo;s design modeled after the Parthenon in Athens, the Lincoln Memorial Commission bypassed several eccentric designs proposed by architect John Russell Pope. In addition to his preferred design for an open-air, neoclassical monument, Pope submitted sketches of alternatives that included a stepped Mayan temple with a massive eternal flame on its summit, a ziggurat topped by a statue of Lincoln and an Egyptian pyramid with classical porticoes on each side. Although passed over for the Lincoln Memorial commission, Pope later submitted the winning design for the Jefferson Memorial.</p>
+
+<h2>3. A former Confederate officer broke ground on the Lincoln Memorial.</h2>
+
+<p>At the monument&rsquo;s groundbreaking on February 12, 1914, Lincoln Memorial Commission member Joseph Blackburn &ldquo;turned the first spadeful of sod,&rdquo; according to The New York Times. Prior to representing the martyred president&rsquo;s native state of Kentucky in the U.S. Congress for nearly 30 years, Blackburn served as a lieutenant colonel in the Confederate Army during the Civil War. &ldquo;This memorial will show that Lincoln is now regarded as the greatest of all Americans,&rdquo; the former Confederate officer said at the simple groundbreaking ceremony, &ldquo;and that he is so held by the South as well as the North.&rdquo;</p>
+
+<h2>4. The memorial&rsquo;s walls and columns tilt inward.</h2>
+
+<p>Although the memorial looks perfectly symmetrical, it&rsquo;s an optical illusion. The structure&rsquo;s exterior walls, facades and columns were purposely built to lean slightly inward, according to the National Park Service, &ldquo;to compensate for perspective distortions which would otherwise make the memorial appear asymmetrical.&rdquo;</p>
+
+<h2>5. Lincoln&rsquo;s hands carry symbolic meanings.</h2>
+
+<p>Daniel Chester French, who sculpted the 19-foot-high statue of Lincoln for the memorial, invested considerable thought in how to position the president&rsquo;s hands. &ldquo;It has always seemed to me that the hands in portraiture were only secondary to the face in expression, and I depend quite as much upon them in showing character in force,&rdquo; the sculptor wrote. French depicted Lincoln with his left hand clenched to symbolize his determination to see the Civil War through to its conclusion and his right hand open to represent a desire to welcome the vanquished Confederacy back into the Union without vengeance.</p>
+
+<h2>6. Six brothers carved Lincoln&rsquo;s statue in the Bronx.</h2>
+
+<p>French tasked six brothers who had emigrated from Italy with chiseling Lincoln&rsquo;s likeness out of 28 blocks of white Georgia marble. Already renowned for carving the New York Stock Exchange&rsquo;s pediment and the Washington Square Arch in Greenwich Village, the Piccirilli brothers carved the slabs in their sprawling workshop in the New York City borough of the Bronx. When finished, the enormous blocks were transported to the memorial and delicately assembled like puzzle pieces with nearly invisible seams. Although French proposed engraving &ldquo;Piccirilli Brothers&rdquo; into the statue&rsquo;s plinth, the humble carvers refused the honor.</p>
+
+<h2>7. A giant underground chamber sits beneath Lincoln&rsquo;s statue.</h2>
+
+<p>Since the Lincoln Memorial is located on land reclaimed from the Potomac River&rsquo;s tidal flats, 122 enormous concrete pillars and a foundation as deep as 65 feet in some spots were built to anchor the massive monument to bedrock. A three-story basement, known as the undercroft, sits below the memorial&rsquo;s pink Tennessee marble floor. The cellar doesn&rsquo;t contain any secrets, but stalactites hang from the ceiling of the cave-like area and cartoons scrawled by the memorial&rsquo;s builders cover its pillars.</p>
+
+<h2>8. A corrected typo can be seen on its walls.</h2>
+
+<p>A worker who possibly grabbed the wrong stencil accidentally chiseled &ldquo;EUTURE&rdquo; instead of &ldquo;FUTURE&rdquo; when etching the words of Lincoln&rsquo;s Second Inaugural Address into the memorial&rsquo;s north wall. Although the bottom line of the &ldquo;E&rdquo; was filled in to correct the flub before the memorial&rsquo;s dedication, remnants of the misspelling can still be spotted by a discerning eye.</p>
+
+<h2>9. The dedication ceremony was racially segregated.</h2>
+
+<p>While Confederate veterans were given seats of honor as a sign of national unity at the Lincoln Memorial&rsquo;s dedication on Memorial Day in 1922, gun-toting soldiers ushered Black spectators far from the monument and behind a rope barrier to segregate them from white onlookers. &ldquo;The conditions which confronted us as a race were most shameful,&rdquo; wrote W.E.B. DuBois. Tuskegee Institute president Dr. Robert Russa Moton, the lone African American speaker at the dedication, was barred from sitting on the platform with his fellow orators, and the White House heavily censored his speech to remove comments about the need for further progress on racial justice such as this line about Lincoln: &ldquo;This memorial which we erect in token of our veneration is but a hollow mockery, a symbol of hypocrisy, unless we together can make real in our national life, in every state and in every section, the things for which he died.&rdquo;</p>
+
+<h2>10. &lsquo;Friendly fire&rsquo; struck the Lincoln Memorial in World War II.</h2>
+
+<p>To protect Washington, D.C., from a possible German aerial attack during World War II, the Army installed anti-aircraft guns at strategic locations around the national capital, including on the rooftops of buildings lining the National Mall. In September 1942, a crew accidentally fired four rounds from one of the guns. Three errant shots struck the Lincoln Memorial&rsquo;s facade above the entrance. Luckily no visitors were injured, but one round left a lasting scar after gouging out a piece of marble the size of a baseball.</p>
+
+    </div>
+
+    <div class="source-note">
+      Originally published on <a href="https://www.history.com/articles/lincoln-memorial-facts">History.com</a> by Christopher Klein.
+    </div>
+
+  </div>
+
+  <!-- Right Column: Sidebar -->
+  <div class="sidebar-column">
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" id="tab-questions" onclick="switchTab('questions')">Questions</button>
+      <button class="sidebar-tab" id="tab-vocab" onclick="switchTab('vocab')">Vocab</button>
+    </div>
+    <div class="sidebar-content">
+      <div class="sidebar-panel active" id="panel-questions">
+        <div id="questions-container"></div>
+      </div>
+      <div class="sidebar-panel" id="panel-vocab">
+        <div class="vocab-instruction">Select any word in the article to look it up and save it to your vocabulary list.</div>
+        <div class="vocab-count-badge" id="vocab-count"></div>
+        <div id="vocab-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="vocab-popup">
+  <button class="popup-close" onclick="dismissPopup()">&times;</button>
+  <div id="popup-content"></div>
+</div>
+
+<div class="bottom-bar">
+  <span class="stat">~1,500 words</span>
+  <span class="stat">Units: <strong>6</strong></span>
+  <button class="done-btn" id="done-btn" onclick="toggleDone()">Mark as Read</button>
+  <button class="reopen-btn" id="reopen-btn" onclick="toggleDone()" style="display:none">Reopen</button>
+  <span class="done-msg" id="done-msg"></span>
+</div>
+
+<script src="../../db.js"></script>
+<script>
+// Fallback if db.js fails to load
+if (typeof _dbReady === 'undefined') { window._dbReady = Promise.resolve(); }
+// === Config ===
+const CHILD = (window.location.hash || "#tepi").slice(1).toLowerCase() || "tepi";
+const ARTICLE_ID = "w6_lincoln_memorial_facts";
+const ARTICLE_TITLE = "Lincoln Memorial Facts";
+const QUESTIONS = [
+  { level: 1, label: "The Details", text: "Lincoln\u2019s sculptor put his left hand clenched (determination) and right hand open (welcome without vengeance). If you were designing a statue of a leader today, what hand positions would you choose and what would they symbolize? Think of a specific leader \u2014 it doesn\u2019t have to be a president." },
+  { level: 2, label: "The Contradictions", text: "At the dedication ceremony in 1922, Confederate veterans got seats of honor while Black spectators were forced behind ropes by armed soldiers \u2014 at a memorial for the president who freed the slaves. Dr. Moton\u2019s speech was censored to remove his criticism. What does this tell you about the difference between what a monument symbolizes and how the people around it actually behave?" },
+  { level: 3, label: "The Scavenger Hunt", text: "When you visit the Lincoln Memorial, you can look for: the corrected typo (\u2018EUTURE\u2019 \u2192 \u2018FUTURE\u2019), the World War II bullet scar, and Lincoln\u2019s symbolic hand positions. Pick ONE of these and explain why you think most visitors walk right past it without noticing. What does it take to really see something instead of just looking at it?" }
+];
+
+const PLAN_SYNC = {
+  tepi: { storageKey: "tepi_q2_2026", taskKey: "w6_t1" },
+  guaimei: { storageKey: "guaimei_q2_2026", taskKey: "w6_t0" }
+};
+const SUB_INDEX = 0; // first reading sub-task (s0)
+
+const STORAGE_DONE = `article_${CHILD}_${ARTICLE_ID}`;
+const STORAGE_ANSWERS = `answers_${CHILD}_${ARTICLE_ID}`;
+const STORAGE_VOCAB = `vocab_${CHILD}`;
+const childName = CHILD === "tepi" ? "TePi" : "GuaiMei";
+const defCache = new Map();
+
+document.getElementById("reader-name").textContent = childName;
+
+// === Sidebar Tabs ===
+function switchTab(tab) {
+  document.getElementById("tab-questions").classList.toggle("active", tab === "questions");
+  document.getElementById("tab-vocab").classList.toggle("active", tab === "vocab");
+  document.getElementById("panel-questions").classList.toggle("active", tab === "questions");
+  document.getElementById("panel-vocab").classList.toggle("active", tab === "vocab");
+}
+
+// === Vocab Popup ===
+function handleTextSelection() {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  let text = sel.toString().trim().replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, "");
+  if (!text || text.includes(" ") || text.length < 2) return;
+  const anchor = sel.anchorNode;
+  if (anchor && (anchor.nodeName === "TEXTAREA" || (anchor.parentElement && anchor.parentElement.nodeName === "TEXTAREA"))) return;
+  const range = sel.getRangeAt(0);
+  showPopup(text.toLowerCase(), range.getBoundingClientRect());
+}
+function showPopup(word, rect) {
+  const popup = document.getElementById("vocab-popup");
+  document.getElementById("popup-content").innerHTML = '<div class="popup-word">' + word + '</div><div class="popup-loading">Looking up...</div>';
+  popup.style.display = "block";
+  var top = rect.top - 210; if (top < 10) top = rect.bottom + 10;
+  var left = Math.max(10, Math.min(rect.left + rect.width/2 - 150, window.innerWidth - 350));
+  popup.style.top = top + "px"; popup.style.left = left + "px";
+  fetchDefinition(word);
+}
+async function fetchDefinition(word) {
+  if (defCache.has(word)) { renderPopupDef(word, defCache.get(word)); return; }
+  try {
+    const resp = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(word));
+    if (!resp.ok) throw new Error("Not found");
+    const data = await resp.json();
+    const phonetic = data[0].phonetic || (data[0].phonetics && data[0].phonetics.find(function(p){return p.text}) || {}).text || "";
+    var defText = "";
+    var meanings = data[0].meanings || [];
+    for (var mi = 0; mi < meanings.length; mi++) {
+      var m = meanings[mi];
+      defText += '<em>(' + m.partOfSpeech + ')</em> ' + ((m.definitions[0] || {}).definition || '') + '<br>';
+      if (defText.split("<br>").length > 3) break;
+    }
+    var result = { phonetic: phonetic, definition: defText || "No definition found." };
+    defCache.set(word, result);
+    renderPopupDef(word, result);
+  } catch(e) {
+    document.getElementById("popup-content").innerHTML =
+      '<div class="popup-word">' + word + '</div>' +
+      '<div class="popup-error">No definition found. Type your own:</div>' +
+      '<textarea class="popup-manual" id="manual-def" rows="2" placeholder="Type definition..."></textarea>' +
+      '<div class="popup-btns"><button class="btn-add" onclick="addFromPopup(\'' + word + '\',true)">+ Add to ' + childName + '\'s Vocab</button></div>';
+  }
+}
+function renderPopupDef(word, result) {
+  var inVocab = getVocab().some(function(v) { return v.word === word; });
+  document.getElementById("popup-content").innerHTML =
+    '<div class="popup-word">' + word + '</div>' +
+    (result.phonetic ? '<div class="popup-phonetic">' + result.phonetic + '</div>' : '') +
+    '<div class="popup-def">' + result.definition + '</div>' +
+    '<div class="popup-btns">' +
+    (inVocab
+      ? '<button class="btn-added" disabled>Already in ' + childName + '\'s list</button>'
+      : '<button class="btn-add" onclick="addFromPopup(\'' + word + '\',false)">+ Add to ' + childName + '\'s Vocab</button>') +
+    '</div>';
+}
+function addFromPopup(word, manual) {
+  var def = "";
+  if (manual) {
+    var ta = document.getElementById("manual-def");
+    def = ta ? ta.value.trim() : "";
+    if (!def) { ta.style.borderColor = "var(--accent)"; return; }
+  } else {
+    var cached = defCache.get(word);
+    def = cached ? cached.definition.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : word;
+  }
+  addToVocab(word, def);
+  var btn = event.target;
+  btn.textContent = "Added!"; btn.classList.add("btn-added"); btn.disabled = true;
+  // Auto-switch to vocab tab to show the new word
+  switchTab('vocab');
+  setTimeout(dismissPopup, 500);
+}
+function dismissPopup() { document.getElementById("vocab-popup").style.display = "none"; }
+
+// === Vocab Storage ===
+function getVocab() { try { return JSON.parse(localStorage.getItem(STORAGE_VOCAB)) || []; } catch(e) { return []; } }
+function saveVocabList(list) { try { localStorage.setItem(STORAGE_VOCAB, JSON.stringify(list)); } catch(e) {} }
+function addToVocab(word, definition) {
+  var list = getVocab();
+  if (list.some(function(v) { return v.word === word; })) return;
+  list.push({ word: word, definition: definition, source: ARTICLE_ID, sourceTitle: ARTICLE_TITLE, dateAdded: new Date().toISOString().slice(0,10) });
+  saveVocabList(list);
+  renderVocabPanel();
+}
+function removeFromVocab(word) {
+  saveVocabList(getVocab().filter(function(v) { return v.word !== word; }));
+  renderVocabPanel();
+}
+
+// === Vocab Panel (sidebar) ===
+function renderVocabPanel() {
+  var vocab = getVocab().filter(function(v) { return v.source === ARTICLE_ID; });
+  document.getElementById("vocab-count").textContent = vocab.length ? vocab.length + " word" + (vocab.length > 1 ? "s" : "") + " saved" : "";
+  var listEl = document.getElementById("vocab-list");
+  if (!vocab.length) {
+    listEl.innerHTML = '<div class="vocab-empty">No words saved yet. Select any word in the article to look it up.</div>';
+    return;
+  }
+  listEl.innerHTML = vocab.map(function(v) {
+    return '<div class="vocab-entry"><span class="v-word">' + v.word + '</span><span class="v-def">' + v.definition + '</span>' +
+      '<button class="v-remove" onclick="removeFromVocab(\'' + v.word + '\')" title="Remove">&times;</button></div>';
+  }).join("");
+}
+
+// === Questions ===
+var saveTimer = null;
+function renderQuestions() {
+  document.getElementById("questions-container").innerHTML = QUESTIONS.map(function(q, i) {
+    var n = i + 1;
+    return '<div class="question-card"><div class="q-top"><span class="q-badge q-badge-' + n + '">' + n + '</span>' +
+      '<div><div class="q-label q-label-' + n + '">' + q.label + '</div><div class="q-text">' + q.text + '</div></div></div>' +
+      '<textarea id="answer-' + n + '" placeholder="Write your thoughts..." oninput="scheduleAutoSave()" onblur="saveAnswers()"></textarea>' +
+      '<div class="q-save-indicator" id="save-ind-' + n + '"></div></div>';
+  }).join("");
+}
+function loadAnswers() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORAGE_ANSWERS)) || {};
+    QUESTIONS.forEach(function(_, i) { var ta = document.getElementById("answer-" + (i+1)); if (ta) ta.value = saved["q" + (i+1)] || ""; });
+  } catch(e) {}
+}
+function saveAnswers() {
+  var data = { lastSaved: new Date().toISOString() };
+  var hasContent = false;
+  QUESTIONS.forEach(function(_, i) {
+    var ta = document.getElementById("answer-" + (i+1));
+    var val = ta ? ta.value : "";
+    data["q" + (i+1)] = val;
+    if (val.trim()) hasContent = true;
+  });
+  if (!hasContent) return;
+  try { localStorage.setItem(STORAGE_ANSWERS, JSON.stringify(data)); } catch(e) {}
+  QUESTIONS.forEach(function(_, i) {
+    var ind = document.getElementById("save-ind-" + (i+1));
+    var ta = document.getElementById("answer-" + (i+1));
+    if (ind && ta && ta.value.trim()) { ind.textContent = "\u2713 Saved"; }
+  });
+}
+function scheduleAutoSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveAnswers, 800); }
+
+// === Done / Reopen with Plan Sync ===
+function toggleDone() {
+  var current = localStorage.getItem(STORAGE_DONE);
+  var sync = PLAN_SYNC[CHILD];
+  if (current) {
+    localStorage.removeItem(STORAGE_DONE);
+    document.getElementById("done-btn").classList.remove("completed");
+    document.getElementById("done-btn").textContent = "Mark as Read";
+    document.getElementById("done-btn").style.display = "";
+    document.getElementById("reopen-btn").style.display = "none";
+    document.getElementById("done-msg").textContent = "";
+    if (sync) {
+      var ps = JSON.parse(localStorage.getItem(sync.storageKey)) || {};
+      ps[sync.taskKey + "_s" + SUB_INDEX] = false;
+      ps[sync.taskKey] = false;
+      localStorage.setItem(sync.storageKey, JSON.stringify(ps));
+    }
+  } else {
+    var now = new Date().toLocaleDateString();
+    localStorage.setItem(STORAGE_DONE, now);
+    document.getElementById("done-btn").classList.add("completed");
+    document.getElementById("done-btn").textContent = "Completed";
+    document.getElementById("done-btn").style.display = "none";
+    document.getElementById("reopen-btn").style.display = "";
+    document.getElementById("done-msg").textContent = "Done " + now;
+    if (sync) {
+      var ps2 = JSON.parse(localStorage.getItem(sync.storageKey)) || {};
+      ps2[sync.taskKey + "_s" + SUB_INDEX] = true;
+      if (ps2[sync.taskKey + "_s0"] && ps2[sync.taskKey + "_s1"]) { ps2[sync.taskKey] = true; }
+      localStorage.setItem(sync.storageKey, JSON.stringify(ps2));
+    }
+  }
+}
+function restoreDone() {
+  var done = localStorage.getItem(STORAGE_DONE);
+  if (done) {
+    document.getElementById("done-btn").classList.add("completed");
+    document.getElementById("done-btn").textContent = "Completed";
+    document.getElementById("done-btn").style.display = "none";
+    document.getElementById("reopen-btn").style.display = "";
+    document.getElementById("done-msg").textContent = "Done " + done;
+  }
+}
+
+// === Init ===
+_dbReady.then(function() {
+  renderQuestions();
+  loadAnswers();
+  renderVocabPanel();
+  restoreDone();
+  document.addEventListener("mouseup", function(e) { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 50); });
+  document.addEventListener("touchend", function(e) { if (!document.getElementById("vocab-popup").contains(e.target)) setTimeout(handleTextSelection, 350); });
+  document.addEventListener("mousedown", function(e) { if (document.getElementById("vocab-popup").style.display === "block" && !document.getElementById("vocab-popup").contains(e.target)) dismissPopup(); });
+  document.addEventListener("keydown", function(e) { if (e.key === "Escape") dismissPopup(); });
+  window.addEventListener("beforeunload", saveAnswers);
+});
+</script>
+</body>
+</html>
